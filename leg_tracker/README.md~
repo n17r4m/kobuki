@@ -1,0 +1,49 @@
+# Leg Detector
+for ROS Hydro Catkin. 
+
+
+
+## To run 
+
+###To run the leg tracker
+
+See leg_tracker.launch for an example.
+
+It uses the detections from the display_leg_cluster_probabilities node and the tracker in scripts/kalman_track.py to do multi-target tracking via Kalman filters.
+
+
+###To view probabilities of laser segments being legs
+
+rosrun display_cluster_probabilities random_forest.yaml scan_topic laser_frame 
+
+See display_cluster_probabilities_smart_wheeler.launch for an example.
+
+It will show a coloured sphere in the centre of each laser scan cluster. 
+The more pink the sphere is, the more likely it is a leg.
+
+
+
+## To re-train
+
+###To train leg detector with a random forest
+
+rosrun leg_detector train_leg_detector --pos positive.bag --neg negative.bag --test test.bag --save trained_leg_detector.yaml
+
+You can have multiple bags for each category. E.g.:
+rosrun leg_detector train_leg_detector --pos positive1.bag --pos positive2.bag --pos positive3.bag --neg negative.bag --test test.bag --save trained_leg_detector.yaml
+
+See train_leg_detector_smart_wheeler.launch for an example. The machine-learning features are in calc_leg_features.cpp. 
+
+Note: the positive bags must have positive segments annotated via extract_positive_training_clusters
+
+
+###To run extract positive training examples
+
+rosrun leg_detector load.bag save.bag scan_topic laser_frame min_angle max_angle max_dist
+
+See extract_positive_training_clusters.launch for an example. 
+
+This will annotate all clusters within the range of [min_angle, max_angle] of the laser scan and within max_dist.
+It marks all scan segments within that range as legs using a geometry_msgs::PoseArray message.
+You can play back save.bag to view the annotations in Rviz to make sure it worked properly. 
+

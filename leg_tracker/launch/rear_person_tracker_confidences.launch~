@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<launch>
+  <arg name="forest_file" value="$(find leg_tracker)/config/trained_leg_detector_very_negative.yaml" />
+  <arg name="scan_topic" value="/rear_scan" />
+  <arg name="laser_frame" value="rear_laser" />
+  <arg name="fixed_frame" value="rear_laser" />
+  <arg name="detection_threshold" value="0.0" />
+  <node pkg="leg_tracker" type="display_cluster_probabilities" name="display_cluster_probabilities" 
+    args="$(arg forest_file) $(arg scan_topic) $(arg laser_frame) $(arg fixed_frame) $(arg detection_threshold)" output="screen"/>
+  
+  <node pkg="leg_tracker" type="kalman_confidence_person_tracker.py" name="kalman_confidence_person_tracker"
+    args="$(arg fixed_frame)" output="screen"/>
+  
+  <!--<node pkg="rviz" type="rviz" name="rviz"/>      -->
+</launch>
+

@@ -1,0 +1,5 @@
+<launch>
+  <node name="laser_point_publisher_front" pkg="frg_rover" type="laser_point_publisher_front.py"/>
+  <node name="point_follower_front" pkg="frg_rover" type="point_follower_front.py"/>
+
+</launch>

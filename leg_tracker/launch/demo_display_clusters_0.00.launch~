@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<launch>
+  <arg name="forest_file" value="$(find leg_tracker)/config/trained_leg_detector.yaml" />
+  <arg name="scan_topic" value="/right_scan" />
+  <arg name="laser_frame" value="right_laser" />
+  <arg name="fixed_frame" value="right_laser" />
+  <arg name="detection_threshold" value="0.0" />
+  <node pkg="leg_tracker" type="display_cluster_probabilities" name="display_cluster_probabilities" 
+    args="$(arg forest_file) $(arg scan_topic) $(arg laser_frame) $(arg fixed_frame) $(arg detection_threshold)" output="screen"/>
+  
+  <node pkg="rviz" type="rviz" name="rviz"/>
+  
+  <node pkg="rosbag" type="play" name="player" output="screen" required="true" 
+    args="--delay=3 --clock /home/angus/rosbags/angus2/follow_andrew_leg_train_everything_15_2014-03-07-14-43-17.bag"/>
+    
+  <param name="use_sim_time" value="true" />
+  
+  <!--<param name="robot_description" command="$(find xacro)/xacro.py '$(find smart_wheeler)/model/SmartWheeler_model.urdf.xacro'" />-->
+  
+    
+</launch>
+

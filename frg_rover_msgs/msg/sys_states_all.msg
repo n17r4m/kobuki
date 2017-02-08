@@ -1,0 +1,10 @@
+uint16 state0
+uint16 state1
+uint16 state2
+uint16 state3
+uint16 state4
+uint16 state5
+uint16 state6
+uint16 state7
+uint16 state8
+uint16 state9

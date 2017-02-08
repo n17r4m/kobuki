@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<launch>
+  <arg name="pos_bag_1" value="$(find leg_tracker)/leg_detector_training_bags_poly/positive_1.bag" />
+  <arg name="pos_bag_2" value="$(find leg_tracker)/leg_detector_training_bags_poly/positive_2.bag" />
+  <arg name="pos_bag_3" value="$(find leg_tracker)/leg_detector_training_bags_poly/positive_3.bag" />
+  <arg name="pos_bag_4" value="$(find leg_tracker)/leg_detector_training_bags_poly/positive_4.bag" />
+  <arg name="pos_bag_6" value="$(find leg_tracker)/leg_detector_training_bags_poly/positive_6.bag" />
+  <arg name="pos_bag_7" value="$(find leg_tracker)/leg_detector_training_bags_poly/positive_7.bag" />
+  <arg name="pos_scan_topic" value="/training_scan" />
+
+  <arg name="neg_bag_1" value="$(find leg_tracker)/leg_detector_training_bags_poly/negative_1.bag" />
+  <arg name="neg_bag_2" value="$(find leg_tracker)/leg_detector_training_bags_poly/negative_2.bag" />
+  <arg name="neg_bag_3" value="$(find leg_tracker)/leg_detector_training_bags_poly/negative_3.bag" />
+  <arg name="neg_bag_4" value="$(find leg_tracker)/leg_detector_training_bags_poly/negative_4.bag" />
+  <arg name="neg_bag_9" value="$(find leg_tracker)/leg_detector_training_bags_poly/negative_9.bag" />
+  <arg name="neg_scan_topic_1" value="/left_scan" />
+  <arg name="neg_scan_topic_2" value="/right_scan" />
+  <arg name="neg_scan_topic_3" value="/rear_scan" />
+
+  <arg name="test_neg_bag" value="$(find leg_tracker)/leg_detector_training_bags_poly/test_negative.bag" />
+
+  <arg name="save_forest_file" value="$(find leg_tracker)/config/trained_leg_detector.yaml" />
+  <node pkg="leg_tracker" type="train_leg_detector" name="train_leg_detector" required="true"
+        args="--test_pos $(arg pos_bag_1) $(arg pos_scan_topic)
+              --pos $(arg pos_bag_2) $(arg pos_scan_topic) 
+              --pos $(arg pos_bag_3) $(arg pos_scan_topic) 
+              --pos $(arg pos_bag_4) $(arg pos_scan_topic) 
+              --pos $(arg pos_bag_6) $(arg pos_scan_topic) 
+              --pos $(arg pos_bag_7) $(arg pos_scan_topic) 
+              --neg $(arg neg_bag_1) $(arg neg_scan_topic_1) 
+              --neg $(arg neg_bag_1) $(arg neg_scan_topic_2) 
+              --neg $(arg neg_bag_1) $(arg neg_scan_topic_3) 
+              --neg $(arg neg_bag_2) $(arg neg_scan_topic_1) 
+              --neg $(arg neg_bag_2) $(arg neg_scan_topic_2) 
+              --neg $(arg neg_bag_2) $(arg neg_scan_topic_3) 
+              --neg $(arg neg_bag_3) $(arg neg_scan_topic_1) 
+              --neg $(arg neg_bag_3) $(arg neg_scan_topic_2) 
+              --neg $(arg neg_bag_3) $(arg neg_scan_topic_3) 
+              --neg $(arg neg_bag_4) $(arg neg_scan_topic_1) 
+              --neg $(arg neg_bag_4) $(arg neg_scan_topic_2) 
+              --neg $(arg neg_bag_4) $(arg neg_scan_topic_3) 
+              --neg $(arg neg_bag_9) $(arg neg_scan_topic_1) 
+              --neg $(arg neg_bag_9) $(arg neg_scan_topic_2) 
+              --neg $(arg neg_bag_9) $(arg neg_scan_topic_3) 
+              --test_neg $(arg test_neg_bag) $(arg neg_scan_topic_1) 
+              --test_neg $(arg test_neg_bag) $(arg neg_scan_topic_2) 
+              --test_neg $(arg test_neg_bag) $(arg neg_scan_topic_3) 
+              --save $(arg save_forest_file)" output="screen"/>
+</launch>
+
+

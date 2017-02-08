@@ -1,0 +1,16 @@
+<launch>
+
+  <node pkg="hokuyo_node" type="hokuyo_node" name="base_hokuyo_node">
+    <param name="port" type="string" value="/dev/ttyACM0" />
+    <remap from="scan" to="scan_laser" />
+    <param name="frame_id" type="string" value="base_laser_link" />
+    <param name="min_ang" type="double" value="-.60" />
+    <param name="max_ang" type="double" value="0.60" />
+    <param name="skip" type="int" value="0" />
+    <param name="intensity" value="false" />
+  </node>
+
+  <node name="collision_avoidance_2016" pkg="frg_rover" type="collision_avoidance_2016.py" output="screen"/>
+
+</launch>
+

@@ -1,0 +1,366 @@
+#!/usr/bin/python
+
+import rospy
+import roslib
+from geometry_msgs.msg import Pose, PoseArray
+from visualization_msgs.msg import Marker
+from pykalman import KalmanFilter # Third party library. To install: http://pykalman.github.io/#installation
+import numpy as np
+import numpy.ma as ma
+from munkres import Munkres, print_matrix # Third party library. For the minimum matching assignment problem. To install: https://pypi.python.org/pypi/munkres 
+import random
+from collections import deque
+import sys
+import timeit
+
+
+# Note: this uses a discrete kalman filter and depends on being called at a set frequency, otherwise it messes up. 
+# So if it can't keep up with the rate of incomming laser scans, it won't work as well 
+# (I haven't found any problem with this when roughly 20 people were in the frame though)
+
+
+
+# A single person who is tracked via a Kalman filter
+class Person:
+    def __init__(self, x, y, id_num): 
+        self.id_num = id_num
+        self.colour = (random.random(), random.random(), random.random())
+    
+        self.last_seen = 0
+        self.times_seen = 1
+        
+        self.confidences = deque(maxlen=10)
+
+
+        # People are tracked via a constant-velocity Kalman filter with a Gaussian acceleration distrubtion
+        self.filtered_state_means = np.array([x, y, 0, 0])
+        self.pos_x = self.filtered_state_means[0]
+        self.pos_y = self.filtered_state_means[1]
+        self.vel_x = self.filtered_state_means[2]
+        self.vel_y = self.filtered_state_means[3]
+       
+        self.filtered_state_covariances = np.zeros(4)
+ 
+        # Kalman filter params
+        delta_t = 1./7.5  # TODO anything better here than just hardcoding the dt in?????
+        var_pos = 0.5#1 
+        var_vel = 0.5#10
+        var_obs = 0.5#100
+
+        # Constant velocity motion model
+        transition_matrix = np.array([[1, 0, delta_t,        0],
+                                      [0, 1,       0,  delta_t],
+                                      [0, 0,       1,        0],
+                                      [0, 0,       0,        1]])
+
+        # Oberservation model. Can observe pos.x and pos.y (unless person is occluded - we deal with this later). 
+        observation_matrix = np.array([[1, 0, 0, 0],
+                                       [0, 1, 0, 0]])
+
+        # Covariance for velocity is higher than for position as we are assuming a constant velocity model with noisy accelerations
+        transition_covariance = np.array([[var_pos,       0,       0,       0],
+                                          [      0, var_pos,       0,       0],
+                                          [      0,       0, var_vel,       0],
+                                          [      0,       0,       0, var_vel]])
+
+        observation_covariance =  var_obs*np.eye(2)
+
+        self.kf = KalmanFilter(
+            transition_matrices=transition_matrix,
+            observation_matrices=observation_matrix,
+            transition_covariance=transition_covariance,
+            observation_covariance=observation_covariance,
+        )
+    
+    def get_max_confidence(self):
+        # TODO try getting average confidence instead???
+        max_confidence = None
+        for confidence in self.confidences:
+            max_confidence = max(max_confidence, confidence)
+        
+        return max_confidence
+
+        
+    
+
+
+
+# Tracker for tracking all the people
+class KalmanTracker:
+    MAX_UNSEEN_FRAMES = 10#20
+    MAX_LEG_PAIRING_DIST = 0.4#0.6
+    MAX_MATCH_DIST = 0.8#1.0#1.5#2.0
+    MIN_TIMES_SEEN_BEFORE_PUBLISH = 4
+    SURE_ITS_A_LEG = 0.30  
+    MIN_MATCH_PROBABILITY = 0.01
+    PAIR_REQUIRED_TO_INITIATE = 1
+
+
+    def __init__(self):  
+        self.person_list = []
+        self.new_person_id_num = 0 # unique id to assign to newly found persons
+                
+        # ROS stuff        
+        self.people_tracked_pub = rospy.Publisher('people_tracked', PoseArray)
+        self.marker_pub = rospy.Publisher('visualization_marker', Marker)
+        self.sub = rospy.Subscriber('detected_leg_clusters', PoseArray, self.detected_leg_clusters_callback)
+        
+        # TODO have this as a rosparam instead
+        self.FIXED_FRAME = None
+        if len(sys.argv) == 4:
+            self.FIXED_FRAME = sys.argv[1]
+        else:
+            print "ERRORS: incorrect number of arguments passed to kalman_confidence_person_tracker"
+
+
+    # Called every time display_leg_cluster_probabilities publishes new sets of detected legs. 
+    def detected_leg_clusters_callback(self,msg):   
+        tic=timeit.default_timer()
+
+    
+        # Attempt to pair legs. Assign pairs or isolated legs to detected_persons.       
+        detected_persons = []
+        matched_legs = set()
+        detections_from_two_legs = set()
+    
+        # Construct matrix of probability of matching all legs to each other
+        p_pair = []       
+        for leg_index_1, leg_1 in enumerate(msg.poses): 
+            new_row = []
+            for leg_index_2, leg_2 in enumerate(msg.poses): 
+                if leg_index_1 == leg_index_2:
+                    # Probability of matching a leg to itself is 0
+                    new_row.append(999999.) # 
+                else:
+                    # Probability of matching a leg to another is based on euclidian distance
+                    dist = ((leg_1.position.x-leg_2.position.x)**2 + (leg_1.position.y-leg_2.position.y)**2)**(1./2.)
+                    new_row.append(dist)
+            if new_row:
+                p_pair.append(new_row)
+                    
+                    
+        # Make sure cost matrix is square for Munkres (see below). Newly created elements have dist of 99999
+        if p_pair:
+            rows = len(p_pair)
+            cols = len(p_pair[0])
+            if rows > cols: # more rows than cols
+                for i in xrange(rows):
+                    for j in range(rows-cols):
+                        p_match[i].append(999999.)
+            else: # more cols than rows
+                for i in xrange(cols-rows):
+                    new_row = []
+                    for j in xrange(cols):
+                        new_row.append(999999.)
+                    p_match.append(new_row)
+ 
+ 
+            
+        # Minimum matching algorithm of leg pairs.
+        if p_pair:
+            munkres = Munkres()
+            indexes = munkres.compute(p_pair)
+            for leg_index_1, leg_index_2 in indexes:
+                if p_pair[leg_index_1][leg_index_2] < self.MAX_LEG_PAIRING_DIST and leg_index_1 not in matched_legs and leg_index_2 not in matched_legs:
+                    # Found a pair of legs which are closer together than MAX_LEG_PAIRING_DIST 
+                    leg_1 = msg.poses[leg_index_1]  
+                    leg_2 = msg.poses[leg_index_2]  
+                    detected_persons.append(((leg_1.position.x+leg_2.position.x)/2., (leg_1.position.y+leg_2.position.y)/2., max(leg_1.position.z, leg_2.position.z))) # note: the z position is actually the detection confidence. We'll take the max of the two legs TODO should probably add the two confidences... or something                    
+                    matched_legs.add(leg_index_2)
+                    matched_legs.add(leg_index_1)
+                    detections_from_two_legs.add(len(detected_persons)-1)
+
+            # Legs that weren't paired are assigned to individual detections
+            for leg_index, leg in enumerate(msg.poses): 
+                if leg_index not in matched_legs: # no matching leg was found
+                    detected_persons.append((leg.position.x, leg.position.y, leg.position.z))
+                    matched_legs.add(leg_index)
+    
+ 
+
+
+
+ 
+ 
+ 
+ 
+         
+
+        # Construct matrix of probability of matching between all persons and all detections.
+        p_match = []
+        for detect_index, detect in enumerate(detected_persons): 
+            new_row = []
+            for person_index, person in enumerate(self.person_list):
+                euclid_dist = ((detect[0]-person.pos_x)**2 + (detect[1]-person.pos_y)**2)**(1./2.)
+                
+                # p_euclid = 1.0 if euclid_dist == 0, p_euclid = 0.0 if euclid_dist > MAX_MATCH_DIST and it is linearly interpolated in between 
+                p_euclid = max(0., (self.MAX_MATCH_DIST - euclid_dist)/self.MAX_MATCH_DIST) 
+                
+                # p_confidence = 1.0 if detection confidence >= SURE_ITS_A_LEG, p_confidence = 0 if detection confidence == 0 and it is linearly interpolated in between
+                p_confidence = min(1., detect[2] / self.SURE_ITS_A_LEG)
+                p_combined = p_euclid*p_confidence
+                new_row.append(p_combined)
+            if new_row:
+                p_match.append(new_row)
+        
+        # Make sure cost matrix is square for Munkres (see below). Newly created elements have probability = 0.
+        if p_match:
+            rows = len(p_match)
+            cols = len(p_match[0])
+            if rows > cols: # more rows than cols
+                for i in xrange(rows):
+                    for j in range(rows-cols):
+                        p_match[i].append(0.)
+            else: # more cols than rows
+                for i in xrange(cols-rows):
+                    new_row = []
+                    for j in xrange(cols):
+                        new_row.append(0.)
+                    p_match.append(new_row)
+
+        observations = {}
+        confidence = {}
+        matched_persons = set()
+        matched_detections = set()     
+            
+        # Minimum matching algorithm of person detections to existing person tracks.
+        if p_match:
+            munkres = Munkres()
+            
+            # Create new matrix with the element-wise inverse of the p_match. Because munkres only finds the lowest possible assignments and we wanted the highest. 
+            inv_p_match = munkres.make_cost_matrix(p_match, lambda cost: 1.0 - cost)
+
+            indexes = munkres.compute(inv_p_match)
+            for detect_index, person_index in indexes:
+                if p_match[detect_index][person_index] > self.MIN_MATCH_PROBABILITY:
+                    observations[person_index] = np.array([detected_persons[detect_index][0], detected_persons[detect_index][1]])
+                    confidence[person_index] = detected_persons[detect_index][2]
+                    matched_persons.add(person_index)
+                    matched_detections.add(detect_index)
+                
+                  
+        # update persons's positions with new oberservations 
+        person_list_to_delete = []      
+        for person_index, person in enumerate(self.person_list):
+            if not person_index in matched_persons: # if a person was not matched to an observation, given them an "observation missing" but still update their kalman filter
+                observations[person_index] = ma.masked_array(np.array([0, 0]), mask=[1,1])
+                person.last_seen += 1
+                person.confidences.append(0)
+                if person.last_seen > self.MAX_UNSEEN_FRAMES or person.get_max_confidence() < self.SURE_ITS_A_LEG:
+                    person_list_to_delete.insert(0, person_index)
+            else:
+                person.last_seen = 0
+                person.times_seen += 1
+                person.confidences.append(confidence[person_index])
+                
+            person.filtered_state_means, person.filtered_state_covariances = (
+                person.kf.filter_update(
+                    person.filtered_state_means,
+                    person.filtered_state_covariances,
+                    observations[person_index]
+                )
+            )
+            person.pos_x = person.filtered_state_means[0]
+            person.pos_y = person.filtered_state_means[1]
+            person.vel_x = person.filtered_state_means[2]
+            person.vel_y = person.filtered_state_means[3]
+
+            
+            
+        # if detections were not match, create a new person  
+        for detect_index, detect in enumerate(detected_persons):      
+            if not detect_index in matched_detections:
+                if (not self.PAIR_REQUIRED_TO_INITIATE) or (self.PAIR_REQUIRED_TO_INITIATE and detect_index in detections_from_two_legs):
+                    if detect[2] > self.SURE_ITS_A_LEG:
+                        new_person = Person(detect[0], detect[1], self.new_person_id_num)
+                        new_person.confidences.append(detect[2])    
+                        self.person_list.append(new_person)
+                        self.new_person_id_num += 1
+
+            
+            
+        # delete persons that haven't been seen for a while
+        for delete_index in person_list_to_delete:
+            del self.person_list[delete_index]
+            
+        toc=timeit.default_timer()
+        elapsed_time = toc-tic
+        if elapsed_time > 0.001:
+            rospy.loginfo("leg_tracker took a long time to run: %f", elapsed_time)
+
+            
+
+    # Publish markers representing estimates of peoples' positions for display in Rviz
+    def publish_people(self):
+        people_tracked = PoseArray()
+        for person in self.person_list:
+            if person.times_seen >= self.MIN_TIMES_SEEN_BEFORE_PUBLISH:
+                # publish once to people_tracked topic
+                new_pose = Pose()
+                new_pose.position.x = person.pos_x
+                new_pose.position.y = person.pos_y
+                new_pose.position.z = person.id_num # overloading the z position again to actually mean the id number!!!!
+                people_tracked.poses.append(new_pose)
+                              
+                # publish rviz markers
+                for i in xrange(0,2): # publish two markers for each peron: one for body and one for head
+                    marker = Marker()
+                    marker.header.frame_id = self.FIXED_FRAME
+                    marker.id = person.id_num+200*i
+                    marker.lifetime = rospy.Duration.from_sec(0.2)
+                    if i==0: # cylinder for body shape
+                        marker.type = Marker.CYLINDER
+                        marker.scale.x = 0.3
+                        marker.scale.y = 0.3
+                        marker.scale.z = 0.8
+                    else: # sphere for head shape
+                        marker.type = Marker.SPHERE
+                        marker.scale.x = 0.3
+                        marker.scale.y = 0.3
+                        marker.scale.z = 0.3                 
+                    marker.color.r = person.colour[0]
+                    marker.color.g = person.colour[1]
+                    marker.color.b = person.colour[2]                                        
+                    marker.color.a = (self.MAX_UNSEEN_FRAMES - person.last_seen)/float(self.MAX_UNSEEN_FRAMES)
+                    marker.pose.position.x = person.pos_x
+                    marker.pose.position.y = person.pos_y
+                    if i==0:
+                        marker.pose.position.z = 0.4
+                    else:
+                        marker.pose.position.z = 0.95
+                    self.marker_pub.publish(marker)
+                    
+        self.people_tracked_pub.publish(people_tracked)
+
+        
+
+
+    def spin(self):
+        rate = rospy.Rate(10)
+        while not rospy.is_shutdown():
+            self.publish_people()
+            rate.sleep()
+
+
+
+if __name__ == '__main__':
+    rospy.init_node('multi_person_kalman_tracker', anonymous=True)
+    mpkt = KalmanTracker()
+    mpkt.spin()
+
+
+#        for leg_index_1, leg_1 in enumerate(msg.poses): 
+#            for leg_index_2, leg_2 in enumerate(msg.poses): 
+#                if leg_index_1 != leg_index_2 and leg_index_1 not in matched_legs and leg_index_2 not in matched_legs:
+#                    dist = ((leg_1.position.x-leg_2.position.x)**2 + (leg_1.position.y-leg_2.position.y)**2)**(1./2.)
+#                    if dist < self.MAX_LEG_PAIRING_DIST: # found a matching leg
+#                        detected_persons.append(((leg_1.position.x+leg_2.position.x)/2., (leg_1.position.y+leg_2.position.y)/2., max(leg_1.position.z, leg_2.position.z))) # note: the z position is actually the detection confidence. We'll take the max of the two legs TODO should probably add the two confidences... or something
+#                        matched_legs.add(leg_index_1)
+#                        matched_legs.add(leg_index_2)
+#                        detections_from_two_legs.add(len(detected_persons)-1)
+#            if leg_index_1 not in matched_legs: # no matching leg was found
+#                detected_persons.append((leg_1.position.x, leg_1.position.y, leg_1.position.z))
+#                matched_legs.add(leg_index_1)
+
+
+

@@ -1,0 +1,8 @@
+<launch>
+  <node name="sys_states_publisher" pkg="frg_rover" type="sys_states_publisher.py"/>
+  <node name="rover_motion_control" pkg="frg_rover" type="rover_motion_control.py"/>
+  <node name="joystick_state_publisher" pkg="frg_rover" type="joystick_state_publisher.py"/>
+  <node name="collision_avoidance_v1" pkg="frg_rover" type="collision_avoidance_v1.py"/>
+
+
+</launch>
