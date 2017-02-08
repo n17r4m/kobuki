@@ -153,7 +153,7 @@
 	but not real time implementation. In real time, each frame should go through
 	an independent detection. </p>
 
-	<h2>The other solution</h2>
+	<h2>Another solution</h2>
 	<p>
 		The idea I had to track a robot is to use image threshold to extract things in black, and then use morphological transformation to remove all the noises. Once we got all in black in the image, then use the image moments to get the centroid point of the largest black block. Store the coordinate of the centroid point x and y into a data structure that has x, y and z. Then, use the depth image to get the distance between two robotics. Fill the z into the last parameter of the data structure and then publish the topic of the point coordinate. To detect if the follower need to turn, compute the subtraction of the x to see if the angle is big enough to turn. To detect if the follower need to move forward or backward, compute the subtraction of the z. 
 	</p>
@@ -166,7 +166,7 @@
 	<p>
 		The URL of the source code is: https://github.com/jjones646/turtlebot-follower
 	</p>
-	
+
 
 </body>
 </html>
