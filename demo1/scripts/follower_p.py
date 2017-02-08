@@ -21,8 +21,9 @@ class Follower:
     self.cmd_vel_pub = rospy.Publisher('cmd_vel_mux/input/teleop',
                                        Twist, queue_size=1)
     self.joy_sub = rospy.Subscriber('/joy', Joy, self.joy_callback)
-    self.twists = []
-
+    self.xtwists = []
+    self.ztwists = []
+    
     self.err_pred = []
     self.err_past = []
 
@@ -55,7 +56,8 @@ class Follower:
   def joy_callback(self, data):
     if data.buttons[0]:
       self.go = not self.go
-      self.twists = []
+      self.xtwists = []
+      self.ztwists = []
 
   def image_callback(self, msg):
     image = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
@@ -89,14 +91,22 @@ class Follower:
       err = cx - w/2
       self.err_past.append(err)
       
-      twist = Twist()
-      twist.linear.x = 0.1
-      twist.angular.z = -float(err) / 100 #+ (theta - 45 ) / 100
-      self.twists.append(twist)
+      
+      
+      
+      x = 0.1
+      z = -float(err) / 100 #+ (theta - 45 ) / 100
+      self.xtwists.append(x)
+      self.ztwists.append(z)
       
       if self.go:
-        if len(self.twists) > 20:
-          self.cmd_vel_pub.publish(self.twists.pop(0))
+        if len(self.xtwists) > 20:
+          twist = Twist()
+          twist.linear.x = np.mean(self.xtwists)
+          twist.angular.z = np.mean(self.ztwists)
+          self.cmd_vel_pub.publish(twist)
+          self.xtwists.pop(0)
+          self.ztwists.pop(0)
         
       # END CONTROL
     cv2.imshow("window", mask)
