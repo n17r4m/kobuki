@@ -14,7 +14,7 @@ class Follower:
   def __init__(self):
     cv2.namedWindow("window", 1)
     self.srv = Server(lineColorConfig, self.cfg_callback)
-    self.go = False
+    self.go = True
     self.stop = False
     self.bridge = cv_bridge.CvBridge()
     self.image_sub = rospy.Subscriber('camera/rgb/image_raw',
@@ -31,28 +31,28 @@ class Follower:
     self.lower_yellow = np.array([ 10,  10,  10])
     self.upper_yellow = np.array([255, 255, 250])
 
-    self.lower_blue = 79
-    self.lower_green = 150
-    self.lower_red = 0
-    self.upper_blue = 225
-    self.upper_green = 255
-    self.upper_red = 101
+    self.lower_hue = 79
+    self.lower_sat = 150
+    self.lower_value = 0
+    self.upper_hue = 225
+    self.upper_sat = 255
+    self.upper_value = 101
 
-    self.lowerbound_blue = np.array([self.lower_blue, self.lower_green, self.lower_red])
-    self.upperbound_blue = np.array([self.upper_blue, self.upper_green, self.upper_red])
+    self.lowerbound_blue = np.array([self.lower_hue, self.lower_sat, self.lower_value])
+    self.upperbound_blue = np.array([self.upper_hue, self.upper_sat, self.upper_value])
 
-    self.web_cap = cv2.VideoCapture(0)
+    #self.web_cap = cv2.VideoCapture(0)
 
   def cfg_callback(self, data, level):
-      self.upper_red = data['upper_red']
-      self.lower_red = data['lower_red']
-      self.upper_green = data['upper_green']
-      self.lower_green = data['lower_green']
-      self.upper_blue = data['upper_blue']
-      self.lower_blue = data['lower_blue']
+      self.upper_value = data['upper_value']
+      self.lower_value = data['lower_value']
+      self.upper_sat = data['upper_sat']
+      self.lower_sat = data['lower_sat']
+      self.upper_hue = data['upper_hue']
+      self.lower_hue = data['lower_hue']
 
-      self.lowerbound_blue = np.array([self.lower_blue, self.lower_green, self.lower_red])
-      self.upperbound_blue = np.array([self.upper_blue, self.upper_green, self.upper_red])
+      self.lowerbound_blue = np.array([self.lower_hue, self.lower_sat, self.lower_value])
+      self.upperbound_blue = np.array([self.upper_hue, self.upper_sat, self.upper_value])
       return data
 
 
@@ -146,7 +146,8 @@ class Follower:
       x = 0.2
       z = - ( (float(err) / 150 + (theta - 45) /250 ))
 
-      if self.go and (not self.stop):
+      #if self.go and (not self.stop):
+      if self.go:
         self.xtwists.append(x)
         self.ztwists.append(z)
 
@@ -163,6 +164,6 @@ class Follower:
 
 rospy.init_node('follower')
 follower = Follower()
-follower.webcam()
+#follower.webcam()
 rospy.spin()
 # END ALL
