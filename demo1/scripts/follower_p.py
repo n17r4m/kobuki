@@ -25,7 +25,7 @@ class Follower:
     self.xtwists = []
     self.ztwists = []
 
-    self.err_pred = []
+    self.theta_past = []
     self.err_past = []
 
     self.lower_yellow = np.array([ 10,  10,  10])
@@ -123,24 +123,34 @@ class Follower:
       M02_ = int(M['m02']) - pow(int(M['m01']),2) / int(M['m00'])
       M20_ = int(M['m20']) - pow(int(M['m10']),2) / int(M['m00'])
       M11_ = int(M['m11']) - int(M['m10']) * int(M['m01']) / int(M['m00'])
-      theta = 0
+
+      theta = 45
       if not M20_ - M02_ == 0:
         tan2th = 2 * M11_ / (M20_ - M02_)
         theta = math.degrees(math.atan(tan2th)/2)
         rospy.loginfo("degree is "+ str(theta) )
       # BEGIN CONTROL
       err = cx - w/2
-      self.err_past.append(err)
+      if len(self.err_past) > 5:
+        self.err_past.pop(0)
+      else:
+        self.err_past.append(err)
 
-      x = 0.3
-      z = -float(err) / 100 #+ (theta - 45 ) / 100)
+      if len(self.theta_past) > 5:
+        self.theta_past.pop(0)
+      else:
+        self.theta_past.append(theta)
+      #err = np.mean(self.err_past)
+      print np.mean(np.diff(self.theta_past)/0.01 )
 
-      print self.go
+      x = 0.2
+      z = - ( (float(err) / 150 + (theta - 45) /250 ))
+
       if self.go and (not self.stop):
         self.xtwists.append(x)
         self.ztwists.append(z)
 
-        if len(self.xtwists) > 7:
+        if len(self.xtwists) > 8:
           twist = Twist()
           twist.linear.x = np.mean(self.xtwists)
           twist.angular.z = np.mean(self.ztwists)
