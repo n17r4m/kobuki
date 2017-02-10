@@ -1,0 +1,2 @@
+followbot
+-DCATKIN_DEVEL_PREFIX=/home/martin/Documents/Classes/Cmput412/devel -DCMAKE_INSTALL_PREFIX=/home/martin/Documents/Classes/Cmput412/install -G Unix Makefiles
