@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package>
+  <name>racer</name>
+  <version>0.0.0</version>
+  <description>The racer package</description>
+  <maintainer email="n17r4m@gmail.com">Martin Humphreys</maintainer>
+  <license>BSD</license>
+  <author email="n17r4m@gmail.com">Martin Humphreys</author>
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>rospy</build_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>gazebo_ros</run_depend>
+  <export>
+    <gazebo_ros gazebo_media_path="${prefix}"/>
+  </export>
+</package>

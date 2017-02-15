@@ -7,8 +7,5 @@
 # new environment variables
 
 # modified environment variables
-export CMAKE_PREFIX_PATH="/home/martin/Documents/Classes/Cmput412/devel:$CMAKE_PREFIX_PATH"
-export LD_LIBRARY_PATH="/home/martin/Documents/Classes/Cmput412/devel/lib:$LD_LIBRARY_PATH"
 export PWD="/home/martin/Documents/Classes/Cmput412/build"
-export ROSLISP_PACKAGE_DIRECTORIES="/home/martin/Documents/Classes/Cmput412/devel/share/common-lisp"
-export ROS_PACKAGE_PATH="/home/martin/Documents/Classes/Cmput412/src:$ROS_PACKAGE_PATH"
+export PYTHONPATH="/opt/ros/kinetic/lib/python2.7/dist-packages:/home/martin/Documents/Classes/Cmput412/devel/lib/python2.7/dist-packages"

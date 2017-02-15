@@ -1,2 +1,6 @@
 # Hashes of file build rules.
+75bee279cc9b4017d1d01358066b07d7 /home/martin/Documents/Classes/Cmput412/devel/include/demo1/lineColorConfig.h
+960d20befa8c1cdc136953420591f716 /home/martin/Documents/Classes/Cmput412/devel/include/racer/lineColorConfig.h
 c097784e542f5a0ee57a31820f57e037 CMakeFiles/clean_test_results
+5531935e673715bb537f91c1020e1d6a demo1/CMakeFiles/demo1_gencfg
+e02f430fcfe4c8792955d1892ec9ef14 racer/CMakeFiles/racer_gencfg

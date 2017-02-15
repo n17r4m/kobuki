@@ -1,0 +1,12 @@
+\subsubsection usage Usage
+\verbatim
+<node name="follower" pkg="demo1" type="follower">
+  <param name="upper_value" type="int" value="255" />
+  <param name="lower_value" type="int" value="150" />
+  <param name="upper_sat" type="int" value="255" />
+  <param name="lower_sat" type="int" value="150" />
+  <param name="upper_hue" type="int" value="130" />
+  <param name="lower_hue" type="int" value="110" />
+</node>
+\endverbatim
+
