@@ -158,7 +158,7 @@ class Follower:
         right[:, 0:w/2] = 0
 
 
-        left = cv2.inRange(left, (0,0,230), (123, 255, 255))
+        left = cv2.inRange(left, self.lowerbound_yellow, self.upperbound_yellow)
         right = cv2.inRange(right, self.lowerbound_white, self.upperbound_white)
 
         #left = self.minpool(left)
@@ -169,7 +169,7 @@ class Follower:
 
         mask = left + right
 
-        mask = cv2.bilateralFilter(mask, 5, 1, 10)
+        #mask = cv2.bilateralFilter(mask, 10, 1, 10)
 
         if M_left['m00'] > 0 and M_right['m00'] > 0:
             cx_left = int(M_left['m10']/M_left['m00'])
