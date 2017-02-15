@@ -5,7 +5,9 @@ import numpy as np
 from sensor_msgs.msg import Image
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Joy
+from std_msgs.msg import Float32
 import math
+import time
 
 from dynamic_reconfigure.server import Server
 from demo1.cfg import lineColorConfig
@@ -14,7 +16,7 @@ class Follower:
   def __init__(self):
     cv2.namedWindow("window", 1)
     self.srv = Server(lineColorConfig, self.cfg_callback)
-    self.go = True
+    self.go = False
     self.stop = False
     self.bridge = cv_bridge.CvBridge()
     self.image_sub = rospy.Subscriber('camera/rgb/image_raw',
@@ -26,7 +28,7 @@ class Follower:
     self.ztwists = []
 
     self.theta_past = []
-    self.err_past = []
+    self.err_past = [0]
 
     self.lower_yellow = np.array([ 10,  10,  10])
     self.upper_yellow = np.array([255, 255, 250])
@@ -42,6 +44,13 @@ class Follower:
     self.upperbound_blue = np.array([self.upper_hue, self.upper_sat, self.upper_value])
 
     #self.web_cap = cv2.VideoCapture(0)
+    self.time_start = time.clock()
+
+    self.debug_error = rospy.Publisher('debug/error', Float32, queue_size = 5)
+
+    self.P_ = 2
+    self.I_ = 0.1
+    self.D_ = 1.5
 
   def cfg_callback(self, data, level):
       self.upper_value = data['upper_value']
@@ -110,7 +119,7 @@ class Follower:
 
     # larger search area
     h, w, d = image.shape
-    search_top = h / 4 * 3
+    search_top = h / 6 * 5
     search_bot = h
     mask[0:search_top, 0:w] = 0
     mask[search_bot:h, 0:w] = 0
@@ -131,30 +140,40 @@ class Follower:
         rospy.loginfo("degree is "+ str(theta) )
       # BEGIN CONTROL
       err = cx - w/2
-      if len(self.err_past) > 5:
+      e = Float32()
+      e.data = err
+      self.debug_error.publish(err)
+
+      if len(self.err_past) > 10:
         self.err_past.pop(0)
+        self.theta_past.pop(0)
+        self.time_start = time.clock()
       else:
         self.err_past.append(err)
-
-      if len(self.theta_past) > 5:
-        self.theta_past.pop(0)
-      else:
         self.theta_past.append(theta)
-      #err = np.mean(self.err_past)
-      print np.mean(np.diff(self.theta_past)/0.01 )
 
-      x = 0.2
-      z = - ( (float(err) / 150 + (theta - 45) /250 ))
+      #err = np.mean(self.err_past)
+      #print np.mean(np.diff(self.theta_past)/0.01 )
+      current_time = time.clock()
+
+      Kp = - (float(err) / 150 + (theta - 45) /250 )
+      Ki = (max(self.err_past) - min(self.err_past)) * (current_time - self.time_start)
+      Kd = np.mean(np.diff(self.err_past)/100)
+
+      x = 0.6 - abs(float(err)/500)
+      z = self.P_*Kp + self.I_*Ki + self.D_*Kd
+      print z
 
       #if self.go and (not self.stop):
       if self.go:
         self.xtwists.append(x)
         self.ztwists.append(z)
 
-        if len(self.xtwists) > 8:
+        if len(self.xtwists) > 10:
           twist = Twist()
           twist.linear.x = np.mean(self.xtwists)
-          twist.angular.z = np.mean(self.ztwists)
+          #twist.angular.z = np.mean(self.ztwists)
+          twist.angular.z = z
           self.cmd_vel_pub.publish(twist)
           self.xtwists.pop(0)
           self.ztwists.pop(0)
