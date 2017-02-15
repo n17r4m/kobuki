@@ -273,6 +273,18 @@ followbot_BINARY_DIR:STATIC=/home/martin/Documents/Classes/Cmput412/build/follow
 //Value Computed by CMake
 followbot_SOURCE_DIR:STATIC=/home/martin/Documents/Classes/Cmput412/src/followbot
 
+//Value Computed by CMake
+frg_rover_BINARY_DIR:STATIC=/home/martin/Documents/Classes/Cmput412/build/frg_rover
+
+//Value Computed by CMake
+frg_rover_SOURCE_DIR:STATIC=/home/martin/Documents/Classes/Cmput412/src/frg_rover
+
+//Value Computed by CMake
+frg_rover_msgs_BINARY_DIR:STATIC=/home/martin/Documents/Classes/Cmput412/build/frg_rover_msgs
+
+//Value Computed by CMake
+frg_rover_msgs_SOURCE_DIR:STATIC=/home/martin/Documents/Classes/Cmput412/src/frg_rover_msgs
+
 //The directory containing a CMake configuration file for gencpp.
 gencpp_DIR:PATH=/opt/ros/kinetic/share/gencpp/cmake
 
@@ -325,11 +337,20 @@ kobuki_msgs_DIR:PATH=/opt/ros/kinetic/share/kobuki_msgs/cmake
 //Path to a library.
 lib:FILEPATH=/opt/ros/kinetic/lib/libxmlrpcpp.so
 
+//The directory containing a CMake configuration file for message_generation.
+message_generation_DIR:PATH=/opt/ros/kinetic/share/message_generation/cmake
+
 //The directory containing a CMake configuration file for message_runtime.
 message_runtime_DIR:PATH=/opt/ros/kinetic/share/message_runtime/cmake
 
 //The directory containing a CMake configuration file for nav_msgs.
 nav_msgs_DIR:PATH=/opt/ros/kinetic/share/nav_msgs/cmake
+
+//Value Computed by CMake
+navigation_sensors_BINARY_DIR:STATIC=/home/martin/Documents/Classes/Cmput412/build/ihe_turtlebot_wander/navigation_sensors
+
+//Value Computed by CMake
+navigation_sensors_SOURCE_DIR:STATIC=/home/martin/Documents/Classes/Cmput412/src/ihe_turtlebot_wander/navigation_sensors
 
 //Value Computed by CMake
 racer_BINARY_DIR:STATIC=/home/martin/Documents/Classes/Cmput412/build/racer
@@ -469,7 +490,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=5
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=8
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

@@ -29,6 +29,10 @@ class Racer:
         pool[y/2, x/2] = numpy.amin(mask[y:y+1, x:x+1])
     return pool
   
+  def deintersect(self, mask1, mask2):
+    z = numpy.zeros(mask1.shape)
+    return (numpy.maximum(z, mask1 - mask2), numpy.maximum(z, mask2 - mask1))
+  
   
   def image_callback(self, msg):
     image = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
@@ -41,6 +45,10 @@ class Racer:
     hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
     
     solid = self.mask_yellow(hsv)
+    dashed = self.mask_white(hsv)
+    
+    solid, dashed = self.deintersect(solid, dashed)
+    
     pool = self.minpool(solid)
     
     cv2.imshow("hsv", pool)
