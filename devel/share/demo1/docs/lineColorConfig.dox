@@ -2,10 +2,18 @@
 
 Reads and maintains the following parameters on the ROS server
 
-- \b "~upper_value" : \b [int] upper value min: 0, default: 255, max: 255
-- \b "~lower_value" : \b [int] upper value min: 0, default: 150, max: 255
-- \b "~upper_sat" : \b [int] upper sat min: 0, default: 255, max: 255
-- \b "~lower_sat" : \b [int] upper sat min: 0, default: 150, max: 255
-- \b "~upper_hue" : \b [int] upper hue min: 0, default: 130, max: 255
-- \b "~lower_hue" : \b [int] lower hue min: 0, default: 110, max: 255
+- \b "~l_upper_value" : \b [int] upper value min: 0, default: 255, max: 255
+- \b "~l_lower_value" : \b [int] upper value min: 0, default: 250, max: 255
+- \b "~l_upper_sat" : \b [int] upper sat min: 0, default: 255, max: 255
+- \b "~l_lower_sat" : \b [int] upper sat min: 0, default: 0, max: 255
+- \b "~l_upper_hue" : \b [int] upper hue min: 0, default: 255, max: 255
+- \b "~l_lower_hue" : \b [int] lower hue min: 0, default: 0, max: 255
+- \b "~r_upper_value" : \b [int] upper value min: 0, default: 255, max: 255
+- \b "~r_lower_value" : \b [int] upper value min: 0, default: 250, max: 255
+- \b "~r_upper_sat" : \b [int] upper sat min: 0, default: 255, max: 255
+- \b "~r_lower_sat" : \b [int] upper sat min: 0, default: 0, max: 255
+- \b "~r_upper_hue" : \b [int] upper hue min: 0, default: 255, max: 255
+- \b "~r_lower_hue" : \b [int] lower hue min: 0, default: 0, max: 255
+- \b "~canny_upper" : \b [int] canny thresh upper min: 0, default: 70, max: 200
+- \b "~canny_lower" : \b [int] canny thresh lower min: 0, default: 30, max: 200
 

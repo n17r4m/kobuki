@@ -226,21 +226,37 @@ class DEFAULT
         boost::any val;
         (*_i)->getValue(config, val);
 
-        if("upper_value"==(*_i)->name){upper_value = boost::any_cast<int>(val);}
-        if("lower_value"==(*_i)->name){lower_value = boost::any_cast<int>(val);}
-        if("upper_sat"==(*_i)->name){upper_sat = boost::any_cast<int>(val);}
-        if("lower_sat"==(*_i)->name){lower_sat = boost::any_cast<int>(val);}
-        if("upper_hue"==(*_i)->name){upper_hue = boost::any_cast<int>(val);}
-        if("lower_hue"==(*_i)->name){lower_hue = boost::any_cast<int>(val);}
+        if("l_upper_value"==(*_i)->name){l_upper_value = boost::any_cast<int>(val);}
+        if("l_lower_value"==(*_i)->name){l_lower_value = boost::any_cast<int>(val);}
+        if("l_upper_sat"==(*_i)->name){l_upper_sat = boost::any_cast<int>(val);}
+        if("l_lower_sat"==(*_i)->name){l_lower_sat = boost::any_cast<int>(val);}
+        if("l_upper_hue"==(*_i)->name){l_upper_hue = boost::any_cast<int>(val);}
+        if("l_lower_hue"==(*_i)->name){l_lower_hue = boost::any_cast<int>(val);}
+        if("r_upper_value"==(*_i)->name){r_upper_value = boost::any_cast<int>(val);}
+        if("r_lower_value"==(*_i)->name){r_lower_value = boost::any_cast<int>(val);}
+        if("r_upper_sat"==(*_i)->name){r_upper_sat = boost::any_cast<int>(val);}
+        if("r_lower_sat"==(*_i)->name){r_lower_sat = boost::any_cast<int>(val);}
+        if("r_upper_hue"==(*_i)->name){r_upper_hue = boost::any_cast<int>(val);}
+        if("r_lower_hue"==(*_i)->name){r_lower_hue = boost::any_cast<int>(val);}
+        if("canny_upper"==(*_i)->name){canny_upper = boost::any_cast<int>(val);}
+        if("canny_lower"==(*_i)->name){canny_lower = boost::any_cast<int>(val);}
       }
     }
 
-    int upper_value;
-int lower_value;
-int upper_sat;
-int lower_sat;
-int upper_hue;
-int lower_hue;
+    int l_upper_value;
+int l_lower_value;
+int l_upper_sat;
+int l_lower_sat;
+int l_upper_hue;
+int l_lower_hue;
+int r_upper_value;
+int r_lower_value;
+int r_upper_sat;
+int r_lower_sat;
+int r_upper_hue;
+int r_lower_hue;
+int canny_upper;
+int canny_lower;
 
     bool state;
     std::string name;
@@ -251,17 +267,33 @@ int lower_hue;
 
 
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      int upper_value;
+      int l_upper_value;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      int lower_value;
+      int l_lower_value;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      int upper_sat;
+      int l_upper_sat;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      int lower_sat;
+      int l_lower_sat;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      int upper_hue;
+      int l_upper_hue;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      int lower_hue;
+      int l_lower_hue;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      int r_upper_value;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      int r_lower_value;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      int r_upper_sat;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      int r_lower_sat;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      int r_upper_hue;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      int r_lower_hue;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      int canny_upper;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      int canny_lower;
 //#line 218 "/opt/ros/kinetic/share/dynamic_reconfigure/cmake/../templates/ConfigType.h.template"
 
     bool __fromMessage__(dynamic_reconfigure::Config &msg)
@@ -398,65 +430,145 @@ int lower_hue;
     {
 lineColorConfig::GroupDescription<lineColorConfig::DEFAULT, lineColorConfig> Default("Default", "", 0, 0, true, &lineColorConfig::groups);
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __min__.upper_value = 0;
+      __min__.l_upper_value = 0;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __max__.upper_value = 255;
+      __max__.l_upper_value = 255;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __default__.upper_value = 255;
+      __default__.l_upper_value = 255;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      Default.abstract_parameters.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("upper_value", "int", 0, "upper value", "", &lineColorConfig::upper_value)));
+      Default.abstract_parameters.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("l_upper_value", "int", 0, "upper value", "", &lineColorConfig::l_upper_value)));
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __param_descriptions__.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("upper_value", "int", 0, "upper value", "", &lineColorConfig::upper_value)));
+      __param_descriptions__.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("l_upper_value", "int", 0, "upper value", "", &lineColorConfig::l_upper_value)));
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __min__.lower_value = 0;
+      __min__.l_lower_value = 0;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __max__.lower_value = 255;
+      __max__.l_lower_value = 255;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __default__.lower_value = 150;
+      __default__.l_lower_value = 250;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      Default.abstract_parameters.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("lower_value", "int", 0, "upper value", "", &lineColorConfig::lower_value)));
+      Default.abstract_parameters.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("l_lower_value", "int", 0, "upper value", "", &lineColorConfig::l_lower_value)));
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __param_descriptions__.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("lower_value", "int", 0, "upper value", "", &lineColorConfig::lower_value)));
+      __param_descriptions__.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("l_lower_value", "int", 0, "upper value", "", &lineColorConfig::l_lower_value)));
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __min__.upper_sat = 0;
+      __min__.l_upper_sat = 0;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __max__.upper_sat = 255;
+      __max__.l_upper_sat = 255;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __default__.upper_sat = 255;
+      __default__.l_upper_sat = 255;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      Default.abstract_parameters.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("upper_sat", "int", 0, "upper sat", "", &lineColorConfig::upper_sat)));
+      Default.abstract_parameters.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("l_upper_sat", "int", 0, "upper sat", "", &lineColorConfig::l_upper_sat)));
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __param_descriptions__.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("upper_sat", "int", 0, "upper sat", "", &lineColorConfig::upper_sat)));
+      __param_descriptions__.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("l_upper_sat", "int", 0, "upper sat", "", &lineColorConfig::l_upper_sat)));
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __min__.lower_sat = 0;
+      __min__.l_lower_sat = 0;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __max__.lower_sat = 255;
+      __max__.l_lower_sat = 255;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __default__.lower_sat = 150;
+      __default__.l_lower_sat = 0;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      Default.abstract_parameters.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("lower_sat", "int", 0, "upper sat", "", &lineColorConfig::lower_sat)));
+      Default.abstract_parameters.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("l_lower_sat", "int", 0, "upper sat", "", &lineColorConfig::l_lower_sat)));
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __param_descriptions__.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("lower_sat", "int", 0, "upper sat", "", &lineColorConfig::lower_sat)));
+      __param_descriptions__.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("l_lower_sat", "int", 0, "upper sat", "", &lineColorConfig::l_lower_sat)));
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __min__.upper_hue = 0;
+      __min__.l_upper_hue = 0;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __max__.upper_hue = 255;
+      __max__.l_upper_hue = 255;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __default__.upper_hue = 130;
+      __default__.l_upper_hue = 255;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      Default.abstract_parameters.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("upper_hue", "int", 0, "upper hue", "", &lineColorConfig::upper_hue)));
+      Default.abstract_parameters.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("l_upper_hue", "int", 0, "upper hue", "", &lineColorConfig::l_upper_hue)));
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __param_descriptions__.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("upper_hue", "int", 0, "upper hue", "", &lineColorConfig::upper_hue)));
+      __param_descriptions__.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("l_upper_hue", "int", 0, "upper hue", "", &lineColorConfig::l_upper_hue)));
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __min__.lower_hue = 0;
+      __min__.l_lower_hue = 0;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __max__.lower_hue = 255;
+      __max__.l_lower_hue = 255;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __default__.lower_hue = 110;
+      __default__.l_lower_hue = 0;
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      Default.abstract_parameters.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("lower_hue", "int", 0, "lower hue", "", &lineColorConfig::lower_hue)));
+      Default.abstract_parameters.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("l_lower_hue", "int", 0, "lower hue", "", &lineColorConfig::l_lower_hue)));
 //#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
-      __param_descriptions__.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("lower_hue", "int", 0, "lower hue", "", &lineColorConfig::lower_hue)));
+      __param_descriptions__.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("l_lower_hue", "int", 0, "lower hue", "", &lineColorConfig::l_lower_hue)));
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __min__.r_upper_value = 0;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __max__.r_upper_value = 255;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __default__.r_upper_value = 255;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      Default.abstract_parameters.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("r_upper_value", "int", 0, "upper value", "", &lineColorConfig::r_upper_value)));
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __param_descriptions__.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("r_upper_value", "int", 0, "upper value", "", &lineColorConfig::r_upper_value)));
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __min__.r_lower_value = 0;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __max__.r_lower_value = 255;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __default__.r_lower_value = 250;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      Default.abstract_parameters.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("r_lower_value", "int", 0, "upper value", "", &lineColorConfig::r_lower_value)));
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __param_descriptions__.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("r_lower_value", "int", 0, "upper value", "", &lineColorConfig::r_lower_value)));
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __min__.r_upper_sat = 0;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __max__.r_upper_sat = 255;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __default__.r_upper_sat = 255;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      Default.abstract_parameters.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("r_upper_sat", "int", 0, "upper sat", "", &lineColorConfig::r_upper_sat)));
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __param_descriptions__.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("r_upper_sat", "int", 0, "upper sat", "", &lineColorConfig::r_upper_sat)));
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __min__.r_lower_sat = 0;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __max__.r_lower_sat = 255;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __default__.r_lower_sat = 0;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      Default.abstract_parameters.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("r_lower_sat", "int", 0, "upper sat", "", &lineColorConfig::r_lower_sat)));
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __param_descriptions__.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("r_lower_sat", "int", 0, "upper sat", "", &lineColorConfig::r_lower_sat)));
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __min__.r_upper_hue = 0;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __max__.r_upper_hue = 255;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __default__.r_upper_hue = 255;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      Default.abstract_parameters.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("r_upper_hue", "int", 0, "upper hue", "", &lineColorConfig::r_upper_hue)));
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __param_descriptions__.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("r_upper_hue", "int", 0, "upper hue", "", &lineColorConfig::r_upper_hue)));
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __min__.r_lower_hue = 0;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __max__.r_lower_hue = 255;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __default__.r_lower_hue = 0;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      Default.abstract_parameters.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("r_lower_hue", "int", 0, "lower hue", "", &lineColorConfig::r_lower_hue)));
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __param_descriptions__.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("r_lower_hue", "int", 0, "lower hue", "", &lineColorConfig::r_lower_hue)));
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __min__.canny_upper = 0;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __max__.canny_upper = 200;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __default__.canny_upper = 70;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      Default.abstract_parameters.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("canny_upper", "int", 0, "canny thresh upper", "", &lineColorConfig::canny_upper)));
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __param_descriptions__.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("canny_upper", "int", 0, "canny thresh upper", "", &lineColorConfig::canny_upper)));
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __min__.canny_lower = 0;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __max__.canny_lower = 200;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __default__.canny_lower = 30;
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      Default.abstract_parameters.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("canny_lower", "int", 0, "canny thresh lower", "", &lineColorConfig::canny_lower)));
+//#line 280 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __param_descriptions__.push_back(lineColorConfig::AbstractParamDescriptionConstPtr(new lineColorConfig::ParamDescription<int>("canny_lower", "int", 0, "canny thresh lower", "", &lineColorConfig::canny_lower)));
 //#line 235 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
       Default.convertParams();
 //#line 235 "/opt/ros/kinetic/lib/python2.7/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"

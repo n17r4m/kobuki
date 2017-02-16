@@ -7,4 +7,7 @@
 subdirs(gtest)
 subdirs(demo1)
 subdirs(followbot)
+subdirs(frg_rover)
+subdirs(frg_rover_msgs)
+subdirs(ihe_turtlebot_wander/navigation_sensors)
 subdirs(racer)

@@ -17,7 +17,6 @@ from demo1.cfg import lineColorConfig
 
 class Follower:
     def __init__(self):
-        cv2.namedWindow("window", 1)
         self.srv = Server(lineColorConfig, self.cfg_callback)
         self.go = False
         self.stop = False
@@ -142,15 +141,18 @@ class Follower:
 
     def image_callback(self, msg):
         image = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
-        image = self.gamma_correction(image, 0.5)
-        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-
+        
         # larger search area
         h, w, d = image.shape
         search_top = h / 5 * 3
         search_bot = h
-        hsv[0:search_top, 0:w] = 0
-        hsv[search_bot:h, 0:w] = 0
+        image = image[search_top:search_bot, :, :]
+        h, w, d = image.shape
+        
+        
+        image = self.gamma_correction(image, 0.5)
+        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
 
         left = hsv.copy()
         right = hsv.copy()

@@ -1,2 +1,2 @@
-demo1:followbot:racer
+demo1:followbot:frg_rover:frg_rover_msgs:ihe_turtlebot_wander/navigation_sensors:racer
 -DCATKIN_DEVEL_PREFIX=/home/martin/Documents/Classes/Cmput412/devel -DCMAKE_INSTALL_PREFIX=/home/martin/Documents/Classes/Cmput412/install -G Unix Makefiles
