@@ -1,8 +1,0 @@
-prefix=/home/martin/Documents/Classes/Cmput412/install
-
-Name: racer
-Description: Description of racer
-Version: 0.0.0
-Cflags: -I/home/martin/Documents/Classes/Cmput412/install/include
-Libs: -L/home/martin/Documents/Classes/Cmput412/install/lib 
-Requires: 

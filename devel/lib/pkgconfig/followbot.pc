@@ -1,8 +1,0 @@
-prefix=/home/martin/Documents/Classes/Cmput412/devel
-
-Name: followbot
-Description: Description of followbot
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/martin/Documents/Classes/Cmput412/devel/lib 
-Requires: 
