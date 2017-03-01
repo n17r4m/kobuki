@@ -17,7 +17,7 @@ from demo1.cfg import lineColorConfig
 
 class Follower:
     def __init__(self):
-        #cv2.namedWindow("window", 1)
+        cv2.namedWindow("window", 1)
         self.srv = Server(lineColorConfig, self.cfg_callback)
         self.go = False
         self.stop = False
@@ -36,19 +36,19 @@ class Follower:
         self.xlist = []
         self.ylist = []
 
-        self.r_lower_hue = 22
-        self.r_lower_sat = 63
-        self.r_lower_value = 111
-        self.r_upper_hue = 36
-        self.r_upper_sat = 153
-        self.r_upper_value = 176
+        self.r_lower_hue = 0
+        self.r_lower_sat = 0
+        self.r_lower_value = 217
+        self.r_upper_hue = 255
+        self.r_upper_sat = 255
+        self.r_upper_value = 255
 
-        self.l_lower_hue = 23
-        self.l_lower_sat = 211
-        self.l_lower_value = 116
-        self.l_upper_hue = 32
+        self.l_lower_hue = 0
+        self.l_lower_sat = 0
+        self.l_lower_value = 218
+        self.l_upper_hue = 255
         self.l_upper_sat = 255
-        self.l_upper_value = 164
+        self.l_upper_value = 255
 
         self.canny_upper = 72
         self.canny_lower = 45
@@ -89,7 +89,7 @@ class Follower:
         return data
 
     def joy_callback(self, data):
-        if data.buttons[0]:
+        if data.buttons[1]:
             self.go = not self.go
         if not self.go:
             #self.stop = True
@@ -128,17 +128,18 @@ class Follower:
                 box = np.int0(box)
                 print box
                 '''
-                cv2.rectangle(frame, (rect[0], rect[1]),(rect[0] + rect[2], rect[1] + rect[3]), (0, 255, 0), 2)
+
                 #print len(retval)
                 #cv2.drawContours(frame, [box], 0, (0,0,255), 2)
-                if rect[2] * rect[3] > 5:
+                if rect[2] * rect[3] > 50:
                     self.stop = True
+                    cv2.rectangle(frame, (rect[0], rect[1]),(rect[0] + rect[2], rect[1] + rect[3]), (0, 255, 0), 2)
             else:
                 self.stop = False
-            #cv2.imshow('webcam', frame)
+            cv2.imshow('webcam', frame)
 
-            #if cv2.waitKey(1) & 0xFF == ord('q'):
-            #    break
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
 
         self.web_cap.release()
         cv2.destroyAllWindows()
@@ -146,7 +147,7 @@ class Follower:
     def image_callback(self, msg):
         image = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
         #while True:
-            #ret, image = self.web_cap.read()
+            #ret, image = self.web_cap.read()                cv2.rectangle(frame, (rect[0], rect[1]),(rect[0] + rect[2], rect[1] + rect[3]), (0, 255, 0), 2)
         image = self.gamma_correction(image, 0.5)
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
@@ -176,7 +177,7 @@ class Follower:
         cy_left = 0
         cy_right = 0
 
-        #mask = cv2.bilateralFilter(mask, 5, 1, 10)
+        mask = cv2.bilateralFilter(mask, 5, 1, 10)
 
         if M_left['m00'] > 0 and M_right['m00'] > 0:
             cx_left = int(M_left['m10']/M_left['m00'])
@@ -187,15 +188,15 @@ class Follower:
             cv2.circle(mask, (cx_right, cy_right), 20, (0,0,255),-1)
             # BEGIN CONTROL
             self.current_error = (cx_left + cx_right)/2 - w/2
-            self.turn = 0
+            #self.turn = 0
 
         elif M_left['m00'] > 0 and M_right['m00'] == 0:
             cx_left = int(M_left['m10']/M_left['m00'])
             cy_left = int(M_left['m01']/M_left['m00'])
             cv2.circle(mask, (cx_left, cy_left), 20, (0,0,255), -1)
             # BEGIN CONTROL
-            self.current_error = cx_left - w/2
-            self.turn = 2
+            self.current_error = -cx_left + w/2
+            #self.turn = 2
 
         elif M_left['m00'] ==0 and M_right['m00'] > 0:
             cx_right = int(M_right['m10']/M_right['m00'])
@@ -203,11 +204,11 @@ class Follower:
             cv2.circle(mask, (cx_right, cy_right), 20, (0,0,255),-1)
             # BEGIN CONTROL
             self.current_error = cy_right - w/2
-            self.turn = 1
+            #self.turn = 1
 
         else:
             #self.current_error = self.err_past[-1]
-            z = np.mean(self.ztwists)
+            z = self.ztwists[-1]
 
         print self.current_error
 
@@ -215,9 +216,9 @@ class Follower:
         # error correction
         tmp = self.err_past
         tmp.append(self.current_error)
-        if np.std(tmp) > np.std(self.err_past) and len(self.err_past) > 3:
+        if np.std(tmp) > np.std(self.err_past) and len(self.err_past) > 5:
 
-            if len(self.err_past) > 7:
+            if len(self.err_past) > 10:
                 self.err_past.pop(0)
                 #self.theta_past.pop(0)
                 self.time_start = time.clock()
@@ -250,42 +251,30 @@ class Follower:
         Kd = np.mean(np.diff(self.err_past)/100)
 
         x = 0.2
-        z = self.P_*Kp + self.I_*Ki + self.D_*Kd
+        z = self.P_*Kp # + self.I_*Ki + self.D_*Kd
+        #z = 0
 
-        if cy_left >= 400 and cy_right >= 400:
-            z *= 15
-            if self.turn == 1:
-                z = 0.5
-            elif self.turn == 2:
-                z = -0.5
-            elif self.turn == 0:
-                z = 0.3
-        elif cy_left >= 400 and cy_right < 400:
+        if cy_left >= 420 and cy_right >= 420:
+            z = 0.8
+        elif cy_left >= 420 and cy_right < 420:
             self.turn = 1
-            z = 0.5
-        elif cy_left < 400 and cy_right >= 400:
-            z = -0.5
+            z = 0.8
+        elif cy_left < 420 and cy_right >= 420 and right_angle <= 1.57:
+            z = -0.8
             self.turn = 2
         if (left_angle == points_angle) | (right_angle == points_angle):
-            z *= 15
-            if self.turn == 1:
-                z = 0.8
-            elif self.turn == 2:
-                z = -0.8
-            elif self.turn == 0:
-                x = 0
-                z = 0.3
+            z = 0.8
 
         if self.go and (not self.stop):
         #if self.go:
             self.xtwists.append(x)
             self.ztwists.append(z)
 
-        if len(self.xtwists) > 3:
+        if len(self.xtwists) > 5:
             twist = Twist()
             twist.linear.x = np.mean(self.xtwists)
-            #twist.angular.z = np.mean(self.ztwists)
-            twist.angular.z = z
+            twist.angular.z = np.mean(self.ztwists)
+            #twist.angular.z = z
             rospy.loginfo("====z value" + str(z))
             self.cmd_vel_pub.publish(twist)
             self.xtwists.pop(0)
@@ -299,6 +288,6 @@ class Follower:
 
 rospy.init_node('follower')
 follower = Follower()
-follower.webcam()
+#follower.webcam()
 rospy.spin()
 # END ALL
