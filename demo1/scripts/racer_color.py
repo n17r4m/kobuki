@@ -177,7 +177,7 @@ class Follower:
         cy_left = 0
         cy_right = 0
 
-        mask = cv2.bilateralFilter(mask, 5, 1, 10)
+        mask = cv2.bilateralFilter(mask, 5, 1, 5)
 
         if M_left['m00'] > 0 and M_right['m00'] > 0:
             cx_left = int(M_left['m10']/M_left['m00'])
@@ -207,8 +207,8 @@ class Follower:
             #self.turn = 1
 
         else:
-            #self.current_error = self.err_past[-1]
-            z = self.ztwists[-1]
+            self.current_error = self.err_past[-1]
+            #z = self.ztwists[-1]
 
         print self.current_error
 
@@ -265,8 +265,8 @@ class Follower:
         if (left_angle == points_angle) | (right_angle == points_angle):
             z = 0.8
 
-        if self.go and (not self.stop):
-        #if self.go:
+        #if self.go and (not self.stop):
+        if self.go:
             self.xtwists.append(x)
             self.ztwists.append(z)
 
