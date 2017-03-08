@@ -39,6 +39,9 @@ class Docker:
             cv2.imshow('img',img)
             k = cv2.waitKey(0) & 0xff
             self.navi(0, 0) # todo
+        else:
+            cv2.imshow('img',img)
+            k = cv2.waitKey(0) & 0xff
     
     def navi(self, dist, theta):
         pass
