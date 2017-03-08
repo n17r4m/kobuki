@@ -30,18 +30,18 @@ class Docker:
             corners2 = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1), self.criteria)
             
             # Find the rotation and translation vectors.
-            rvecs, tvecs, inliers = cv2.solvePnPRansac(self.objp, corners2, self.eye)
+            rvecs, tvecs, inliers = cv2.solvePnPRansac(self.objp, corners2, self.eye, None)
     
             # project 3D points to image plane
-            imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.eye)
+            imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.eye, None)
     
             img = self.draw(img,corners2,imgpts)
             cv2.imshow('img',img)
-            k = cv2.waitKey(3) & 0xff
+            k = cv2.waitKey(1) & 0xff
             self.navi(0, 0) # todo
         else:
             cv2.imshow('img',img)
-            k = cv2.waitKey(3) & 0xff
+            k = cv2.waitKey(1) & 0xff
     
     def navi(self, dist, theta):
         pass
