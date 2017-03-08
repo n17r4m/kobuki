@@ -28,7 +28,7 @@ class Docker:
         
         if ret == True:
             corners2 = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1), self.criteria)
-            z = np.array([0,0,0,0,0])
+            z = np.array([0.0,0.0,0.0,0.0,0.0])
             # Find the rotation and translation vectors.
             rvecs, tvecs, inliers = cv2.solvePnPRansac(self.objp, corners2, self.eye, z)
     
