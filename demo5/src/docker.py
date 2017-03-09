@@ -9,6 +9,7 @@ import numpy as np
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import CompressedImage
 from geometry_msgs.msg import Twist
+import math
 
 class Docker:
     def __init__(self):
@@ -28,7 +29,6 @@ class Docker:
         img  = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         ret, corners = cv2.findChessboardCorners(gray, (9,7))
-        #print ret
 
         if ret == True:
             print "found it"
@@ -38,11 +38,16 @@ class Docker:
             shits = cv2.solvePnPRansac(self.objp, corners2, self.eye, None)
             rvecs, tvecs, inliers = shits[1], shits[2], shits[3]
             # project 3D points to image plane
-            imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.eye, z)
+            imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.eye, None)
 
-            img = self.draw(gray,corners2,imgpts)
+            img = self.draw(img,corners2,imgpts)
+
             cv2.imshow('img',img)
             k = cv2.waitKey(1) & 0xff
+
+            robo_pose = tuple(imgpts[2].ravel())
+            corner = tuple(corners[0].ravel())
+            dist = math.sqrt(pow(robo_pose[0]+320 -corner[0],2) + pow(robo_pose[1]+240 -corner[1],2))
             self.navi(0, 0) # todo
         else:
             cv2.imshow('img',img)
@@ -56,6 +61,7 @@ class Docker:
         img = cv2.line(img, corner, tuple(imgpts[0].ravel()), (255,0,0), 5)
         img = cv2.line(img, corner, tuple(imgpts[1].ravel()), (0,255,0), 5)
         img = cv2.line(img, corner, tuple(imgpts[2].ravel()), (0,0,255), 5)
+        print corner
         return img
 
 
