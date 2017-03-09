@@ -26,7 +26,7 @@ class Docker:
         self.K = None
         
     def info_cb(self, msg):
-        self.K = msg.K
+        self.K = np.array(msg.K.reshape(3,3))
 
     def img_cb(self, msg):
         #np_arr = np.fromstring(msg.data, np.uint8)
