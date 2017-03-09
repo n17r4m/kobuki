@@ -52,20 +52,31 @@ class Docker:
             cv2.imshow('img',img)
             k = cv2.waitKey(1) & 0xff
 
-            self.navi(0, 0) # todo
+            self.navi(tvecs, rvecs) # todo
         else:
             cv2.imshow('img',img)
             k = cv2.waitKey(1) & 0xff
 
     def navi(self, dist, theta):
-        pass
+        print dist, theta
+        self.twist.angular.z = 0
+        self.twist.linear.x = 0
+        if theta[-1] < 0:
+            self.twist.angular.z = 0.3
+        else:
+            self.twist.angular.z = -0.3
+        if dist[-1] > 0:
+            self.twist.linear.x = 0.3
+        else:
+            self.twist.linear.x = 0
+        self.cmd_vel_pub.publish(self.twist)
+
 
     def draw(self, img, corners, imgpts):
         corner = tuple(corners[0].ravel())
         img = cv2.line(img, corner, tuple(imgpts[0].ravel()), (255,0,0), 5)
         img = cv2.line(img, corner, tuple(imgpts[1].ravel()), (0,255,0), 5)
         img = cv2.line(img, corner, tuple(imgpts[2].ravel()), (0,0,255), 5)
-        print corner
         return img
 
 
