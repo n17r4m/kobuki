@@ -15,7 +15,7 @@ class Docker:
     def __init__(self):
         self.bridge = cv_bridge.CvBridge()
         self.cam_info_sub = rospy.Subscriber('camera/rgb/camera_info', CameraInfo, self.info_cb)
-        self.img_sub = rospy.Subscriber('camera/rgb/image_rect_color', Image, self.img_cb)
+        self.img_sub = rospy.Subscriber('camera/rgb/image_raw', Image, self.img_cb)
         self.cmd_vel_pub = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=1)
         self.twist = Twist()
         self.eye = np.identity(3)
@@ -24,9 +24,11 @@ class Docker:
         self.objp[:,:2] = np.mgrid[0:8,0:6].T.reshape(-1,2)
         self.criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
         self.K = None
+        self.D = None
 
     def info_cb(self, msg):
         self.K = np.array(msg.K).reshape(3,3)
+        self.D = np.array(msg.D)
 
     def img_cb(self, msg):
         #np_arr = np.fromstring(msg.data, np.uint8)
@@ -40,10 +42,10 @@ class Docker:
             corners2 = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1), self.criteria)
             z = np.array([0.0,0.0,0.0,0.0,0.0])
             # Find the rotation and translation vectors.
-            shits = cv2.solvePnPRansac(self.objp, corners2, self.K, None)
+            shits = cv2.solvePnPRansac(self.objp, corners2, self.K, self.D)
             rvecs, tvecs, inliers = shits[1], shits[2], shits[3]
             # project 3D points to image plane
-            imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.K, None)
+            imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.K, self.D)
 
             img = self.draw(img,corners2,imgpts)
 
