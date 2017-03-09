@@ -44,7 +44,7 @@ class Docker:
         if ret == True: #and not self.found:
             print "found it"
             #self.found = True
-            corners2 = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1), self.criteria)
+            corners2 = cv2.cornerSubPix(gray,corners,(3,3),(-1,-1), self.criteria)
             #z = np.array([0.0,0.0,0.0,0.0,0.0])
             # Find the rotation and translation vectors.
             shits = cv2.solvePnPRansac(self.objp, corners2, self.K, self.D)#, cv2.SOLVEPNP_UPNP)
@@ -74,16 +74,14 @@ class Docker:
         #self.twist.angular.z = - theta[0]  * 180 / 3.1415 / 10
         #self.twist.linear.x = (dist[-1]- 15) / 100
 
-        if theta[0] < -0.8 and dist[-1] > 20:
+        if theta[0] < -0.4 and  60 > dist[-1] > 20:
             self.twist.angular.z = -0.3
-        elif theta[0] > 0.8 and dist[-1] > 20:
+        elif theta[0] > 0.4 and 60 > dist[-1] > 20:
             self.twist.angular.z = 0.3
         else:
             self.twist.angular.z = 0
         if dist[-1] > 10:
             self.twist.linear.x = 0.1
-        elif dist[-1] < -10:
-            self.twist.linear.x = -0.1
         else:
             self.twist.linear.x = 0
         self.cmd_vel_pub.publish(self.twist)
