@@ -15,7 +15,7 @@ class Docker:
     def __init__(self):
         self.bridge = cv_bridge.CvBridge()
         self.cam_info_sub = rospy.Subscriber('camera/rgb/camera_info', CameraInfo, self.info_cb)
-        self.img_sub = rospy.Subscriber('camera/rgb/image_rect', Image, self.img_cb)
+        self.img_sub = rospy.Subscriber('camera/rgb/image_rect_color', Image, self.img_cb)
         self.cmd_vel_pub = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=1)
         self.twist = Twist()
         self.eye = np.identity(3)
