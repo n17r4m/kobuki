@@ -6,7 +6,7 @@
 
 import rospy, cv2, cv_bridge
 import numpy as np
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import Image, CameraInfo
 from sensor_msgs.msg import CompressedImage
 from geometry_msgs.msg import Twist
 import math
@@ -14,7 +14,8 @@ import math
 class Docker:
     def __init__(self):
         self.bridge = cv_bridge.CvBridge()
-        self.img_sub = rospy.Subscriber('camera/rgb/image_rect_color', Image, self.img_cb)
+        self.cam_info_sub = rospy.Subscriber('camera/rgb/camera_info', CameraInfo, self.info_cb)
+        self.img_sub = rospy.Subscriber('camera/rgb/image_rect', Image, self.img_cb)
         self.cmd_vel_pub = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=1)
         self.twist = Twist()
         self.eye = np.identity(3)
@@ -22,6 +23,9 @@ class Docker:
         self.objp = np.zeros((6*8,3), np.float32)
         self.objp[:,:2] = np.mgrid[0:8,0:6].T.reshape(-1,2)
         self.criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+    
+    def info_cb(self, msg):
+        
 
     def img_cb(self, msg):
         #np_arr = np.fromstring(msg.data, np.uint8)
