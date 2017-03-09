@@ -25,7 +25,7 @@ class Docker:
         self.criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
     
     def info_cb(self, msg):
-        
+        pass
 
     def img_cb(self, msg):
         #np_arr = np.fromstring(msg.data, np.uint8)
