@@ -61,11 +61,11 @@ class Docker:
         print dist, theta
         self.twist.angular.z = 0
         self.twist.linear.x = 0
-        if theta[-1] < 0:
+        if theta[0] < 0:
             self.twist.angular.z = 0.3
         else:
             self.twist.angular.z = -0.3
-        if dist[-1] > 0:
+        if dist[-1] > 20:
             self.twist.linear.x = 0.3
         else:
             self.twist.linear.x = 0
