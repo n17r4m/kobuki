@@ -10,6 +10,7 @@ from sensor_msgs.msg import Image, CameraInfo
 from sensor_msgs.msg import CompressedImage
 from geometry_msgs.msg import Twist
 import math
+import time
 
 class Docker:
     def __init__(self):
@@ -25,6 +26,9 @@ class Docker:
         self.criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
         self.K = None
         self.D = None
+        self.found = False
+        self.rot = None
+        self.trans = None
 
     def info_cb(self, msg):
         self.K = np.array(msg.K).reshape(3,3)
@@ -35,15 +39,18 @@ class Docker:
         #img_np = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
         img  = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        ret, corners = cv2.findChessboardCorners(gray, (8,6))
+        ret, corners = cv2.findChessboardCorners(gray, (8,6), cv2.CALIB_CB_FAST_CHECK)
 
-        if ret == True:
+        if ret == True: #and not self.found:
             print "found it"
+            #self.found = True
             corners2 = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1), self.criteria)
-            z = np.array([0.0,0.0,0.0,0.0,0.0])
+            #z = np.array([0.0,0.0,0.0,0.0,0.0])
             # Find the rotation and translation vectors.
-            shits = cv2.solvePnPRansac(self.objp, corners2, self.K, self.D)
+            shits = cv2.solvePnPRansac(self.objp, corners2, self.K, self.D)#, cv2.SOLVEPNP_UPNP)
             rvecs, tvecs, inliers = shits[1], shits[2], shits[3]
+            self.rot = rvecs
+            self.trans = tvecs
             # project 3D points to image plane
             imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.K, self.D)
 
@@ -53,20 +60,30 @@ class Docker:
             k = cv2.waitKey(1) & 0xff
 
             self.navi(tvecs, rvecs) # todo
-        else:
+        elif not ret and not self.found:
             cv2.imshow('img',img)
             k = cv2.waitKey(1) & 0xff
+        elif self.found:
+            self.path_plan() # todo
+
+    def path_plan(self):
+        pass
 
     def navi(self, dist, theta):
         print dist, theta
-        self.twist.angular.z = 0
-        self.twist.linear.x = 0
-        if theta[0] < 0:
+        #self.twist.angular.z = - theta[0]  * 180 / 3.1415 / 10
+        #self.twist.linear.x = (dist[-1]- 15) / 100
+
+        if theta[0] < -0.8 and dist[-1] > 20:
+            self.twist.angular.z = -0.3
+        elif theta[0] > 0.8 and dist[-1] > 20:
             self.twist.angular.z = 0.3
         else:
-            self.twist.angular.z = -0.3
-        if dist[-1] > 20:
-            self.twist.linear.x = 0.3
+            self.twist.angular.z = 0
+        if dist[-1] > 10:
+            self.twist.linear.x = 0.1
+        elif dist[-1] < -10:
+            self.twist.linear.x = -0.1
         else:
             self.twist.linear.x = 0
         self.cmd_vel_pub.publish(self.twist)
