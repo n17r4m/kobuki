@@ -24,9 +24,9 @@ class Docker:
         self.objp[:,:2] = np.mgrid[0:8,0:6].T.reshape(-1,2)
         self.criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
         self.K = None
-        
+
     def info_cb(self, msg):
-        self.K = np.array(msg.K.reshape(3,3))
+        self.K = np.array(msg.K).reshape(3,3)
 
     def img_cb(self, msg):
         #np_arr = np.fromstring(msg.data, np.uint8)
