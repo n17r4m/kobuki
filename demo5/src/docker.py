@@ -24,7 +24,8 @@ class Docker:
     def img_cb(self, msg):
         img  = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        ret, corners = cv2.findChessboardCorners(gray, (8,6), None)
+        #corners = np.zeros((8,6))
+        ret = cv2.findChessboardCorners(gray, (8,6), None)
         
         if ret == True:
             corners2 = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1), self.criteria)
