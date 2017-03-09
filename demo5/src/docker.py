@@ -38,6 +38,7 @@ class Docker:
         #np_arr = np.fromstring(msg.data, np.uint8)
         #img_np = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
         img  = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
+        img  = img[50:500]
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         ret, corners = cv2.findChessboardCorners(gray, (8,6), cv2.CALIB_CB_FAST_CHECK)
 
@@ -59,31 +60,44 @@ class Docker:
             cv2.imshow('img',img)
             k = cv2.waitKey(1) & 0xff
 
-            self.navi(tvecs, rvecs) # todo
-        elif not ret and not self.found:
-            cv2.imshow('img',img)
-            k = cv2.waitKey(1) & 0xff
-        elif self.found:
-            self.path_plan() # todo
+        else:
+            tvecs = np.zeros((3,))
+            rvecs = np.zeros((3,))
+        self.navi(tvecs, rvecs) # todo
+
+        cv2.imshow('img',img)
+        k = cv2.waitKey(1) & 0xff
 
     def path_plan(self):
         pass
 
     def navi(self, dist, theta):
-        print dist, theta
+        print dist
+        print theta
         #self.twist.angular.z = - theta[0]  * 180 / 3.1415 / 10
         #self.twist.linear.x = (dist[-1]- 15) / 100
+        z = 0
+        if theta[0] > 0.2:
+            dist[0] -= 6
+        elif theta[0] < -0.2:
+            dist[0] += 6
 
-        if theta[0] < -0.4 and  60 > dist[-1] > 20:
-            self.twist.angular.z = -0.3
-        elif theta[0] > 0.4 and 60 > dist[-1] > 20:
-            self.twist.angular.z = 0.3
+        if 0 > dist[0]:
+            z = 0.2
+        elif 0 < dist[0]:
+            z = -0.2
         else:
-            self.twist.angular.z = 0
+            z = 0
+
+
         if dist[-1] > 10:
-            self.twist.linear.x = 0.1
+            x = 0.2
         else:
-            self.twist.linear.x = 0
+            x = 0
+
+        self.twist.angular.z = (3*self.twist.angular.z + z) / 4
+        self.twist.linear.x = (3*self.twist.linear.x + x) / 4
+
         self.cmd_vel_pub.publish(self.twist)
 
 
