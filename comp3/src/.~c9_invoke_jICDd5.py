@@ -10,7 +10,7 @@ import rospy
 import actionlib
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from geometry_msgs.msg import PoseWithCovarianceStamped
-from ensor_msgs.msg import Joy
+from ger
 import math
 
 goals = [
@@ -19,7 +19,6 @@ goals = [
     [( 0.64, -6.00, 0.0), (0.0, 0.0, -1.00, 0.00)], # bottom right
     [(-1.93, -6.73, 0.0), (0.0, 0.0, -0.68, 0.74)]  # top right
     ]
-    
 
 def goal_pose(pose):
     goal_pose = MoveBaseGoal()
@@ -47,38 +46,31 @@ def close_to_goal(goal):
     print "Distance to goal:", d
     return d < 0.5
 
-go_g = False    
-def joy_cb(msg):
-    global go_g
-    if msg.buttons[1]:
-        go_g = not go_g
-
 if __name__ == '__main__':
     rospy.init_node('patrol')
     rospy.Subscriber('/amcl_pose', PoseWithCovarianceStamped, amcl_cb)
-    rospy.Subscriber('/joy', Joy, joy_cb)
+    
     rate = rospy.Rate(10)
 
     try:
         while not rospy.is_shutdown():
-            global go_g
-            if go_g:
-                client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
-                client.wait_for_server()
-        
-                loop = 0
-                while loop < 3:
-                    for pose in goals:
-                        print "New goal:", pose
-                        notNear = True
-                        while notNear:
-                            goal = goal_pose(pose)
-                            client.send_goal(goal)
-                            client.wait_for_result(rospy.Duration.from_sec(0.5))
-                            if close_to_goal(goal):
-                                notNear = False
-        
-                    loop += 1
+
+            client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+            client.wait_for_server()
+
+            loop = 0
+            while loop < 3:
+                for pose in goals:
+                    print "New goal:", pose
+                    notNear = True
+                    while notNear:
+                        goal = goal_pose(pose)
+                        client.send_goal(goal)
+                        client.wait_for_result(rospy.Duration.from_sec(0.5))
+                        if close_to_goal(goal):
+                            notNear = False
+
+                loop += 1
 
             rate.sleep()
     except rospy.ROSInterruptException:
