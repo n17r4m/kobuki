@@ -46,7 +46,7 @@ def next_goal():
         loops += 1
 
 def amcl_cb(pose):
-    global position, goal, loops, client
+    global go_g, position, goal, loops, client
     position[0] = pose.pose.pose.position.x
     position[1] = pose.pose.pose.position.y
     pose = goal_pose(goals[goal]) # get once
