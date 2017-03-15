@@ -62,7 +62,7 @@ def close_to_goal(goal):
     x, y = goal.target_pose.pose.position.x, goal.target_pose.pose.position.y
     d = math.sqrt((x - position[0])**2 + (y - position[1])**2)
     print "Distance to goal:", d
-    return d < 0.5
+    return d < 0.25
 
 go_g = False
 def joy_cb(msg):
