@@ -11,6 +11,7 @@ import actionlib
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from geometry_msgs.msg import PoseWithCovarianceStamped
 from geometry_msgs.msg import Pose
+import math
 
 goals = [
     [(-0.95, -9.67, 0.0), (0.0, 0.0, -0.61, 0.79)], # top left corner
