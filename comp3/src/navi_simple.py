@@ -68,14 +68,9 @@ if __name__ == '__main__':
 
             while loop < 3 and go_g:
                 for pose in goals:
-                    print "New goal:", pose
-                    notNear = True
-                    while notNear:
-                        goal = goal_pose(pose)
-                        client.send_goal(goal)
-                        client.wait_for_result(rospy.Duration.from_sec(0.5))
-                        if close_to_goal(goal):
-                            notNear = False
+                    goal = goal_pose(pose)
+                    client.send_goal(goal)
+                    client.wait_for_result(rospy.Duration.from_sec(0.5))
 
                 loop += 1
 
