@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
     try:
         loop = 0
-        while not rospy.is_shutdown():
+        while loop < 3 and not rospy.is_shutdown():
 
             client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
             client.wait_for_server()
