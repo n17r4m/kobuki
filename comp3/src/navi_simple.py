@@ -17,7 +17,7 @@ goals = [
     [(-0.45, -12.6, 0.0), (0.0, 0.0,  0.00, 1.00)], # top left corner
     [( 2.00, -12.2, 0.0), (0.0, 0.0,  0.66, 0.75)], # bottom left
     [( 0.64, -6.00, 0.0), (0.0, 0.0, -1.00, 0.00)], # bottom right
-    [(-1.93, -6.50, 0.0), (0.0, 0.0, -0.68, 0.74)]  # top right
+    [(-1.93, -6.73, 0.0), (0.0, 0.0, -0.68, 0.74)]  # top right
     ]
 
 
@@ -70,7 +70,7 @@ if __name__ == '__main__':
                 for pose in goals:
                     goal = goal_pose(pose)
                     client.send_goal(goal)
-                    client.wait_for_result(rospy.Duration.from_sec(0.5))
+                    client.wait_for_result()
 
                 loop += 1
 
