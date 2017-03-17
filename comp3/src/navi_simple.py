@@ -13,11 +13,13 @@ from geometry_msgs.msg import PoseWithCovarianceStamped
 from sensor_msgs.msg import Joy
 import math
 
+# goals corrected for small map
 goals = [
-    [(-0.45, -12.6, 0.0), (0.0, 0.0,  0.00, 1.00)], # top left corner
-    [( 2.00, -12.2, 0.0), (0.0, 0.0,  0.66, 0.75)], # bottom left
-    [( 0.64, -6.00, 0.0), (0.0, 0.0, -1.00, 0.00)], # bottom right
-    [(-1.93, -6.73, 0.0), (0.0, 0.0, -0.68, 0.74)]  # top right
+
+    [( 5.70, -6.57, 0.0), (0.0, 0.0,  0.93, 0.37)], # bottom left
+    [( 1.02, -3.10, 0.0), (0.0, 0.0, -0.94, 0.33)], # bottom right
+    [(-0.29, -4.64, 0.0), (0.0, 0.0, -0.68, 0.74)],  # top right
+    [(4.22, -8.62, 0.0), (0.0, 0.0,  0.45, 0.89)] # top left corner
     ]
 
 
