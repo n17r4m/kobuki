@@ -14,12 +14,12 @@ from sensor_msgs.msg import Joy, Image
 import math
 
 goals = [
-    [(-0.45, -12.6, 0.0), (0.0, 0.0,  0.00, 1.00)], # top left corner
     [( 2.00, -12.2, 0.0), (0.0, 0.0,  0.66, 0.75)], # bottom left
     [( 0.64, -6.00, 0.0), (0.0, 0.0, -1.00, 0.00)], # bottom right
-    [(-1.93, -6.50, 0.0), (0.0, 0.0, -0.68, 0.74)]  # top right
+    [(-1.93, -6.50, 0.0), (0.0, 0.0, -0.68, 0.74)],  # top right
+    [(-0.45, -12.6, 0.0), (0.0, 0.0,  0.00, 1.00)] # top left corner
     ]
-    
+
 cur_goal = 0
 cur_loop = 0
 position = [0,0]
@@ -54,8 +54,8 @@ def tick_cb(msg):
         pose = goal_pose(goals[cur_goal])
     if cur_loop <= 3:
         client.send_goal(pose)
-        client.wait_for_result(rospy.Duration.from_sec(2))
-        
+        client.wait_for_result(rospy.Duration.from_sec(1))
+
 
 def amcl_cb(pose):
     global position
