@@ -139,6 +139,6 @@ class Part3:
 
 
 if __name__ == "__main__":
-    rospy.init_node('docker')
-    docker = Docker()
+    rospy.init_node('part3')
+    part3 = Part3()
     rospy.spin()
