@@ -31,17 +31,19 @@
     <param name="image_width" value="640" />
     <param name="image_height" value="480" />
     <!-- <param name="camera_info_url" value="package://visp_auto_tracker/models/calibration.ini" type="string" /> -->
-    
-  </node>
   
-  <!--
-  <remap from="cv_camera/image_raw" to="camera/image_raw" />
-  <remap from="cv_camera/camera_info" to="camera/camera_info" />
-  -->
+  </node>
   
   <!-- Launch image_proc -->
   <node pkg="image_proc" type="image_proc" name="image_proc" output="screen">      
     <env name="ROS_NAMESPACE" value="/camera" />
   </node>
+
+  <!-- Launch tracker viewer -->
+  <node pkg="visp_tracker" type="visp_tracker_viewer" name="visp_tracker_viewer" output="screen">      
+    <param name="tracker_prefix" value="/visp_auto_tracker" />
+  </node>
+
+
 
 </launch>
