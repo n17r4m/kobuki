@@ -32,7 +32,7 @@
   </node>
 
   <!-- Launch the tracker -->
-  <node pkg="demo6" type="part3" name="part3.py" output="screen" required="true" />
+  <node pkg="demo6" type="part3.py" name="part3" output="screen" required="true" />
 
 
 
