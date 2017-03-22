@@ -18,8 +18,8 @@
     <param name="model_name" value="pattern" />
     <param name="debug_display" value="True" />
 	      
-    <remap from="/visp_auto_tracker/camera_info" to="/usb_cam/camera_info"/>
-    <remap from="/visp_auto_tracker/image_raw" to="/usb_cam/image_raw"/>
+    <remap from="/visp_auto_tracker/camera_info" to="/camera/camera_info"/>
+    <remap from="/visp_auto_tracker/image_raw" to="/camera/image_raw"/>
   </node>
   
   <remap from="/cv_camera" to="/camera" />
@@ -39,6 +39,14 @@
     <env name="ROS_NAMESPACE" value="/camera" />
   </node>
 
+  <!-- Launch the viewer -->
+  <node pkg="visp_tracker" type="visp_tracker_viewer" name="tracker_mbt_viewer" output="screen">
+    <param name="frame_size" value="0.1" />
+    <remap from="/image_rect" to="/camera/image_raw"/>
+    <remap from="/camera_info" to="/camera/camera_info"/>
+    <remap from="/object_position_covariance" to="/visp_auto_tracker/object_position_covariance"/>
+    <remap from="/object_position" to="/visp_auto_tracker/object_position"/>
+  </node>
 
 
 
