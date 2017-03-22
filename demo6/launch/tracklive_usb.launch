@@ -22,7 +22,9 @@
     <remap from="/visp_auto_tracker/image_raw" to="/usb_cam/image_raw"/>
   </node>
   
+  <remap from="/cv_camera" to="/camera" />
   <param name="camera_prefix" value="/camera" />
+  
   
   <!-- Launch the usb camera acquisition node -->
   <node pkg="cv_camera" type="cv_camera_node" name="cv_camera" output="screen">      
@@ -31,7 +33,7 @@
     <!-- <param name="camera_info_url" value="package://visp_auto_tracker/models/calibration.ini" type="string" /> -->
     
   </node>
-  <remap from="cv_camera" to="camera" />
+  
   <!--
   <remap from="cv_camera/image_raw" to="camera/image_raw" />
   <remap from="cv_camera/camera_info" to="camera/camera_info" />
