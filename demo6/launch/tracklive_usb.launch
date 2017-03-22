@@ -21,7 +21,9 @@
     <remap from="/visp_auto_tracker/camera_info" to="/usb_cam/camera_info"/>
     <remap from="/visp_auto_tracker/image_raw" to="/usb_cam/image_raw"/>
   </node>
-
+  
+  <param name="camera_prefix" value="/camera" />
+  
   <!-- Launch the usb camera acquisition node -->
   <node pkg="cv_camera" type="cv_camera_node" name="cv_camera" output="screen">      
     <param name="image_width" value="640" />
