@@ -8,7 +8,7 @@
   <arg name="output_frame" default="/camera_rgb_optical_frame" />
 
   <!-- Launch the camera -->
-  <node pkg="turtlebot_bringup" type="3dsensor" name="3dsensor" output="screen" />      
+  <include file="$(find turtlebot_bringup)/launch/3dsensor.launch" />      
   
   
   <!-- Launch the tracker -->
