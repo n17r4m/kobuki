@@ -23,7 +23,7 @@ class Part3:
         # Load the target image
         self.target_image = cv2.imread("../img/UA-1C-SOLID.png", 0)
         # Initiate STAR detector
-        self.orb = cv2.ORB()
+        self.orb = cv2.ORB_create()
         # find the keypoints with ORB
         self.kp = self.orb.detect(self.target_image,None)
         # compute the descriptors with ORB
@@ -54,7 +54,7 @@ class Part3:
         img3 = gray
         
         
-        orb = cv2.ORB()
+        orb = cv2.ORB_create()
         kp = orb.detect(gray,None)
         kp, des = self.orb.compute(gray, kp)
         
