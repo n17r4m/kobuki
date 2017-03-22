@@ -41,7 +41,7 @@
   
   <!-- Launch image_proc -->
   <node pkg="image_proc" type="image_proc" name="image_proc" output="screen">      
-    <param name="ros_namespace" value="/camera" />
+    <env name="ROS_NAMESPACE" value="/camera" />
   </node>
 
 </launch>
