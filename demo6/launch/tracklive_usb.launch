@@ -39,10 +39,6 @@
     <env name="ROS_NAMESPACE" value="/camera" />
   </node>
 
-  <!-- Launch tracker viewer -->
-  <node pkg="visp_tracker" type="visp_tracker_viewer" name="visp_tracker_viewer" output="screen">      
-    <param name="tracker_prefix" value="/visp_auto_tracker" />
-  </node>
 
 
 
