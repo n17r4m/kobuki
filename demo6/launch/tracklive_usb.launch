@@ -33,4 +33,9 @@
     <remap from="/cv_camera/camera_info" to="/camera/camera_info" />
   </node>
 
+  <!-- Launch image_proc -->
+  <node pkg="image_proc" type="image_proc" name="image_proc" output="screen">      
+    <param name="ros_namespace" value="/camera" />
+  </node>
+
 </launch>
