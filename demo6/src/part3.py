@@ -89,7 +89,8 @@ class Part3:
             theta = np.radians(90)
             c, s = np.cos(theta), np.sin(theta)
             R = np.matrix('{} {}; {} {}'.format(c, -s, s, c))
-            M2 = M * R
+            M2 = R * M
+            print M, M2
             
             h,w = gray.shape
             rect = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
