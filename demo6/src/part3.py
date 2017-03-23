@@ -30,8 +30,7 @@ class Part3:
 
         # Load the target image
         self.target_image = cv2.imread("/home/martin/Documents/Classes/Cmput412/src/demo6/img/UA-1C-SOLID.png", 0)
-        self.target_image = cv2.cvtColor(self.target_image, cv2.COLOR_BGR2GRAY)
-        print self.target_image
+        
         
         # Initiate STAR detector
         self.orb = cv2.ORB_create()
@@ -92,7 +91,7 @@ class Part3:
             M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
             matchesMask = mask.ravel().tolist()
 
-            h,w = self.target_image #gray.shape
+            h,w = self.target_image.shape #gray.shape
             rect = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
             rect = cv2.perspectiveTransform(rect,M)
             #M = M * (self.eye * 0.25)
