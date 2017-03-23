@@ -105,10 +105,12 @@ class Part3:
             ipts = np.array([self.kp[idx].pt for idx in range(len(self.kp))],dtype=np.float).reshape(-1,1,2)
             """
             
-            dst = dst_pts[matchesMask]
-            src = src_pts[matchesMask]
+            dst2 = dst_pts[matchesMask]
+            src2 = src_pts[matchesMask]
             
-            rvecs, tvecs, inliers = cv2.solvePnPRansac(dst, src, self.K, self.D)
+            print dst2, src2
+            
+            rvecs, tvecs, inliers = cv2.solvePnPRansac(dst2, src2, self.K, self.D)
             imgpts, jac = cv2.projectPoints(axis, rvecs, tvecs, self.K, self.D)
             img3 = self.draw(img3, np.int32(dst), imgpts)
             
