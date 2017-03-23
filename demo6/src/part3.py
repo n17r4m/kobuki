@@ -112,7 +112,7 @@ class Part3:
         
         
         #plt.imshow(img3, 'gray'),plt.show()
-        cv2.imshow("result", img3)
+        cv2.imshow("result", img2)
 
         """
         ret, corners = cv2.findChessboardCorners(gray, (8,6), cv2.CALIB_CB_FAST_CHECK)
