@@ -33,6 +33,7 @@ class Part3:
         self.kp = self.orb.detect(self.target_image,None)
         # compute the descriptors with ORB
         self.kp, self.des = self.orb.compute(self.target_image, self.kp)
+        self.des = np.float32(self.des)
 
 
         self.eye = np.identity(3)
@@ -61,6 +62,7 @@ class Part3:
         orb = cv2.ORB_create()
         kp = orb.detect(gray,None)
         kp, des = self.orb.compute(gray, kp)
+        des = np.float32(des)
 
         
         FLANN_INDEX_KDTREE = 0
