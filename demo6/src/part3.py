@@ -22,7 +22,7 @@ class Part3:
         self.img_sub = rospy.Subscriber('/camera/image_rect_color', Image, self.img_cb)
 
         # Load the target image
-        self.target_image = cv2.imread("/home/ka/Desktop/ua.png", 0)
+        self.target_image = cv2.imread("../img/UA-1C-SOLID.png", 0)
         # Initiate STAR detector
         self.orb = cv2.ORB_create()
         # find the keypoints with ORB
