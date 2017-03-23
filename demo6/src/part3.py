@@ -108,7 +108,7 @@ class Part3:
             dst2 = dst_pts[matchesMask]
             src2 = src_pts[matchesMask]
             
-            print dst2, src2
+            print len(dst2), len(src2)
             
             rvecs, tvecs, inliers = cv2.solvePnPRansac(dst2, src2, self.K, self.D)
             imgpts, jac = cv2.projectPoints(axis, rvecs, tvecs, self.K, self.D)
