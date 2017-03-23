@@ -14,7 +14,13 @@ import time
 from matplotlib import pyplot as plt
 import os
 
+from numpy import cross, eye, dot
+from scipy.linalg import expm3, norm
+
 MIN_MATCH_COUNT = 10
+
+def R(axis, theta):
+    return expm3(cross(eye(3), axis/norm(axis)*theta))
 
 class Part3:
     def __init__(self):
@@ -86,10 +92,7 @@ class Part3:
             M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
             matchesMask = mask.ravel().tolist()
 
-            theta = np.radians(90)
-            c, s = np.cos(theta), np.sin(theta)
-            R = np.matrix('{} {}; {} {}'.format(c, -s, s, c))
-            M2 = R * M
+            M2 =  M * R(1, 3.14159)
             print M, M2
             
             h,w = gray.shape
