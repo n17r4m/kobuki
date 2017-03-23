@@ -90,13 +90,15 @@ class Part3:
             pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
             dst = cv2.perspectiveTransform(pts,M)
 
-            img2 = cv2.polylines(gray,[np.int32(dst)],True,255,3, cv2.LINE_AA)
+            img2 = cv2.polylines(gray,[np.int32(dst).roll(2)],True,255,3, cv2.LINE_AA)
             draw_params = dict(matchColor = (0,255,0), # draw matches in green color
                        singlePointColor = None,
                        matchesMask = matchesMask, # draw only inliers
                        flags = 2)
     
             img3 = cv2.drawMatches(self.target_image, self.kp, gray, kp, good, None, **draw_params)
+            #plt.imshow(img3, 'gray'),plt.show()
+            cv2.imshow("result", img3)
             
         else:
             print "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT)
@@ -114,8 +116,7 @@ class Part3:
             img3 = self.draw(img3, np.int32(dst), imgpts)
             """
         
-        #plt.imshow(img3, 'gray'),plt.show()
-        cv2.imshow("result", img3)
+        
 
         """
         ret, corners = cv2.findChessboardCorners(gray, (8,6), cv2.CALIB_CB_FAST_CHECK)
