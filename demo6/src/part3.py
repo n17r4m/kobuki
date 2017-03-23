@@ -30,7 +30,7 @@ class Part3:
 
         # Load the target image
         self.target_image = cv2.imread("/home/martin/Documents/Classes/Cmput412/src/demo6/img/UA-1C-SOLID.png", 0)
-        
+        self.target_image = cv2.cvtColor(self.target_image, cv2.COLOR_BGR2GRAY)
         print self.target_image
         
         # Initiate STAR detector
