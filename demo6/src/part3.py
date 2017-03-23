@@ -37,8 +37,7 @@ class Part3:
 
         self.eye = np.identity(3)
         self.axis = np.float32([[3,0,0], [0,3,0], [0,0,-3]]).reshape(-1,3)
-        self.objp = np.zeros((6*8,3), np.float32)
-        self.objp[:,:2] = np.mgrid[0:8,0:6].T.reshape(-1,2)
+        
         self.criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
         self.K = None
         self.D = None
@@ -105,10 +104,11 @@ class Part3:
         img3 = cv2.drawMatches(self.target_image, self.kp, gray, kp, good, None, **draw_params)
         
         pts = np.array([kp[idx].pt for idx in range(len(kp))],dtype=np.float).reshape(-1,1,2)
-        print pts
-        rvecs, tvecs, inliers = cv2.solvePnPRansac(self.objp, pts, self.K, self.D)
-        imgpts, jac = cv2.projectPoints(axis, rvecs, tvecs, mtx, dist)
-        img3 = self.draw(img3, desCam,imgpts)
+        ipts = np.array([self.kp[idx].pt for idx in range(len(self.kp))],dtype=np.float).reshape(-1,1,2)
+        
+        rvecs, tvecs, inliers = cv2.solvePnPRansac(pts, ipts, self.K, self.D)
+        imgpts, jac = cv2.projectPoints(axis, rvecs, tvecs, self.K, self.D)
+        img3 = self.draw(img3, desCam, imgpts)
         
         
         #plt.imshow(img3, 'gray'),plt.show()
