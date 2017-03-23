@@ -103,13 +103,13 @@ class Part3:
                    flags = 2)
 
         img3 = cv2.drawMatches(self.target_image, self.kp, gray, kp, good, None, **draw_params)
-        """
+        
         pts = np.array([kp[idx].pt for idx in range(len(kp))],dtype=np.float).reshape(-1,1,2)
         print pts
         rvecs, tvecs, inliers = cv2.solvePnPRansac(self.objp, pts, self.K, self.D)
         imgpts, jac = cv2.projectPoints(axis, rvecs, tvecs, mtx, dist)
         img3 = self.draw(img3, desCam,imgpts)
-        """
+        
         
         #plt.imshow(img3, 'gray'),plt.show()
         cv2.imshow("result", img3)
