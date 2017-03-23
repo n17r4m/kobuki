@@ -25,7 +25,7 @@ class Part3:
         # Load the target image
         self.target_image = cv2.imread("/home/martin/Documents/Classes/Cmput412/src/demo6/img/UA-1C-SOLID.png", 0)
         
-        
+        print self.target_image
         
         # Initiate STAR detector
         self.orb = cv2.ORB_create()
