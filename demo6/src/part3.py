@@ -72,10 +72,6 @@ class Part3:
         flann = cv2.FlannBasedMatcher(index_params, search_params)
         matches = flann.knnMatch(self.des, des, k=2)
         
-        """
-        bf = cv2.BFMatcher()
-        matches = bf.knnMatch(self.des,des, k=2)
-        """
         
         # store all the good matches as per Lowe's ratio test.
         good = []
@@ -109,6 +105,7 @@ class Part3:
         
         pts = np.array([kp[idx].pt for idx in range(len(kp))],dtype=np.float).reshape(-1,1,2)
         ipts = np.array([self.kp[idx].pt for idx in range(len(self.kp))],dtype=np.float).reshape(-1,1,2)
+        
         """
         rvecs, tvecs, inliers = cv2.solvePnPRansac(pts, ipts, self.K, self.D)
         imgpts, jac = cv2.projectPoints(axis, rvecs, tvecs, self.K, self.D)
@@ -116,7 +113,7 @@ class Part3:
         """
         
         #plt.imshow(img3, 'gray'),plt.show()
-        cv2.imshow("result", img2)
+        cv2.imshow("result", img3)
 
         """
         ret, corners = cv2.findChessboardCorners(gray, (8,6), cv2.CALIB_CB_FAST_CHECK)
