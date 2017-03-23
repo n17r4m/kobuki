@@ -86,9 +86,16 @@ class Part3:
             M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
             matchesMask = mask.ravel().tolist()
 
+            theta = np.radians(90)
+            c, s = np.cos(theta), np.sin(theta)
+            R = np.matrix('{} {}; {} {}'.format(c, -s, s, c))
+            M2 = M * R
+            
             h,w = gray.shape
             rect = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
-            rect = cv2.perspectiveTransform(rect,M)
+            rect = cv2.perspectiveTransform(rect,M2)
+
+            
 
             img2 = cv2.polylines(gray,[np.int32(rect)],True,255,3, cv2.LINE_AA)
             draw_params = dict(matchColor = (0,255,0), # draw matches in green color
