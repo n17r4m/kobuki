@@ -91,17 +91,18 @@ class Part3:
             dst = cv2.perspectiveTransform(pts,M)
 
             img2 = cv2.polylines(gray,[np.int32(dst)],True,255,3, cv2.LINE_AA)
-
-        else:
-            print "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT)
-            matchesMask = None
-
             draw_params = dict(matchColor = (0,255,0), # draw matches in green color
                        singlePointColor = None,
                        matchesMask = matchesMask, # draw only inliers
                        flags = 2)
     
             img3 = cv2.drawMatches(self.target_image, self.kp, gray, kp, good, None, **draw_params)
+            
+        else:
+            print "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT)
+            matchesMask = None
+
+            
             
             """
             pts = np.array([kp[idx].pt for idx in range(len(kp))],dtype=np.float).reshape(-1,1,2)
