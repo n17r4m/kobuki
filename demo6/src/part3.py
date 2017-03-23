@@ -95,7 +95,7 @@ class Part3:
             w,h = gray.shape
             rect = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
             rect = cv2.perspectiveTransform(rect,M)
-            M = M * (self.eye * 0.25)
+            #M = M * (self.eye * 0.25)
             
 
             img2 = cv2.polylines(gray,[np.int32(rect)],True,255,3, cv2.LINE_AA)
@@ -118,11 +118,11 @@ class Part3:
             pts = np.array([kp[idx].pt for idx in range(len(kp))],dtype=np.float).reshape(-1,1,2)
             ipts = np.array([self.kp[idx].pt for idx in range(len(self.kp))],dtype=np.float).reshape(-1,1,2)
             """
-            """
+            
             rvecs, tvecs, inliers = cv2.solvePnPRansac(dst_pts, src_pts, self.K, self.D)
             imgpts, jac = cv2.projectPoints(axis, rvecs, tvecs, self.K, self.D)
             img3 = self.draw(img3, np.int32(dst), imgpts)
-            """
+            
         
         
 
