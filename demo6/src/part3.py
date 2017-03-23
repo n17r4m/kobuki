@@ -96,21 +96,22 @@ class Part3:
             print "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT)
             matchesMask = None
 
-        draw_params = dict(matchColor = (0,255,0), # draw matches in green color
-                   singlePointColor = None,
-                   matchesMask = matchesMask, # draw only inliers
-                   flags = 2)
-
-        img3 = cv2.drawMatches(self.target_image, self.kp, gray, kp, good, None, **draw_params)
+            draw_params = dict(matchColor = (0,255,0), # draw matches in green color
+                       singlePointColor = None,
+                       matchesMask = matchesMask, # draw only inliers
+                       flags = 2)
+    
+            img3 = cv2.drawMatches(self.target_image, self.kp, gray, kp, good, None, **draw_params)
+            
+            """
+            pts = np.array([kp[idx].pt for idx in range(len(kp))],dtype=np.float).reshape(-1,1,2)
+            ipts = np.array([self.kp[idx].pt for idx in range(len(self.kp))],dtype=np.float).reshape(-1,1,2)
+            """
+            
+            rvecs, tvecs, inliers = cv2.solvePnPRansac(dst_pts, src_pts, self.K, self.D)
+            imgpts, jac = cv2.projectPoints(axis, rvecs, tvecs, self.K, self.D)
+            img3 = self.draw(img3, np.int32(dst), imgpts)
         
-        pts = np.array([kp[idx].pt for idx in range(len(kp))],dtype=np.float).reshape(-1,1,2)
-        ipts = np.array([self.kp[idx].pt for idx in range(len(self.kp))],dtype=np.float).reshape(-1,1,2)
-        
-        """
-        rvecs, tvecs, inliers = cv2.solvePnPRansac(pts, ipts, self.K, self.D)
-        imgpts, jac = cv2.projectPoints(axis, rvecs, tvecs, self.K, self.D)
-        img3 = self.draw(img3, desCam, imgpts)
-        """
         
         #plt.imshow(img3, 'gray'),plt.show()
         cv2.imshow("result", img3)
