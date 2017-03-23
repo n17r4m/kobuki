@@ -62,17 +62,19 @@ class Part3:
         kp = orb.detect(gray,None)
         kp, des = self.orb.compute(gray, kp)
 
-        """
+        
         FLANN_INDEX_KDTREE = 0
         index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
         search_params = dict(checks = 50)
 
         flann = cv2.FlannBasedMatcher(index_params, search_params)
         matches = flann.knnMatch(self.des, des, k=2)
+        
         """
         bf = cv2.BFMatcher()
         matches = bf.knnMatch(self.des,des, k=2)
-
+        """
+        
         # store all the good matches as per Lowe's ratio test.
         good = []
         for m,n in matches:
