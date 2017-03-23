@@ -103,15 +103,15 @@ class Part3:
                        matchesMask = matchesMask, # draw only inliers
                        flags = 2)
     
-            img3 = cv2.drawMatches(self.target_image, self.kp, gray, kp, good, None, **draw_params)
-            #plt.imshow(img3, 'gray'),plt.show()
-            cv2.imshow("result", img3)
+            
             
         else:
             print "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT)
             matchesMask = None
 
-            
+        img3 = cv2.drawMatches(self.target_image, self.kp, gray, kp, good, None, **draw_params)
+        #plt.imshow(img3, 'gray'),plt.show()
+        cv2.imshow("result", img3)
             
             """
             pts = np.array([kp[idx].pt for idx in range(len(kp))],dtype=np.float).reshape(-1,1,2)
