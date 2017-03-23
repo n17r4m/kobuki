@@ -12,6 +12,7 @@ from geometry_msgs.msg import Twist
 import math
 import time
 from matplotlib import pyplot as plt
+import os
 
 MIN_MATCH_COUNT = 10
 
@@ -23,6 +24,8 @@ class Part3:
 
         # Load the target image
         self.target_image = cv2.imread("../img/UA-1C-SOLID.png", 0)
+        
+        print os.system('pwd')
         print self.target_image
         # Initiate STAR detector
         self.orb = cv2.ORB_create()
