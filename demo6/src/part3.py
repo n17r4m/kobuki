@@ -90,7 +90,7 @@ class Part3:
             pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
             dst = cv2.perspectiveTransform(pts,M)
 
-            img2 = cv2.polylines(gray,[np.int32(dst).roll(2)],True,255,3, cv2.LINE_AA)
+            img2 = cv2.polylines(gray,[np.roll(np.int32(dst), 2, axis=0)],True,255,3, cv2.LINE_AA)
             draw_params = dict(matchColor = (0,255,0), # draw matches in green color
                        singlePointColor = None,
                        matchesMask = matchesMask, # draw only inliers
