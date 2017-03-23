@@ -69,10 +69,11 @@ class Part3:
         """
         bf = cv2.BFMatcher()
         matches = bf.knnMatch(self.des,des, k=2)
+
         # store all the good matches as per Lowe's ratio test.
         good = []
         for m,n in matches:
-            if m.distance < 0.7*n.distance:
+            if m.distance < 0.75*n.distance:
                 good.append(m)
 
         if len(good)>MIN_MATCH_COUNT:
@@ -98,6 +99,12 @@ class Part3:
                    flags = 2)
 
         img3 = cv2.drawMatches(self.target_image, self.kp, gray, kp, good, None, **draw_params)
+
+        pts = np.array([kp[idx].pt for idx in range(len(kp))],dtype=np.float).reshape(-1,1,2)
+        print pts
+        rvecs, tvecs, inliers = cv2.solvePnPRansac(self.objp, pts, self.K, self.D)
+        imgpts, jac = cv2.projectPoints(axis, rvecs, tvecs, mtx, dist)
+        img3 = self.draw(img3, desCam,imgpts)
 
         #plt.imshow(img3, 'gray'),plt.show()
         cv2.imshow("result", img3)
@@ -129,7 +136,6 @@ class Part3:
 
         """
 
-        cv2.imshow('img',img2)
         k = cv2.waitKey(1) & 0xff
 
 
