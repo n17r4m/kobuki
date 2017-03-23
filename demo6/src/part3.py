@@ -92,7 +92,7 @@ class Part3:
             M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
             matchesMask = mask.ravel().tolist()
 
-            h,w,c = self.target_image #gray.shape
+            h,w = self.target_image #gray.shape
             rect = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
             rect = cv2.perspectiveTransform(rect,M)
             #M = M * (self.eye * 0.25)
