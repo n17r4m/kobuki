@@ -92,7 +92,7 @@ class Part3:
             M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
             matchesMask = mask.ravel().tolist()
 
-            M2 =  M * R(1, 3.14159)
+            M2 =  M * R(0, 3.14159)
             print M, M2
             
             h,w = gray.shape
