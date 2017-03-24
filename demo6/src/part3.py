@@ -165,8 +165,8 @@ class Part3:
         """
         return img
     
-    def line(img, p1, p2, c):
-        return cv2.line(img, np.minimum(p1, 0), np.minimum(p2, 0), c)
+    def line(self, img, p1, p2, c, w):
+        return cv2.line(img, np.minimum(p1, 0), np.minimum(p2, 0), c, w)
 
 if __name__ == "__main__":
     rospy.init_node('part3')
