@@ -43,6 +43,7 @@ class Part3:
 
         self.eye = np.identity(3)
         self.axis = np.float32([[30,0,0], [0,30,0], [0,0,-30]]).reshape(-1,3)
+        self.origin = np.float32([[0,0,0], [0,0,0], [0,0,0]]).reshape(-1,3)
         
         self.criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
         self.K = None
@@ -114,6 +115,7 @@ class Part3:
             rvecs, tvecs, inliers = pnp[1], pnp[2], pnp[3]
             
             imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.K, self.D)
+            rect, jac = cv2.projectPoints(rect, rvecs, tvecs, self.K, self.D)
             
             
             
