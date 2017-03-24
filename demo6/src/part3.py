@@ -93,7 +93,7 @@ class Part3:
 
             h,w = self.target_image.shape #gray.shape
             rect = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
-            rect3d = np.float32([ [0,0,0],[0,h-1,0],[w-1,h-1,0],[w-1,0,0] ]).reshape(-1,1,2)
+            rect3d = np.float32([ [0,0,0],[0,h-1,0],[w-1,h-1,0],[w-1,0,0] ])
             rect = cv2.perspectiveTransform(rect,M)
             #M = M * (self.eye * 0.25)
             
