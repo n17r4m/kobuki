@@ -175,7 +175,7 @@ class Part3:
     def draw(self, img, corners, imgpts):
         print "shapes", corners.shape, imgpts.shape
         #mid = tuple([np.mean(corners[:,:,0]), np.mean(corners[:,:,1])])
-        mid = tuple([np.mean(corners[0,0,0]), np.mean(corners[0,0,1])])
+        mid = tuple([np.mean(corners[0,0,0]), np.mean(corners[0,0,1])]).astype(int)
         img = cv2.line(img, mid, tuple(imgpts[0].ravel()), (255,0,0), 5)
         img = cv2.line(img, mid, tuple(imgpts[1].ravel()), (0,255,0), 5)
         img = cv2.line(img, mid, tuple(imgpts[2].ravel()), (0,0,255), 5)
