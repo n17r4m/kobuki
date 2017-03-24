@@ -34,7 +34,7 @@
 
   <!-- Launch the tracker -->
   <node pkg="demo6" type="part3.py" name="part3" output="screen" required="true" />
-  <param name="/ua_marker" value="$(find demo6)/img/UA-1C-SOLID.png"/>
+  <param name="/ua_marker" value="$(find demo6)/img/UA-1C-SOLID.png" />
 
 
 
