@@ -42,7 +42,7 @@ class Part3:
 
 
         self.eye = np.identity(3)
-        self.axis = np.float32([[3,0,0], [0,3,0], [0,0,-3]])#.reshape(-1,3)
+        self.axis = np.float32([[3,0,0], [0,3,0], [0,0,-3]]).reshape(-1,3)
         
         self.criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
         self.K = None
@@ -139,11 +139,18 @@ class Part3:
 
 
     def draw(self, img, corners, imgpts):
+        """
         offset = np.array([self.target_image.shape[0], 0])
         mid = tuple(np.array([np.mean(corners[:,:,0]), np.mean(corners[:,:,1])]).astype(int) + offset)
         img = cv2.line(img, mid, tuple((imgpts[0] + offset).astype(int).ravel()), (255,0,0), 5)
         img = cv2.line(img, mid, tuple((imgpts[1] + offset).astype(int).ravel()), (0,255,0), 5)
         img = cv2.line(img, mid, tuple((imgpts[2] + offset).astype(int).ravel()), (0,0,255), 5)
+        """
+        
+        mid = tuple(np.array([np.mean(corners[:,:,0]), np.mean(corners[:,:,1])]).astype(int))
+        img = cv2.line(img, mid, tuple((imgpts[0]).astype(int).ravel()), (255,0,0), 5)
+        img = cv2.line(img, mid, tuple((imgpts[1]).astype(int).ravel()), (0,255,0), 5)
+        img = cv2.line(img, mid, tuple((imgpts[2]).astype(int).ravel()), (0,0,255), 5)
         return img
 
 
