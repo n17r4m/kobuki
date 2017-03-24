@@ -118,7 +118,11 @@ class Part3:
             
             imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.K, self.D)
             imgpts2, jac = cv2.projectPoints(self.axis2, rvecs, tvecs, self.K, self.D)
+            img3 = self.draw(img3, imgpts, imgpts2, rect)
             
+            imgpts, jac = cv2.projectPoints(self.axis + h, rvecs, tvecs, self.K, self.D)
+            imgpts2, jac = cv2.projectPoints(self.axis2 + h, rvecs, tvecs, self.K, self.D)
+            img3 = self.draw(img3, imgpts, imgpts2, rect)
             
             
         else:
@@ -136,10 +140,6 @@ class Part3:
         
         #img3 = cv2.cvtColor(img3, cv2.COLOR_GRAY2BGR)
         
-        self.imgpts = imgpts # (self.imgpts + imgpts) / 2
-        self.imgpts2 = imgpts2 # (self.imgpts2 + imgpts2) / 2
-        
-        img3 = self.draw(img3, self.imgpts, self.imgpts2, rect)
         img3 = cv2.drawMatches(self.target_image, self.kp, gray, kp, good, None, **draw_params)
         
         
