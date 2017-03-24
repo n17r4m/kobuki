@@ -33,7 +33,7 @@ class Part3:
         
         
         # Initiate STAR detector
-        self.orb = cv2.ORB_create()
+        self.orb = cv2.ORB_create(120)
         # find the keypoints with ORB
         self.kp = self.orb.detect(self.target_image,None)
         # compute the descriptors with ORB
@@ -64,7 +64,7 @@ class Part3:
         img3 = gray
 
 
-        orb = cv2.ORB_create()
+        orb = cv2.ORB_create(200)
         kp = orb.detect(gray,None)
         kp, des = self.orb.compute(gray, kp)
         des = np.float32(des)
@@ -168,10 +168,10 @@ class Part3:
 
 
     def draw(self, img, corners, imgpts):
-        corner = tuple([np.mean(corners[:,:,0]), np.mean(corners[:,:,1])])
-        img = cv2.line(img, corner, tuple(imgpts[0].ravel()), (255,0,0), 5)
-        img = cv2.line(img, corner, tuple(imgpts[1].ravel()), (0,255,0), 5)
-        img = cv2.line(img, corner, tuple(imgpts[2].ravel()), (0,0,255), 5)
+        mid = tuple([np.mean(corners[:,:,0]), np.mean(corners[:,:,1])])
+        img = cv2.line(img, mid, tuple(imgpts[0].ravel()), (255,0,0), 5)
+        img = cv2.line(img, mid, tuple(imgpts[1].ravel()), (0,255,0), 5)
+        img = cv2.line(img, mid, tuple(imgpts[2].ravel()), (0,0,255), 5)
         return img
 
 
