@@ -16,6 +16,7 @@
   
   
   <remap from="/cv_camera" to="/camera" />
+  <remap from="/camera/rgb" to="/camera" />
   <param name="camera_prefix" value="/camera" />
   
   <!-- Launch the usb camera acquisition node -->
