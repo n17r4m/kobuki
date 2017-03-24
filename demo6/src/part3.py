@@ -120,7 +120,9 @@ class Part3:
             imgpts2, jac = cv2.projectPoints(self.axis2, rvecs, tvecs, self.K, self.D)
             img3 = self.draw(img3, imgpts, imgpts2, rect)
             
-            imgpts, jac = cv2.projectPoints(self.axis + h, rvecs, tvecs, self.K, self.D)
+            a2_1 = self.axis + [0,h,0]
+            a2_2 = self.axis2 + [0,h,0]
+            imgpts, jac = cv2.projectPoints(a2_1, rvecs, tvecs, self.K, self.D)
             imgpts2, jac = cv2.projectPoints(self.axis2 + h, rvecs, tvecs, self.K, self.D)
             img3 = self.draw(img3, imgpts, imgpts2, rect)
             
