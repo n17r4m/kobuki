@@ -30,7 +30,10 @@ class Part3:
 
         # Load the target image
         img_path = rospy.get_param("/pkg_path")
+<<<<<<< HEAD
         print img_path+ "/img/UA-1C-SOLID.png"
+=======
+>>>>>>> 814e894f77311f584f49351977c042b61ac19411
         self.target_image = cv2.imread(img_path + "/img/UA-1C-SOLID.png", 0)
 
         self.imgpts = np.zeros((3, 1, 2), dtype=np.int)
