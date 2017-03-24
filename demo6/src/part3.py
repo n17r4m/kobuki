@@ -105,11 +105,11 @@ class Part3:
             
             dst2 = dst_pts[matchesMask].reshape(dst_pts.shape[0], 2)
             src2 = src_pts[matchesMask].reshape(dst_pts.shape[0], 2)
-            src2 = np.concatenate(src2, [0], axis=1)
+            #src2 = np.concatenate(src2, [0], axis=1)
             
             
-            #pnp = cv2.solvePnPRansac(rect3d, rect, self.K, self.D)
-            pnp = cv2.solvePnPRansac(src2, dst2, self.K, self.D)
+            pnp = cv2.solvePnPRansac(rect3d, rect, self.K, self.D)
+            #pnp = cv2.solvePnPRansac(src2, dst2, self.K, self.D)
             rvecs, tvecs, inliers = pnp[1], pnp[2], pnp[3]
             
             imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.K, self.D)
