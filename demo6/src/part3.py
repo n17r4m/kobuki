@@ -25,7 +25,7 @@ def R(axis, theta):
 class Part3:
     def __init__(self):
         self.bridge = cv_bridge.CvBridge()
-        self.cam_info_sub = rospy.Subscriber('/camera/rgb/camera_info', CameraInfo, self.info_cb)
+        self.cam_info_sub = rospy.Subscriber('/camera/camera_info', CameraInfo, self.info_cb)
         self.img_sub = rospy.Subscriber('/camera/image_rect_color', Image, self.img_cb)
 
         # Load the target image
