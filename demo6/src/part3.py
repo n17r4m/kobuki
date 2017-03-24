@@ -123,6 +123,8 @@ class Part3:
         else:
             print "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT)
             matchesMask = None
+            rect = [[0,0],[0,0],[0,0],[0,0]]
+            imgpts = [[0,0],[0,0],[0,0],[0,0]]
         
         draw_params = dict(matchColor = (0,255,0), # draw matches in green color
                        singlePointColor = None,
