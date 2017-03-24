@@ -168,7 +168,7 @@ class Part3:
 
 
     def draw(self, img, corners, imgpts):
-        corner = np.array([np.mean(corners[:,0]), np.mean(corners[:,1])])
+        corner = np.array([np.mean(corners[:,:,0]), np.mean(corners[:,:,1])])
         img = cv2.line(img, corner, tuple(imgpts[0].ravel()), (255,0,0), 5)
         img = cv2.line(img, corner, tuple(imgpts[1].ravel()), (0,255,0), 5)
         img = cv2.line(img, corner, tuple(imgpts[2].ravel()), (0,0,255), 5)
