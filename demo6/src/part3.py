@@ -133,7 +133,7 @@ class Part3:
                        flags = 2)
         
         img3 = cv2.drawMatches(self.target_image, self.kp, gray, kp, good, None, **draw_params)
-        img3 = self.draw(img3, rect, imgpts)
+        img3 = self.draw(img3, imgpts, imgpts2)
         
         cv2.imshow("result", img3)
         
