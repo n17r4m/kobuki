@@ -113,7 +113,8 @@ class Part3:
             
             
             
-            rvecs, tvecs, inliers = cv2.solvePnPRansac(rect3d, rect, self.K, self.D)
+            pnp = cv2.solvePnPRansac(rect3d, rect, self.K, self.D)
+            rvecs, tvecs, inliers = pnp[0], pnp[1], pnp[2]
             imgpts, jac = cv2.projectPoints(axis, rvecs, tvecs, self.K, self.D)
             img3 = self.draw(img3, np.int32(dst), imgpts)
             
