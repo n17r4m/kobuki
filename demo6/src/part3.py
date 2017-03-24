@@ -114,7 +114,7 @@ class Part3:
             
             
             pnp = cv2.solvePnPRansac(rect3d, rect, self.K, self.D)
-            rvecs, tvecs, inliers = pnp[0], pnp[1], pnp[2]
+            rvecs, tvecs, inliers = pnp[1], pnp[2], pnp[3]
             print pnp
             imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.K, self.D)
             img3 = self.draw(img3, np.int32(dst), imgpts)
