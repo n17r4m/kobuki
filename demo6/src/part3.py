@@ -133,8 +133,9 @@ class Part3:
                        matchesMask = matchesMask, # draw only inliers
                        flags = 2)
         
-        img3 = cv2.drawMatches(self.target_image, self.kp, gray, kp, good, None, **draw_params)
         img3 = self.draw(img3, imgpts, imgpts2)
+        img3 = cv2.drawMatches(self.target_image, self.kp, gray, kp, good, None, **draw_params)
+        
         
         cv2.imshow("result", img3)
         
@@ -144,7 +145,7 @@ class Part3:
 
     def draw(self, img, imgpts, imgpts2):
         
-        offset = np.array([self.target_image.shape[0], 0]) # self.target_image.shape[1]/2])
+        offset = np.array([0,0]) # np.array([self.target_image.shape[0], self.target_image.shape[1]/2])
         #mid = tuple(np.array([np.mean(corners[:,:,0]), np.mean(corners[:,:,1])]).astype(int) + offset)
         img = cv2.line(img, tuple((imgpts[0] + offset).astype(int).ravel()), tuple((imgpts2[0] + offset).astype(int).ravel()), (255,0,0), 5)
         img = cv2.line(img, tuple((imgpts[1] + offset).astype(int).ravel()), tuple((imgpts2[1] + offset).astype(int).ravel()), (0,255,0), 5)
