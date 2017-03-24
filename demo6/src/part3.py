@@ -33,7 +33,7 @@ class Part3:
         
         
         # Initiate STAR detector
-        self.orb = cv2.ORB_create(120)
+        self.orb = cv2.ORB_create(220)
         # find the keypoints with ORB
         self.kp = self.orb.detect(self.target_image,None)
         # compute the descriptors with ORB
@@ -64,7 +64,7 @@ class Part3:
         img3 = gray
 
 
-        orb = cv2.ORB_create(200)
+        orb = cv2.ORB_create(500)
         kp = orb.detect(gray,None)
         kp, des = self.orb.compute(gray, kp)
         des = np.float32(des)
