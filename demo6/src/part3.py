@@ -136,8 +136,8 @@ class Part3:
         
         #img3 = cv2.cvtColor(img3, cv2.COLOR_GRAY2BGR)
         
-        self.imgpts = (self.imgpts + imgpts) / 2
-        self.imgpts2 = (self.imgpts2 + imgpts2) / 2
+        self.imgpts = np.maximum((self.imgpts + imgpts) / 2, 1)
+        self.imgpts2 = np.maximum((self.imgpts2 + imgpts2) / 2, 1)
         
         img3 = self.draw(img3, self.imgpts, self.imgpts2, rect)
         img3 = cv2.drawMatches(self.target_image, self.kp, gray, kp, good, None, **draw_params)
@@ -166,7 +166,7 @@ class Part3:
         return img
     
     def line(self, img, p1, p2, c, w):
-        return cv2.line(img, tuple(np.maximum(p1, 0)), tuple(np.maximum(p2, 0)), c, w)
+        return cv2.line(img, tuple(np.maximum(p1, 1)), tuple(np.maximum(p2, 1)), c, w)
 
 if __name__ == "__main__":
     rospy.init_node('part3')
