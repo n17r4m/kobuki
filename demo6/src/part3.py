@@ -117,6 +117,7 @@ class Part3:
             rvecs, tvecs, inliers = pnp[1], pnp[2], pnp[3]
             print pnp
             imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.K, self.D)
+            img3 = cv2.cvtColor(img3, cv2.COLOR_GRAY2BGR)
             img3 = self.draw(img3, rect, imgpts)
             print imgpts
             
