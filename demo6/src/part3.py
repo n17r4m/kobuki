@@ -33,7 +33,7 @@ class Part3:
         
         
         # Initiate STAR detector
-        self.orb = cv2.ORB_create(550)
+        self.orb = cv2.ORB_create(200)
         # find the keypoints with ORB
         self.kp = self.orb.detect(self.target_image,None)
         # compute the descriptors with ORB
@@ -118,6 +118,7 @@ class Part3:
             print pnp
             imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.K, self.D)
             img3 = self.draw(img3, rect, imgpts)
+            print imgpts
             
         else:
             print "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT)
