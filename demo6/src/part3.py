@@ -109,16 +109,13 @@ class Part3:
             dst2 = dst_pts[matchesMask].reshape(dst_pts.shape[0], 2)
             src2 = src_pts[matchesMask].reshape(dst_pts.shape[0], 2)
             
-            print dst2.shape, len(dst2), len(src2)
-            
-            
             
             pnp = cv2.solvePnPRansac(rect3d, rect, self.K, self.D)
             rvecs, tvecs, inliers = pnp[1], pnp[2], pnp[3]
-            print pnp
+            
             imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.K, self.D)
-            img3 = self.draw(img3, rect, imgpts)
-            print imgpts
+            
+            
             
         else:
             print "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT)
