@@ -151,8 +151,8 @@ class Part3:
         img = cv2.line(img, mid, tuple((imgpts[0]).astype(int).ravel()), (255,0,0), 5)
         img = cv2.line(img, mid, tuple((imgpts[1]).astype(int).ravel()), (0,255,0), 5)
         img = cv2.line(img, mid, tuple((imgpts[2]).astype(int).ravel()), (0,0,255), 5)
-        return img
         """
+        return img
 
 
 if __name__ == "__main__":
