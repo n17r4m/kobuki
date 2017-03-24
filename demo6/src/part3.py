@@ -115,7 +115,7 @@ class Part3:
             rvecs, tvecs, inliers = pnp[1], pnp[2], pnp[3]
             
             imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.K, self.D)
-            rect, jac = cv2.projectPoints(rect3d, rvecs, tvecs, self.K, self.D)
+            #rect, jac = cv2.projectPoints(rect3d, rvecs, tvecs, self.K, self.D)
             
             
             
@@ -142,7 +142,7 @@ class Part3:
 
     def draw(self, img, corners, imgpts):
         
-        offset = np.array([self.target_image.shape[0], 0])
+        offset = np.array([self.target_image.shape[0], self.target_image.shape[1]/2])
         mid = tuple(np.array([np.mean(corners[:,:,0]), np.mean(corners[:,:,1])]).astype(int) + offset)
         img = cv2.line(img, mid, tuple((imgpts[0] + offset).astype(int).ravel()), (255,0,0), 5)
         img = cv2.line(img, mid, tuple((imgpts[1] + offset).astype(int).ravel()), (0,255,0), 5)
