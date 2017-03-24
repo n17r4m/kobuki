@@ -136,8 +136,8 @@ class Part3:
         
         #img3 = cv2.cvtColor(img3, cv2.COLOR_GRAY2BGR)
         
-        self.imgpts = (self.imgpts + imgpts) / 2
-        self.imgpts2 = (self.imgpts2 + imgpts2) / 2
+        self.imgpts = imgpts # (self.imgpts + imgpts) / 2
+        self.imgpts2 = imgpts2 # (self.imgpts2 + imgpts2) / 2
         
         img3 = self.draw(img3, self.imgpts, self.imgpts2, rect)
         img3 = cv2.drawMatches(self.target_image, self.kp, gray, kp, good, None, **draw_params)
