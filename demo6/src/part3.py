@@ -145,7 +145,7 @@ class Part3:
 
     def draw(self, img, imgpts, imgpts2, rect):
         
-        offset = ((rect[0] + rect[2]) / 2) # np.array([self.target_image.shape[0], self.target_image.shape[1]/2])
+        offset = np.absolute((rect[2] - rect[0]) / 2) # np.array([self.target_image.shape[0], self.target_image.shape[1]/2])
         #mid = tuple(np.array([np.mean(corners[:,:,0]), np.mean(corners[:,:,1])]).astype(int) + offset)
         img = cv2.line(img, tuple((imgpts[0] + offset).astype(int).ravel()), tuple((imgpts2[0] + offset).astype(int).ravel()), (255,0,0), 5)
         img = cv2.line(img, tuple((imgpts[1] + offset).astype(int).ravel()), tuple((imgpts2[1] + offset).astype(int).ravel()), (0,255,0), 5)
