@@ -93,6 +93,7 @@ class Part3:
 
             h,w = self.target_image.shape #gray.shape
             rect = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
+            rect3d = np.float32([ [0,0,0],[0,h-1,0],[w-1,h-1,0],[w-1,0,0] ]).reshape(-1,1,2)
             rect = cv2.perspectiveTransform(rect,M)
             #M = M * (self.eye * 0.25)
             
@@ -112,7 +113,7 @@ class Part3:
             
             
             
-            rvecs, tvecs, inliers = cv2.solvePnPRansac(np.float32(dst2), np.float32(src2), self.K, self.D)
+            rvecs, tvecs, inliers = cv2.solvePnPRansac(rect3d, rect, self.K, self.D)
             imgpts, jac = cv2.projectPoints(axis, rvecs, tvecs, self.K, self.D)
             img3 = self.draw(img3, np.int32(dst), imgpts)
             
