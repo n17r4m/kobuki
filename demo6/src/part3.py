@@ -29,7 +29,8 @@ class Part3:
         self.img_sub = rospy.Subscriber('/camera/image_rect_color', Image, self.img_cb)
 
         # Load the target image
-        self.target_image = cv2.imread("/home/martin/Documents/Classes/Cmput412/src/demo6/img/UA-1C-SOLID.png", 0)
+        img_path = rospy.get_param("/ua_marker")
+        self.target_image = cv2.imread(img_path, 0)
         
         self.imgpts = np.zeros((3, 1, 2), dtype=np.int)
         self.imgpts2 = np.zeros((3, 1, 2), dtype=np.int)
