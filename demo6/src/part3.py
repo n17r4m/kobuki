@@ -133,6 +133,7 @@ class Part3:
                        matchesMask = matchesMask, # draw only inliers
                        flags = 2)
         
+        img3 = cv2.cvtColor(img3, COLOR_GRAY2BGR)
         img3 = self.draw(img3, imgpts, imgpts2, rect)
         img3 = cv2.drawMatches(self.target_image, self.kp, gray, kp, good, None, **draw_params)
         
