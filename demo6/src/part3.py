@@ -98,22 +98,17 @@ class Part3:
             rect = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
             rect3d = np.float32([ [0,0,0],[0,h-1,0],[w-1,h-1,0],[w-1,0,0] ]).reshape(-1,1,3)
             rect = cv2.perspectiveTransform(rect,M)
-            #M = M * (self.eye * 0.25)
-            
+
 
             img2 = cv2.polylines(gray,[np.int32(rect)],True,255,3, cv2.LINE_AA)
             
-    
-            """
-            pts = np.array([kp[idx].pt for idx in range(len(kp))],dtype=np.float).reshape(-1,1,2)
-            ipts = np.array([self.kp[idx].pt for idx in range(len(self.kp))],dtype=np.float).reshape(-1,1,2)
-            """
             
             dst2 = dst_pts[matchesMask].reshape(dst_pts.shape[0], 2)
             src2 = src_pts[matchesMask].reshape(dst_pts.shape[0], 2)
+            src2 = np.append(src2, 0, axis=1)
             
-            
-            pnp = cv2.solvePnPRansac(rect3d, rect, self.K, self.D)
+            #pnp = cv2.solvePnPRansac(rect3d, rect, self.K, self.D)
+            pnp = cv2.solvePnPRansac(src2, dst2, self.K, self.D)
             rvecs, tvecs, inliers = pnp[1], pnp[2], pnp[3]
             
             imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.K, self.D)
