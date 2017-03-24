@@ -110,7 +110,7 @@ class Part3:
             
             print dst2.shape, len(dst2), len(src2)
             
-            rvecs, tvecs, inliers = cv2.solvePnPRansac(dst2, src2, self.K, self.D)
+            rvecs, tvecs, inliers = cv2.solvePnPRansac(np.float32(dst2), np.float32(src2), self.K, self.D)
             imgpts, jac = cv2.projectPoints(axis, rvecs, tvecs, self.K, self.D)
             img3 = self.draw(img3, np.int32(dst), imgpts)
             
