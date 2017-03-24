@@ -115,7 +115,7 @@ class Part3:
             rvecs, tvecs, inliers = pnp[1], pnp[2], pnp[3]
             
             imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.K, self.D)
-            rect, jac = cv2.projectPoints(rect, rvecs, tvecs, self.K, self.D)
+            rect, jac = cv2.projectPoints(rect3d, rvecs, tvecs, self.K, self.D)
             
             
             
