@@ -151,11 +151,11 @@ class Part3:
 
     def draw(self, img, imgpts, imgpts2, rect):
         
-        offset = np.absolute((rect[2] - rect[0]) / 2) # np.array([self.target_image.shape[0], self.target_image.shape[1]/2])
+        offset = np.array([0,0]) #np.absolute((rect[2] - rect[0]) / 2) # np.array([self.target_image.shape[0], self.target_image.shape[1]/2])
         #mid = tuple(np.array([np.mean(corners[:,:,0]), np.mean(corners[:,:,1])]).astype(int) + offset)
         img = self.line(img, tuple((imgpts[0] + offset).astype(int).ravel()), tuple((imgpts2[0] + offset).astype(int).ravel()), (255,255,255), 5)
-        img = self.line(img, tuple((imgpts[1] + offset).astype(int).ravel()), tuple((imgpts2[1] + offset).astype(int).ravel()), (200,200,200), 5)
-        img = self.line(img, tuple((imgpts[2] + offset).astype(int).ravel()), tuple((imgpts2[2] + offset).astype(int).ravel()), (150,150,150), 5)
+        img = self.line(img, tuple((imgpts[1] + offset).astype(int).ravel()), tuple((imgpts2[1] + offset).astype(int).ravel()), (150,150,150), 5)
+        img = self.line(img, tuple((imgpts[2] + offset).astype(int).ravel()), tuple((imgpts2[2] + offset).astype(int).ravel()), (100,100,100), 5)
         
         """
         mid = tuple(np.array([np.mean(corners[:,:,0]), np.mean(corners[:,:,1])]).astype(int))
