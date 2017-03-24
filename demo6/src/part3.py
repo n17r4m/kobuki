@@ -117,7 +117,7 @@ class Part3:
             rvecs, tvecs, inliers = pnp[1], pnp[2], pnp[3]
             print pnp
             imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.K, self.D)
-            img3 = self.draw(img3, np.int32(dst), imgpts)
+            img3 = self.draw(img3, rect, imgpts)
             
         else:
             print "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT)
