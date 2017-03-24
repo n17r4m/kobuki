@@ -31,7 +31,8 @@ class Part3:
         # Load the target image
         self.target_image = cv2.imread("/home/martin/Documents/Classes/Cmput412/src/demo6/img/UA-1C-SOLID.png", 0)
         
-        
+        self.imgpts = np.zeros((3, 1, 2), dtype=np.int)
+        self.imgpts2 = np.zeros((3, 1, 2), dtype=np.int)
         # Initiate STAR detector
         self.orb = cv2.ORB_create(200)
         # find the keypoints with ORB
@@ -134,7 +135,11 @@ class Part3:
                        flags = 2)
         
         #img3 = cv2.cvtColor(img3, cv2.COLOR_GRAY2BGR)
-        img3 = self.draw(img3, imgpts, imgpts2, rect)
+        
+        self.imgpts = (self.imgpts + imgpts) / 2
+        self.imgpts2 = (self.imgpts2 + imgpts2) / 2
+        
+        img3 = self.draw(img3, self.imgpts, self.imgpts2, rect)
         img3 = cv2.drawMatches(self.target_image, self.kp, gray, kp, good, None, **draw_params)
         
         
