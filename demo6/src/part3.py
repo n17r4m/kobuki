@@ -131,40 +131,9 @@ class Part3:
         
         img3 = cv2.drawMatches(self.target_image, self.kp, gray, kp, good, None, **draw_params)
         img3 = self.draw(img3, rect, imgpts)
-        #plt.imshow(img3, 'gray'),plt.show()
+        
         cv2.imshow("result", img3)
-            
-            
-            
         
-        
-
-        """
-        ret, corners = cv2.findChessboardCorners(gray, (8,6), cv2.CALIB_CB_FAST_CHECK)
-
-        if ret == True: #and not self.found:
-            print "found it"
-            #self.found = True
-            corners2 = cv2.cornerSubPix(gray,corners,(3,3),(-1,-1), self.criteria)
-            #z = np.array([0.0,0.0,0.0,0.0,0.0])
-            # Find the rotation and translation vectors.
-            shits = cv2.solvePnPRansac(self.objp, corners2, self.K, self.D)#, cv2.SOLVEPNP_UPNP)
-            rvecs, tvecs, inliers = shits[1], shits[2], shits[3]
-            self.rot = rvecs
-            self.trans = tvecs
-            # project 3D points to image plane
-            imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.K, self.D)
-
-            img = self.draw(img,corners2,imgpts)
-
-            cv2.imshow('img',img)
-            k = cv2.waitKey(1) & 0xff
-
-        else:
-            tvecs = np.zeros((3,))
-            rvecs = np.zeros((3,))
-
-        """
 
         k = cv2.waitKey(1) & 0xff
 
