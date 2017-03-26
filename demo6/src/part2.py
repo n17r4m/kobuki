@@ -12,9 +12,9 @@ import time
 class Track:
 	def __init__(self):
 		self.bridge = cv_bridge.CvBridge()
-		self.cam_info_sub = rospy.Subscriber('camera/rgb/camera_info', CameraInfo, self.info_cb)	
-		self.img_sub = rospy.Subscriber('camera/rgb/image_raw', Image, self.img_cb)
-		self.marker = rospy.Subscriber('visualization_marker', Marker, self.marker_cb)	
+		self.cam_info_sub = rospy.Subscriber('/cv_camera/camera_info', CameraInfo, self.info_cb)
+		self.img_sub = rospy.Subscriber('/cv_camera/image_raw', Image, self.img_cb)
+		self.marker = rospy.Subscriber('visualization_marker', Marker, self.marker_cb)
 		self.axis = np.float32([[0.1,0,0], [0,0.1,0], [0,0,-0.1],[0,0,0]]).reshape(-1,3)
 		self.rvecs = None
 		self.tvecs = None
@@ -41,10 +41,10 @@ class Track:
 			ox = msg.pose.orientation.x
 			oy = msg.pose.orientation.y
 			oz = msg.pose.orientation.z
-			ow = msg.pose.orientation.w		
-					
+			ow = msg.pose.orientation.w
+
 			tvecs = np.array([px, py, pz])
-			
+
 			angle = 2 * math.acos(ow)
 			x = ox / math.sqrt(1 - ow*ow)
 			y = oy / math.sqrt(1 - ow*ow)
@@ -52,21 +52,21 @@ class Track:
 			ratio = math.sqrt(x*x + y*y + z*z)
 
 			#normalize them
-			x = -x / (ratio*angle)
-			y = -y / (ratio*angle)
-			z = -z / (ratio*angle)
+			x = x / ratio*angle
+			y = y / ratio*angle
+			z = z / ratio*angle
 			rvecs = np.array([x, y, z])
-			
+
 			#rvecs = msg.getAngle().getAxis() bullet
 			#print(rvecs)
 			imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.K, self.D)
 			print(imgpts)
-			
-			image = cv2.line(self.img, tuple(imgpts[0].ravel()), tuple(imgpts[1].ravel()), (255,0,0), 5)
-			image = cv2.line(self.img, tuple(imgpts[0].ravel()), tuple(imgpts[2].ravel()), (0,255,0), 5)
-			image = cv2.line(self.img, tuple(imgpts[0].ravel()), tuple(imgpts[3].ravel()), (0,0,255), 5)
-			cv2.imshow('img',self.img)
-			k = cv2.waitKey(1) & 0xff
+
+			image = cv2.line(self.img, tuple(imgpts[3].ravel()), tuple(imgpts[0].ravel()), (255,0,0), 5)
+			image = cv2.line(self.img, tuple(imgpts[3].ravel()), tuple(imgpts[1].ravel()), (0,255,0), 5)
+			image = cv2.line(self.img, tuple(imgpts[3].ravel()), tuple(imgpts[2].ravel()), (0,0,255), 5)
+		cv2.imshow('img',self.img)
+		k = cv2.waitKey(1) & 0xff
 
 
 
