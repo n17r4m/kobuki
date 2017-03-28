@@ -94,7 +94,6 @@ class Comp4_bf:
             rect3d = np.float32([ [0,0,0],[0,h-1,0],[w-1,h-1,0],[w-1,0,0] ]).reshape(-1,1,3)
             rect = cv2.perspectiveTransform(rect,M)
 
-
             img2 = cv2.polylines(gray,[np.int32(rect)],True,255,3, cv2.LINE_AA)
 
 
@@ -141,6 +140,40 @@ class Comp4_bf:
         cv2.imshow("result", img3)
 
         k = cv2.waitKey(1) & 0xff
+
+    #TODO:
+    # make sure the measurement is correct
+    # calculate the real-life scale distance
+    #
+
+    def navi(self, dist, theta):
+        print dist
+        print theta
+        #self.twist.angular.z = - theta[0]  * 180 / 3.1415 / 10
+        #self.twist.linear.x = (dist[-1]- 15) / 100
+        z = 0
+        if theta[0] > 0.2:
+            dist[0] -= 6
+        elif theta[0] < -0.2:
+            dist[0] += 6
+
+        if 0 > dist[0]:
+            z = 0.2
+        elif 0 < dist[0]:
+            z = -0.2
+        else:
+            z = 0
+
+
+        if dist[-1] > 10:
+            x = 0.2
+        else:
+            x = 0
+
+        self.twist.angular.z = (3*self.twist.angular.z + z) / 4
+        self.twist.linear.x = (3*self.twist.linear.x + x) / 4
+
+        self.cmd_vel_pub.publish(self.twist)
 
 
     def draw(self, img, imgpts, imgpts2, rect):
