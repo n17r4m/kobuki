@@ -97,10 +97,9 @@ class Comp4_bf:
             img2 = cv2.polylines(gray,[np.int32(rect)],True,255,3, cv2.LINE_AA)
 
 
-            dst2 = dst_pts[matchesMask].reshape(dst_pts.shape[0], 2)
-            src2 = src_pts[matchesMask].reshape(dst_pts.shape[0], 2)
+            #dst2 = dst_pts[matchesMask].reshape(dst_pts.shape[0], 2)
+            #src2 = src_pts[matchesMask].reshape(dst_pts.shape[0], 2)
             #src2 = np.concatenate(src2, [0], axis=1)
-
 
             pnp = cv2.solvePnPRansac(rect3d, rect, self.K, self.D)
             #pnp = cv2.solvePnPRansac(src2, dst2, self.K, self.D)
