@@ -21,7 +21,7 @@ MIN_MATCH_COUNT = 10
 def R(axis, theta):
     return expm3(cross(eye(3), axis/norm(axis)*theta))
 
-class Part3:
+class Comp4_bf:
     def __init__(self):
         self.bridge = cv_bridge.CvBridge()
         self.cam_info_sub = rospy.Subscriber('/camera/camera_info', CameraInfo, self.info_cb)
@@ -30,6 +30,7 @@ class Part3:
         # Load the target image
         img_path = rospy.get_param("/pkg_path")
         self.target_image = cv2.imread(img_path + "/img/UA-1C-SOLID.png", 0)
+        print img_path + "/img/UA-1C-SOLID.png"
 
         self.imgpts = np.zeros((3, 1, 2), dtype=np.int)
         self.imgpts2 = np.zeros((3, 1, 2), dtype=np.int)
@@ -66,20 +67,14 @@ class Part3:
         img2 = gray
         img3 = gray
 
-
         orb = cv2.ORB_create(800)
         kp = orb.detect(gray,None)
         kp, des = self.orb.compute(gray, kp)
         des = np.float32(des)
 
-
-        FLANN_INDEX_KDTREE = 0
-        index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
-        search_params = dict(checks = 50)
-
-        flann = cv2.FlannBasedMatcher(index_params, search_params)
-        matches = flann.knnMatch(self.des, des, k=2)
-
+        # initiate BF matcher
+        bf = cv2.BFMatcher()
+        matches = bf.knnMatch(self.des,des, k=2)
 
         # store all the good matches as per Lowe's ratio test.
         good = []
@@ -142,13 +137,8 @@ class Part3:
                        matchesMask = matchesMask, # draw only inliers
                        flags = 2)
 
-        #img3 = cv2.cvtColor(img3, cv2.COLOR_GRAY2BGR)
-
         img3 = cv2.drawMatches(self.target_image, self.kp, gray, kp, good, None, **draw_params)
-
-
         cv2.imshow("result", img3)
-
 
         k = cv2.waitKey(1) & 0xff
 
@@ -173,6 +163,6 @@ class Part3:
         return cv2.line(img, tuple(np.maximum(p1, 1)), tuple(np.maximum(p2, 1)), c, w)
 
 if __name__ == "__main__":
-    rospy.init_node('part3')
-    part3 = Part3()
+    rospy.init_node('comp4')
+    comp4_bf = Comp4_bf()
     rospy.spin()
