@@ -105,22 +105,25 @@ class Comp4_bf:
             #pnp = cv2.solvePnPRansac(src2, dst2, self.K, self.D)
             rvecs, tvecs, inliers = pnp[1], pnp[2], pnp[3]
 
+            """
             imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.K, self.D)
             imgpts2, jac = cv2.projectPoints(self.axis2, rvecs, tvecs, self.K, self.D)
             img3 = self.draw(img3, imgpts, imgpts2, rect)
 
-            imgpts, jac = cv2.projectPoints(self.axis + [0,h,0], rvecs, tvecs, self.K, self.D)
-            imgpts2, jac = cv2.projectPoints(self.axis2 + [0,h,0], rvecs, tvecs, self.K, self.D)
+            imgpts, jac = cv2.projectPoints(self.axis + [0,h/2,0], rvecs, tvecs, self.K, self.D)
+            imgpts2, jac = cv2.projectPoints(self.axis2 + [0,h/2,0], rvecs, tvecs, self.K, self.D)
             img3 = self.draw(img3, imgpts, imgpts2, rect)
 
-            imgpts, jac = cv2.projectPoints(self.axis + [w,0,0], rvecs, tvecs, self.K, self.D)
-            imgpts2, jac = cv2.projectPoints(self.axis2 + [w,0,0], rvecs, tvecs, self.K, self.D)
+            imgpts, jac = cv2.projectPoints(self.axis + [w/2,0,0], rvecs, tvecs, self.K, self.D)
+            imgpts2, jac = cv2.projectPoints(self.axis2 + [w/2,0,0], rvecs, tvecs, self.K, self.D)
+            img3 = self.draw(img3, imgpts, imgpts2, rect)
+            """
+            imgpts, jac = cv2.projectPoints(self.axis + [w/2,h/2,0], rvecs, tvecs, self.K, self.D)
+            imgpts2, jac = cv2.projectPoints(self.axis2 + [w/2,h/2,0], rvecs, tvecs, self.K, self.D)
             img3 = self.draw(img3, imgpts, imgpts2, rect)
 
-            imgpts, jac = cv2.projectPoints(self.axis + [w,h,0], rvecs, tvecs, self.K, self.D)
-            imgpts2, jac = cv2.projectPoints(self.axis2 + [w,h,0], rvecs, tvecs, self.K, self.D)
-            img3 = self.draw(img3, imgpts, imgpts2, rect)
-
+            tvecs/= 525 * 2
+            print rvecs, tvecs
 
         else:
             print "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT)
