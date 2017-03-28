@@ -13,10 +13,14 @@
   -->
 <launch>	
   <!-- Launch the turtlebot -->
+  <!-- 
   <include file="$(find turtlebot_bringup)/launch/minimal.launch" />
+  -->
   
   <!-- Launch the camera -->
+  <!--
   <include file="$(find turtlebot_bringup)/launch/3dsensor.launch" />      
+  -->
   
   <!-- Launch the usb camera acquisition node -->
   <node pkg="cv_camera" type="cv_camera_node" name="cv_camera" output="screen">      
