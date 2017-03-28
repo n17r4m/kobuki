@@ -72,6 +72,7 @@ class TemplateMatcher(object):
 		(endX, endY) = (int((maxLoc[0] + self.tw) * r), int((maxLoc[1] + self.th) * r))
 		
 		# draw a bounding box around the detected result and display the image
+		image = self.template.copy()
 		cv2.rectangle(image, (startX, startY), (endX, endY), (0, 0, 255), 2)
 		cv2.imshow(self.name, image)
 		cv2.waitKey(1)
@@ -213,6 +214,35 @@ class Comp4:
 		
 
 		k = cv2.waitKey(1) & 0xff
+		
+	def navi(self, dist, theta):
+        print dist
+        print theta
+        #self.twist.angular.z = - theta[0]  * 180 / 3.1415 / 10
+        #self.twist.linear.x = (dist[-1]- 15) / 100
+        z = 0
+        if theta[0] > 0.2:
+            dist[0] -= 6
+        elif theta[0] < -0.2:
+            dist[0] += 6
+
+        if 0 > dist[0]:
+            z = 0.2
+        elif 0 < dist[0]:
+            z = -0.2
+        else:
+            z = 0
+
+
+        if dist[-1] > 10:
+            x = 0.2
+        else:
+            x = 0
+
+        self.twist.angular.z = (3*self.twist.angular.z + z) / 4
+        self.twist.linear.x = (3*self.twist.linear.x + x) / 4
+
+        self.cmd_vel_pub.publish(self.twist)
 
 
 	def draw(self, img, imgpts, imgpts2, rect):
