@@ -72,7 +72,7 @@ class TemplateMatcher(object):
         (endX, endY) = (int((maxLoc[0] + self.tw) * r), int((maxLoc[1] + self.th) * r))
         
         # draw a bounding box around the detected result and display the image
-        image = self.template.copy()
+        image = img.copy()
         cv2.rectangle(image, (startX, startY), (endX, endY), (0, 0, 255), 2)
         cv2.imshow(self.name, image)
         cv2.waitKey(1)
