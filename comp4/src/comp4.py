@@ -215,9 +215,9 @@ class Comp4:
 
 		k = cv2.waitKey(1) & 0xff
 		
-	def navi(self, dist, theta):
-        print dist
-        print theta
+	def navi(self, tvec, rvec):
+        print tvec
+        print rvec
         #self.twist.angular.z = - theta[0]  * 180 / 3.1415 / 10
         #self.twist.linear.x = (dist[-1]- 15) / 100
         z = 0
