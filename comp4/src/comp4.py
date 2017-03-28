@@ -120,7 +120,10 @@ class Comp4:
 		self.webcam_D = np.array(msg.D)
 
 	def webcam_cb(self, msg):
-		self.UA_Tracker.process(msg)
+		self.UA_Tracker.process(msg, self.found_webcam_match)
+	
+	def found_webcam_match(self):
+		print "FOUND IT!"
 	
 	# FRONT CAMERA (kinect)
 	
