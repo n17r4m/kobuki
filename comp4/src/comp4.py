@@ -79,11 +79,11 @@ class TemplateMatcher(object):
 
 
 
-class Part3:
+class Comp4:
 	def __init__(self):
 		
-		self.Tracker_UA = TemplateMatcher("ua.png")
-		#self.Tracker_AR = TemplateMatcher("ar.png")
+		self.UA_Tracker = TemplateMatcher("ua.png")
+		#self.AR_Tracker = TemplateMatcher("ar.png")
 	
 		self.webcam_info_sub = rospy.Subscriber('/cv_camera/camera_info', CameraInfo, self.webcam_info_cb)
 		self.webcam_sub = rospy.Subscriber('/cv_camera/image_rect_color', Image, self.webcam_cb)
@@ -232,6 +232,6 @@ class Part3:
 		return cv2.line(img, tuple(np.maximum(p1, 1)), tuple(np.maximum(p2, 1)), c, w)
 
 if __name__ == "__main__":
-	rospy.init_node('part3')
-	part3 = Part3()
+	rospy.init_node('comp4')
+	comp4 = Comp4()
 	rospy.spin()
