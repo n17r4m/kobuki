@@ -185,9 +185,36 @@ class TemplateMatcher(object):
         
         if maxVal > self.threshold:
             found_cb(startX, startY, endX, endY, maxVal, self.name)
-        
 
-class Comp4:
+class SearchGoals(object):
+    def __init__(self):
+        self.goals = [
+            # middle, facing elevator
+            {"position": {"x": -5.48, "y": 0.93, z: 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": -0.707, "w": 0.707}}, 
+            # in front of elevator, facing east
+            {"position": {"x": -5.31, "y": 0.14, z: 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}}, 
+            # south east corner, facing north
+            {"position": {"x": -0.20, "y": 0.20, z: 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.707, "w": 0.707}}, 
+            # north east corner, facing west
+            {"position": {"x": -0.20, "y": 4.17, z: 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": -1.0, "w": 0.0}}, 
+            # in front of garbage, facing west
+            {"position": {"x": -4.56, "y": 3.65, z: 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": -1.0, "w": 0.0}}, 
+            # north west corner, facing south
+            {"position": {"x": -10.89, "y": 3.73, z: 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": -0.707, "w": 0.707}}, 
+            # south west corner, facing east
+            {"position": {"x": -10.45, "y": -0.34, z: 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}},
+            # in front of elevator (again), facing east
+            #{"position": {"x": -5.51, "y": 0.15, z: 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}}, 
+            ]
+        self.next_goal = self.goals.pop(0) # take first element
+        self.goal_num = 0
+    def get_goal(self):
+        g = self.next_goal
+        self.next_goal = self.goals[self.goal_num]
+        self.goal_num = (self.goal_num + 1) % len(self.goals)
+        return goal_pose(g)
+
+class Comp4(object):
     def __init__(self):
         
         self.UA_Template_Tracker = TemplateMatcher("ua_small.png", 0.2)
@@ -221,6 +248,8 @@ class Comp4:
         self.twist = Twist()
         self.pose = None
         
+        self.goals = SearchGoals()
+        
         self.move = actionlib.SimpleActionClient('move_base', MoveBaseAction)
         self.move.wait_for_server()
         
@@ -247,7 +276,9 @@ class Comp4:
             if name == "ar_small.png":
                 self.found = "ar"
             self.template_found_at = [x1, y1, x2, y2]
+            self.move.cancel_goal()
             self.state = "turning"
+            
     
     # FRONT CAMERA (kinect)
     
@@ -285,14 +316,18 @@ class Comp4:
 
     def tick(self):
         getattr(self, self.state)()
-        
+
     def amcl_cb(self, msg):
         self.pose = msg.pose.pose
 
+    def goal_is_active(self):
+        s = self.move.get_status()
+        #TODO
+    
     def searching(self):
-        self.twist.angular.z = 0
-        self.twist.linear.x = 0
-        #self.cmd_vel_pub.publish(self.twist)
+        if not self.goal_is_active():
+            goal = self.goals.get_goal()
+            self.move.send_goal(goal)
     
     def turning(self):
         self.mid_pts = self.pose
@@ -349,10 +384,12 @@ class Comp4:
         sleep(1)
         soundhandle.stopAll()
 
-def goal_pose(pose, movement):
+def goal_pose(pose, movement = "do we need this?"):
     goal_pose = MoveBaseGoal()
     goal_pose.target_pose.header.frame_id = 'map'
     goal_pose.target_pose.header.stamp = rospy.Time.now()
+    goal_pose.target_pose.pose = pose
+    """
     if movement == "turning":
         # turning right 90 degrees
         goal_pose.target_pose.pose.position.x = pose[0][0]
@@ -364,7 +401,7 @@ def goal_pose(pose, movement):
         goal_pose.target_pose.pose.orientation.w = pose[1][3] - 0.4
     elif movement == "searching":
         pass
-
+    """
     return goal_pose
 
 

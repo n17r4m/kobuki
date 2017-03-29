@@ -1,173 +1,336 @@
 #!/usr/bin/env python
 
-# date: 28th March
-# Brute-Force based matcher; substitution for flann matcher not working onopencv 3.1.0-dev
-
 import rospy, cv2, cv_bridge
 import numpy as np
 from sensor_msgs.msg import Image, CameraInfo
 from sensor_msgs.msg import CompressedImage
+from geometry_msgs.msg import PoseWithCovarianceStamped
 from geometry_msgs.msg import Twist
 import math
 import time
 from matplotlib import pyplot as plt
 import os
+import smach
+import smach_ros
+import actionlib
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 
 from numpy import cross, eye, dot
 from scipy.linalg import expm3, norm
+import imutils
+import threading
 
-MIN_MATCH_COUNT = 10
+from sound_play.msg import SoundRequest
+from sound_play.libsoundplay import SoundClient
 
-def R(axis, theta):
-    return expm3(cross(eye(3), axis/norm(axis)*theta))
+def set_interval(func, sec):
+    def func_wrapper():
+        set_interval(func, sec)
+        func()
+    t = threading.Timer(sec, func_wrapper)
+    t.daemon = True
+    t.start()
+    return t
 
-class Comp4_bf:
-    def __init__(self):
+
+class OrbTracker(object):
+    def __init__(self, template_filename, min_match_count = 10):
+        
+        self.K = None # set externally
+        self.D = None # set externally 
+        
         self.bridge = cv_bridge.CvBridge()
-        self.cam_info_sub = rospy.Subscriber('/camera/camera_info', CameraInfo, self.info_cb)
-        self.img_sub = rospy.Subscriber('/camera/image_rect_color', Image, self.img_cb)
-
-        # Load the target image
-        img_path = rospy.get_param("/pkg_path")
-        self.target_image = cv2.imread(img_path + "/img/UA-1C-SOLID.png", 0)
-        print img_path + "/img/UA-1C-SOLID.png"
-
+        path = rospy.get_param("/pkg_path")
+        self.name = template_filename
+        self.template = cv2.imread(path + "/img/" + template_filename, 0)
+        self.th, self.tw =  self.template.shape[:2]
+        self.min_match_count = min_match_count
         self.imgpts = np.zeros((3, 1, 2), dtype=np.int)
         self.imgpts2 = np.zeros((3, 1, 2), dtype=np.int)
-        # Initiate STAR detector
-        self.orb = cv2.ORB_create(200)
-        # find the keypoints with ORB
-        self.kp = self.orb.detect(self.target_image,None)
-        # compute the descriptors with ORB
-        self.kp, self.des = self.orb.compute(self.target_image, self.kp)
+        
+        #nfeatures[, scaleFactor[, nlevels[, edgeThreshold[, firstLevel[, WTA_K[, scoreType[, patchSize]
+        self.orb = cv2.ORB_create(300, 1.2, 10, 31, 0, 3, cv2.NORM_HAMMING2, 31)
+        self.kp = self.orb.detect(self.template,None)
+        self.kp, self.des = self.orb.compute(self.template, self.kp)
         self.des = np.float32(self.des)
-
-
+        
         self.eye = np.identity(3)
         self.axis = np.float32([[30,0,0], [0,30,0], [0,0,-30]]).reshape(-1,3)
         self.axis2 = np.float32([[-30,0,0], [0,-30,0], [0,0,30]]).reshape(-1,3)
-
-
+        
         self.criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
-        self.K = None
-        self.D = None
         self.found = False
         self.rot = None
         self.trans = None
-
-    def info_cb(self, msg):
-        self.K = np.array(msg.K).reshape(3,3)
-        self.D = np.array(msg.D)
-
-    def img_cb(self, msg):
-
+        
+        
+    def process(self, msg, found_cb):
+        
         img  = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
-        img  = img[50:500]
+        #img = imutils.resize(img, width = int(img.shape[1] * 1))
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         img2 = gray
         img3 = gray
-
+        
         orb = cv2.ORB_create(800)
-        kp = orb.detect(gray,None)
+        kp = orb.detect(gray, None)
         kp, des = self.orb.compute(gray, kp)
         des = np.float32(des)
 
-        # initiate BF matcher
         bf = cv2.BFMatcher()
-        matches = bf.knnMatch(self.des,des, k=2)
-
+        matches = bf.match(self.des, des)
+        
         # store all the good matches as per Lowe's ratio test.
         good = []
         for m,n in matches:
             if m.distance < 0.75*n.distance:
                 good.append(m)
 
-        if len(good)>MIN_MATCH_COUNT:
+        if len(good) > self.min_match_count:
             src_pts = np.float32([ self.kp[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
             dst_pts = np.float32([ kp[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
 
             M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
             matchesMask = mask.ravel().tolist()
 
-            h,w = self.target_image.shape #gray.shape
+            h,w = self.template.shape
             rect = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
             rect3d = np.float32([ [0,0,0],[0,h-1,0],[w-1,h-1,0],[w-1,0,0] ]).reshape(-1,1,3)
             rect = cv2.perspectiveTransform(rect,M)
 
             img2 = cv2.polylines(gray,[np.int32(rect)],True,255,3, cv2.LINE_AA)
 
-
             #dst2 = dst_pts[matchesMask].reshape(dst_pts.shape[0], 2)
             #src2 = src_pts[matchesMask].reshape(dst_pts.shape[0], 2)
             #src2 = np.concatenate(src2, [0], axis=1)
-
             pnp = cv2.solvePnPRansac(rect3d, rect, self.K, self.D)
             #pnp = cv2.solvePnPRansac(src2, dst2, self.K, self.D)
             rvecs, tvecs, inliers = pnp[1], pnp[2], pnp[3]
-
-            """
-            imgpts, jac = cv2.projectPoints(self.axis, rvecs, tvecs, self.K, self.D)
-            imgpts2, jac = cv2.projectPoints(self.axis2, rvecs, tvecs, self.K, self.D)
-            img3 = self.draw(img3, imgpts, imgpts2, rect)
-
-            imgpts, jac = cv2.projectPoints(self.axis + [0,h/2,0], rvecs, tvecs, self.K, self.D)
-            imgpts2, jac = cv2.projectPoints(self.axis2 + [0,h/2,0], rvecs, tvecs, self.K, self.D)
-            img3 = self.draw(img3, imgpts, imgpts2, rect)
-
-            imgpts, jac = cv2.projectPoints(self.axis + [w/2,0,0], rvecs, tvecs, self.K, self.D)
-            imgpts2, jac = cv2.projectPoints(self.axis2 + [w/2,0,0], rvecs, tvecs, self.K, self.D)
-            img3 = self.draw(img3, imgpts, imgpts2, rect)
-            """
+            # gives central position
             imgpts, jac = cv2.projectPoints(self.axis + [w/2,h/2,0], rvecs, tvecs, self.K, self.D)
             imgpts2, jac = cv2.projectPoints(self.axis2 + [w/2,h/2,0], rvecs, tvecs, self.K, self.D)
             img3 = self.draw(img3, imgpts, imgpts2, rect)
-
-            tvecs/= 525 * 2
-            print rvecs, tvecs
-
+        
+            found_cb(rvecs, tvecs / 900.0, self.name)
+            
         else:
-            print "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT)
+            #print "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT)
             matchesMask = None
             rect = np.zeros((4, 1, 2), dtype=np.int)
             imgpts = np.zeros((3, 1, 2), dtype=np.int)
             imgpts2 = imgpts
-
-
+            
         draw_params = dict(matchColor = (0,255,0), # draw matches in green color
                        singlePointColor = None,
                        matchesMask = matchesMask, # draw only inliers
                        flags = 2)
-
-        img3 = cv2.drawMatches(self.target_image, self.kp, gray, kp, good, None, **draw_params)
-        cv2.imshow("result", img3)
-
+        
+        #img3 = cv2.cvtColor(img3, cv2.COLOR_GRAY2BGR)
+        img3 = cv2.drawMatches(self.template, self.kp, gray, kp, good, None, **draw_params)
+        
+        cv2.imshow(self.name, img3)
         k = cv2.waitKey(1) & 0xff
+        
+    def draw(self, img, imgpts, imgpts2, rect):
+        img = self.line(img, tuple((imgpts[0]).astype(int).ravel()), tuple((imgpts2[0]).astype(int).ravel()), (255,255,255), 5)
+        img = self.line(img, tuple((imgpts[1]).astype(int).ravel()), tuple((imgpts2[1]).astype(int).ravel()), (150,150,150), 5)
+        img = self.line(img, tuple((imgpts[2]).astype(int).ravel()), tuple((imgpts2[2]).astype(int).ravel()), (100,100,100), 5)
+        return img
+    
+    def line(self, img, p1, p2, c, w):
+        return cv2.line(img, tuple(np.maximum(p1, 1)), tuple(np.maximum(p2, 1)), c, w)
+        
+        
 
-    #TODO:
-    # make sure the measurement is correct
-    # calculate the real-life scale distance
-    #
+class TemplateMatcher(object):
+    
+    def __init__(self, template_filename, threshold = 0.2):
+        self.bridge = cv_bridge.CvBridge()
+        path = rospy.get_param("/pkg_path")
+        self.name = template_filename
+        self.template = cv2.imread(path + "/img/" + template_filename, 0)
+        self.template = cv2.Canny(self.template, 50, 200)
+        self.th, self.tw =  self.template.shape[:2]
+        self.threshold = threshold
 
-    def navi(self, dist, theta):
-        print dist
-        print theta
+    def process(self, msg, found_cb):
+        img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        img = imutils.resize(img, width = int(img.shape[1] * 0.5))
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        found = None
+        for scale in np.linspace(0.1, 1.0, 10)[::-1]:
+            resized = imutils.resize(gray, width = int(gray.shape[1] * scale))
+            r = gray.shape[1] / float(resized.shape[1])
+            if resized.shape[0] < self.th or resized.shape[1] < self.tw:
+                break
+            edged = cv2.Canny(resized, 50, 200)
+            result = cv2.matchTemplate(edged, self.template, cv2.TM_CCOEFF_NORMED)
+            (_, maxVal, _, maxLoc) = cv2.minMaxLoc(result)
+            if found is None or maxVal > found[0]:
+                found = (maxVal, maxLoc, r)
+        (maxVal, maxLoc, r) = found
+        (startX, startY) = (int(maxLoc[0] * r), int(maxLoc[1] * r))
+        (endX, endY) = (int((maxLoc[0] + self.tw) * r), int((maxLoc[1] + self.th) * r))
+        cv2.rectangle(img, (startX, startY), (endX, endY), (0, 0, 255), 2)
+        cv2.imshow(self.name, img)
+        cv2.waitKey(1)
+        
+        if maxVal > self.threshold:
+            found_cb(startX, startY, endX, endY, maxVal, self.name)
+
+class SearchGoals(object):
+    def __init__(self):
+        self.goals = [
+            # middle, facing elevator
+            {"position": {"x": -5.48, "y": 0.93, z: 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": -0.707, "w": 0.707}}, 
+            # in front of elevator, facing east
+            {"position": {"x": -5.31, "y": 0.14, z: 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}}, 
+            # south east corner, facing north
+            {"position": {"x": -0.20, "y": 0.20, z: 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.707, "w": 0.707}}, 
+            # north east corner, facing west
+            {"position": {"x": -0.20, "y": 0.20, z: 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.707, "w": 0.707}}, 
+            ]
+
+class Comp4(object):
+    def __init__(self):
+        
+        self.UA_Template_Tracker = TemplateMatcher("ua_small.png", 0.2)
+        self.AR_Template_Tracker = TemplateMatcher("ar_small.png", 0.3)
+        
+        self.UA_ORB_Tracker = OrbTracker("ua.png")
+        self.AR_ORB_Tracker = OrbTracker("ar.png")
+        
+        self.webcam_info_sub = rospy.Subscriber('/cv_camera/camera_info', CameraInfo, self.webcam_info_cb)
+        self.webcam_sub = rospy.Subscriber('/cv_camera/image_rect_color', Image, self.webcam_cb)
+        
+        self.kinect_info_sub = rospy.Subscriber('/camera/rgb/camera_info', CameraInfo, self.kinect_info_cb)
+        self.kinect_sub = rospy.Subscriber('/camera/rgb/image_rect_color', Image, self.kinect_cb)
+
+        rospy.Subscriber('/amcl_pose', PoseWithCovarianceStamped, self.amcl_cb)
+
+        """
+        States are: 
+            searching (wandering around, wall crawling)
+            turning   (turning towards wall)
+            locking   (moving forward, waiting for rvecs & tvecs)
+            docking   (moving towards goal computed from locking)
+        """
+        self.state = "searching"
+        self.found = "ua" 
+        self.vec_measures = 0
+        self.tvecs = None
+        self.rvecs = None
+        
+        self.cmd_vel_pub = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=1)
+        self.twist = Twist()
+        self.pose = None
+        
+        self.move = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+        self.move.wait_for_server()
+        
+        # store gloabl turning point on the map when searching
+        self.bigmap_turning_goal = []
+    
+    # SIDE CAMERA (webcam)
+    
+    def webcam_info_cb(self, msg):
+        pass
+
+    def webcam_cb(self, msg):
+        if self.state == "searching":
+            self.UA_Template_Tracker.process(msg, self.found_webcam_match)
+            self.AR_Template_Tracker.process(msg, self.found_webcam_match)
+    
+    def found_webcam_match(self, x1, y1, x2, y2, name):
+        print "[webcam] FOUND IT:", x1, y1, x2, y2, name
+        if x1 > 150:
+            if name == "ua_small.png":
+                self.found = "ua"
+            if name == "ar_small.png":
+                self.found = "ar"
+            self.template_found_at = [x1, y1, x2, y2]
+            self.state = "turning"
+    
+    # FRONT CAMERA (kinect)
+    
+    def kinect_info_cb(self, msg):
+        self.UA_ORB_Tracker.K = np.array(msg.K).reshape(3,3)
+        self.AR_ORB_Tracker.K = np.array(msg.K).reshape(3,3)
+        self.UA_ORB_Tracker.D = np.array(msg.D)
+        self.AR_ORB_Tracker.D = np.array(msg.D)
+    
+    def kinect_cb(self, msg):
+        if self.state == "locking":
+            if self.found == "ua":
+                self.UA_ORB_Tracker.process(msg, self.found_kinect_match)
+            if self.found == "ar":
+                self.AR_ORB_Tracker.process(msg, self.found_kinect_match)
+    
+    def found_kinect_match(self, rvecs, tvecs, name):
+        measures_needed = 50.0
+        if self.vec_measures == 0:
+            self.rvecs = (1.0/measures_needed) * rvecs
+            self.tvecs = (1.0/measures_needed) * tvecs
+        self.vec_measures += 1
+        if self.vec_measures < measures_needed:
+            self.rvecs += (1.0/measures_needed) * rvecs
+            self.tvecs += (1.0/measures_needed) * tvecs
+        else:
+            self.state = "docking"
+            self.vec_measures = 0
+            print "LOCKED ONTO TARGET " + name
+            print rvecs
+            print tvecs
+        
+    
+    # ODOMETRY
+
+    def tick(self):
+        getattr(self, self.state)()
+        
+    def amcl_cb(self, msg):
+        self.pose = msg.pose.pose
+
+    def searching(self):
+        self.twist.angular.z = 0
+        self.twist.linear.x = 0
+        #self.cmd_vel_pub.publish(self.twist)
+    
+    def turning(self):
+        self.mid_pts = self.pose
+        try:
+            goal = goal_pose(self.pose, self.state)
+            self.move.send_goal(goal)
+            self.move.wait_for_result()
+        except rospy.ROSInterruptException:
+            pass
+        
+    def locking(self):
+        self.twist.angular.z = 0
+        self.twist.linear.x = 0.1
+        self.cmd_vel_pub.publish(self.twist)
+        # takes template tracking position and lock the marker to the center of screen
+    
+    def docking(self, tvec, rvec):
+        print tvec
+        print rvec
         #self.twist.angular.z = - theta[0]  * 180 / 3.1415 / 10
         #self.twist.linear.x = (dist[-1]- 15) / 100
         z = 0
-        if theta[0] > 0.2:
-            dist[0] -= 6
-        elif theta[0] < -0.2:
-            dist[0] += 6
+        if rvec[0] > 0.2:
+            tvec[0] -= 6
+        elif rvec[0] < -0.2:
+            tvec[0] += 6
 
-        if 0 > dist[0]:
+        if 0 > tvec[0]:
             z = 0.2
-        elif 0 < dist[0]:
+        elif 0 < tvec[0]:
             z = -0.2
         else:
             z = 0
 
 
-        if dist[-1] > 10:
+        if tvec[-1] > 10:
             x = 0.2
         else:
             x = 0
@@ -177,27 +340,38 @@ class Comp4_bf:
 
         self.cmd_vel_pub.publish(self.twist)
 
+        
+    def sound_beep():
+        
+        soundhandle = SoundClient()  # blocking = False by default
+        rospy.sleep(0.5)  # Ensure publisher connection is successful.
+    
+        sound_beep = soundhandle.say("beep")
 
-    def draw(self, img, imgpts, imgpts2, rect):
+        sleep(1)
+        soundhandle.stopAll()
 
-        offset = np.array([0,0]) #np.absolute((rect[2] - rect[0]) / 2) # np.array([self.target_image.shape[0], self.target_image.shape[1]/2])
-        #mid = tuple(np.array([np.mean(corners[:,:,0]), np.mean(corners[:,:,1])]).astype(int) + offset)
-        img = self.line(img, tuple((imgpts[0] + offset).astype(int).ravel()), tuple((imgpts2[0] + offset).astype(int).ravel()), (255,255,255), 5)
-        img = self.line(img, tuple((imgpts[1] + offset).astype(int).ravel()), tuple((imgpts2[1] + offset).astype(int).ravel()), (150,150,150), 5)
-        img = self.line(img, tuple((imgpts[2] + offset).astype(int).ravel()), tuple((imgpts2[2] + offset).astype(int).ravel()), (100,100,100), 5)
+def goal_pose(pose, movement):
+    goal_pose = MoveBaseGoal()
+    goal_pose.target_pose.header.frame_id = 'map'
+    goal_pose.target_pose.header.stamp = rospy.Time.now()
+    if movement == "turning":
+        # turning right 90 degrees
+        goal_pose.target_pose.pose.position.x = pose[0][0]
+        goal_pose.target_pose.pose.position.y = pose[0][1]
+        goal_pose.target_pose.pose.position.z = pose[0][2]
+        goal_pose.target_pose.pose.orientation.x = pose[1][0]
+        goal_pose.target_pose.pose.orientation.y = pose[1][1]
+        goal_pose.target_pose.pose.orientation.z = pose[1][2] - 0.6
+        goal_pose.target_pose.pose.orientation.w = pose[1][3] - 0.4
+    elif movement == "searching":
+        pass
 
-        """
-        mid = tuple(np.array([np.mean(corners[:,:,0]), np.mean(corners[:,:,1])]).astype(int))
-        img = cv2.line(img, mid, tuple((imgpts[0]).astype(int).ravel()), (255,0,0), 5)
-        img = cv2.line(img, mid, tuple((imgpts[1]).astype(int).ravel()), (0,255,0), 5)
-        img = cv2.line(img, mid, tuple((imgpts[2]).astype(int).ravel()), (0,0,255), 5)
-        """
-        return img
+    return goal_pose
 
-    def line(self, img, p1, p2, c, w):
-        return cv2.line(img, tuple(np.maximum(p1, 1)), tuple(np.maximum(p2, 1)), c, w)
 
 if __name__ == "__main__":
     rospy.init_node('comp4')
-    comp4_bf = Comp4_bf()
+    comp4 = Comp4()
+    set_interval(comp4.tick, 0.1)
     rospy.spin()
