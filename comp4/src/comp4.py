@@ -79,7 +79,7 @@ class TemplateMatcher(object):
         cv2.waitKey(1)
         
         if maxVal > self.threshold:
-            onFoundFn(startX, startY, endX, endY)
+            onFoundFn(startX, startY, endX, endY, maxVal)
         
 
 
@@ -130,8 +130,8 @@ class Comp4:
     def webcam_cb(self, msg):
         self.UA_Tracker.process(msg, self.found_webcam_match)
     
-    def found_webcam_match(self, x1, y1, x2, y2):
-        print "FOUND IT:", x1, y1, x2, y2
+    def found_webcam_match(self, x1, y1, x2, y2, maxVal):
+        print "FOUND IT:", x1, y1, x2, y2, maxVal
     
     # FRONT CAMERA (kinect)
     
