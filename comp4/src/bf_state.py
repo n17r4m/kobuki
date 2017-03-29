@@ -22,12 +22,15 @@ class templateMatcher(smach.State):
 
 class orbMatcher(smach.State):
     def __init__(self):
-        smach.State.__init__(self, outcomes = ['pose_found'])
+        smach.State.__init__(self, outcomes = ['docked'])
                                    
     def execute(self, usrdata):
         rospy.loginfo('Executing orb matching on front camera')
-        # do stuff
-        return 'pose_found'
+        orb = OrbTracker()
+        if orb.status == 'notyet':
+            orb.process()
+        elif orb.status == 'docked':
+            return 'docked'
         
 class Docking(smach.State):
     def __init__(self):

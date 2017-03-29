@@ -141,10 +141,10 @@ class OrbTracker(object):
                        flags = 2)
         
         #img3 = cv2.cvtColor(img3, cv2.COLOR_GRAY2BGR)
-        img3 = cv2.drawMatches(self.template, self.kp, gray, kp, good, None, **draw_params)
+        #img3 = cv2.drawMatches(self.template, self.kp, gray, kp, good, None, **draw_params)
         print "ORB process8"
-        cv2.imshow(self.name, img3)
-        k = cv2.waitKey(1) & 0xff
+        #cv2.imshow(self.name, img3)
+        #k = cv2.waitKey(1) & 0xff
         print "ORB process9"
         
     def draw(self, img, imgpts, imgpts2, rect):
@@ -188,8 +188,8 @@ class TemplateMatcher(object):
         (startX, startY) = (int(maxLoc[0] * r), int(maxLoc[1] * r))
         (endX, endY) = (int((maxLoc[0] + self.tw) * r), int((maxLoc[1] + self.th) * r))
         cv2.rectangle(img, (startX, startY), (endX, endY), (0, 0, 255), 2)
-        cv2.imshow(self.name, img)
-        cv2.waitKey(1)
+        #cv2.imshow(self.name, img)
+        #cv2.waitKey(1)
         
         if maxVal > self.threshold:
             found_cb(startX, startY, endX, endY, self.name)
@@ -254,7 +254,7 @@ class Comp4(object):
             pausing   (easter egg reached, pause for 3 sec)
             returning (moving back to last position before turn + dock)
         """
-        self.state = "searching"
+        self.state = "waiting"
         self.found = None
         self.vec_measures = 0
         self.tvecs = None
@@ -308,7 +308,7 @@ class Comp4(object):
                 self.template_found_at = [x1, y1, x2, y2]
                 self.move.cancel_goal()
                 self.state = "turning"
-                cv2.destroyAllWindows()
+                #cv2.destroyAllWindows()
                 self.t_matches = 0
         else:
             self.t_matches = 0
@@ -340,7 +340,7 @@ class Comp4(object):
             self.tvecs += (1.0/measures_needed) * tvecs
         else:
             self.state = "docking"
-            cv2.destroyAllWindows()
+            #cv2.destroyAllWindows()
             self.vec_measures = 0
             self.say("Locked on to Target!")
             print rvecs
