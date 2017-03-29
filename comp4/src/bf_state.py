@@ -15,6 +15,7 @@ class templateMatcher(smach.State):
     def execute(self, usrdata):
         rospy.loginfo('Executing template matcher on the side camera')
         if usrdata.start_matching:
+            pass
             # do matching
         if usrdata.tm_done:
             return 'template_matched'
