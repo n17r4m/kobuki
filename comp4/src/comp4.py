@@ -370,7 +370,7 @@ class Comp4(object):
     
     
     def say(self, message):
-        print("[say]", message)
+        print "[  SAY]", message
         self.sound.say(message)
         
     
