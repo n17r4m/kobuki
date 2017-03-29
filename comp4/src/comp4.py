@@ -273,7 +273,7 @@ class Comp4:
     # ODOMETRY
 
     def tick(self):
-        self[self.state]()
+        getattr(self, self.state)()
         
     def amcl_cb(self, msg):
         self.pose = pose.pose.pose
@@ -285,14 +285,10 @@ class Comp4:
         self.cmd_vel_pub.publish(self.twist)
     
     def turning(self):
-        current_pose = self.pose
         client = client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
         client.wait_for_server()
+        goal = self.pose
         
-        
-        self.twist.angular.z = 0.2
-        self.twist.linear.x = 0
-        self.cmd_vel_pub.publish(self.twist)
     
     def locking(self, x1, y1, x2, y2):
         pass
@@ -327,17 +323,32 @@ class Comp4:
         self.twist.linear.x = (3*self.twist.linear.x + x) / 4
 
         self.cmd_vel_pub.publish(self.twist)
-        
+
         
     def sound_beep():
         
         soundhandle = SoundClient()  # blocking = False by default
         rospy.sleep(0.5)  # Ensure publisher connection is successful.
     
-        sound_beep = soundhandle.say("beep", volume=0.5)
+        sound_beep = soundhandle.say("beep")
 
         sleep(1)
         soundhandle.stopAll()
+
+def goal_pose(pose):
+    goal_pose = MoveBaseGoal()
+    goal_pose.target_pose.header.frame_id = 'map'
+    goal_pose.target_pose.header.stamp = rospy.Time.now()
+    goal_pose.target_pose.pose.position.x = pose[0][0]
+    goal_pose.target_pose.pose.position.y = pose[0][1]
+    goal_pose.target_pose.pose.position.z = pose[0][2]
+    goal_pose.target_pose.pose.orientation.x = pose[1][0]
+    goal_pose.target_pose.pose.orientation.y = pose[1][1]
+    goal_pose.target_pose.pose.orientation.z = pose[1][2]
+    goal_pose.target_pose.pose.orientation.w = pose[1][3]
+
+    return goal_pose
+
 
 if __name__ == "__main__":
     rospy.init_node('comp4')
