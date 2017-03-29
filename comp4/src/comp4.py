@@ -261,6 +261,7 @@ class Comp4(object):
         self.pose = None
         self.can_go = False
         self.pause_until = 0
+        self.time_out = time.time() + 3600
         
         self.goals = SearchGoals()
         
@@ -283,7 +284,7 @@ class Comp4(object):
             self.AR_Template_Tracker.process(msg, self.found_webcam_match)
     
     def found_webcam_match(self, x1, y1, x2, y2, name):
-        print "[webcam] FOUND IT:", x1, y1, x2, y2, name
+        print "FOUND A TARGET:", x1, y1, x2, y2, name
         if x1 > 150:
             if name == "ua_small.png":
                 self.found = "ua"
@@ -339,14 +340,19 @@ class Comp4(object):
     # TIMER
     
     def tick(self):
-        getattr(self, self.state)()
+        if time.time() < self.time_out:
+            getattr(self, self.state)()
+        else
+            self.say("times up")
+            self.time_out = time.time() + 3600
+            self.status = "waiting"
     
     # HELPERS    
         
     def turn_goal(self):
         turn = copy.deepcopy(self.pose)
-        turn.orientation.z -= 0.6
-        turn.orientation.w -= 0.4
+        turn.orientation.z -= 0.707
+        turn.orientation.w -= 0.707
         return goal_pose(turn)
 
     def goal_is_active(self):
@@ -354,32 +360,37 @@ class Comp4(object):
         return self.move.simple_state != 2 # 2 = DONE
     
     
-    def sound_beep(self):
-        
+    def say(self, message):
         soundhandle = SoundClient()  # blocking = False by default
         rospy.sleep(0.5)  # Ensure publisher connection is successful.
-    
-        sound_beep = soundhandle.say("beep")
-
-        rospy.sleep(1)
+        sound_beep = soundhandle.say(message)
+        rospy.sleep(float(len(message)) / 3.0)
         soundhandle.stopAll()
+    
     
     # STATES
     
     def waiting(self):
         if self.can_go:
+            self.time_out = time.time() + 60 * 5 # five minutes
             self.state = "searching"
+            self.say("here we go")
+            print "HERE WE GO!"
+        print "WAITING FOR JOYSTICK (BUTTON 1)"
     
     def searching(self):
         if not self.goal_is_active():
+            print "SEARCHING WAYPOINT", self.goals.goal_num + 1
             goal = self.goals.get_goal()
             self.move.send_goal(goal)
     
     def turning(self):
         try:
             goal = self.turn_goal()
+            print "TURNING"
             self.move.send_goal(goal)
             self.move.wait_for_result()
+            print "TURN COMPLETE"
             self.state = "locking"
         except rospy.ROSInterruptException:
             pass
@@ -389,6 +400,7 @@ class Comp4(object):
         self.twist.angular.z = 0
         self.twist.linear.x = 0.05
         self.cmd_vel_pub.publish(self.twist)
+        print "LOCKING ON TO TARGET"
         # takes template tracking position and lock the marker to the center of screen
     
     def docking(self, tvec, rvec):
@@ -414,7 +426,10 @@ class Comp4(object):
             
             self.move.send_goal(goal)
             self.move.wait_for_result()
-            self.sound_beep()
+            
+            print "TARGET REACHED"
+            
+            self.say("beep")
             self.pause_until = time.time() + 4 
             self.state = "pausing"
             
@@ -450,6 +465,7 @@ class Comp4(object):
 
     def pausing(self):
         if time.time() > self.pause_until:
+            print "RETURNING TO SEARCH"
             self.state = "returning"
 
     def returning(self):
@@ -457,6 +473,7 @@ class Comp4(object):
             goal = self.goals.last_goal
             self.move.send_goal(goal)
             self.move.wait_for_result()
+            print "RESUMING SEARCH"
             self.state = "searching"
         except rospy.ROSInterruptException:
             pass
@@ -475,6 +492,6 @@ def goal_pose(pose, movement = "do we need this?"):
 if __name__ == "__main__":
     rospy.init_node('comp4')
     comp4 = Comp4()
-    comp4.say_beep()
+    comp4.say("Hello")
     set_interval(comp4.tick, 0.1)
     rospy.spin()
