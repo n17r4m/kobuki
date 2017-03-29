@@ -8,8 +8,10 @@ import rospy, cv2, cv_bridge
 import numpy as np
 from sensor_msgs.msg import Image, CameraInfo
 from sensor_msgs.msg import CompressedImage
+from sensor_msgs.msg import Joy
 from geometry_msgs.msg import PoseWithCovarianceStamped
 from geometry_msgs.msg import Twist
+
 import math
 import time
 from matplotlib import pyplot as plt
@@ -17,6 +19,9 @@ import os
 import smach
 import smach_ros
 import actionlib
+import copy
+import tf
+import time
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 
 from numpy import cross, eye, dot
@@ -207,9 +212,11 @@ class SearchGoals(object):
             #{"position": {"x": -5.51, "y": 0.15, z: 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}}, 
             ]
         self.next_goal = self.goals.pop(0) # take first element
+        self.last_goal = self.next_goal
         self.goal_num = 0
     def get_goal(self):
         g = self.next_goal
+        self.last_goal = self.next_goal
         self.next_goal = self.goals[self.goal_num]
         self.goal_num = (self.goal_num + 1) % len(self.goals)
         return goal_pose(g)
@@ -230,15 +237,20 @@ class Comp4(object):
         self.kinect_sub = rospy.Subscriber('/camera/rgb/image_rect_color', Image, self.kinect_cb)
 
         rospy.Subscriber('/amcl_pose', PoseWithCovarianceStamped, self.amcl_cb)
+        
+        rospy.Subscriber('/joy', Joy, self.joy_cb
 
         """
         States are: 
+            waiting   (waiting for joystick trigger)
             searching (wandering around, wall crawling)
             turning   (turning towards wall)
             locking   (moving forward, waiting for rvecs & tvecs)
             docking   (moving towards goal computed from locking)
+            pausing   ("easter egg" reached, pause for 3 sec)
+            returning (moving back to last position before turn + dock)
         """
-        self.state = "searching"
+        self.state = "waiting"
         self.found = "ua" 
         self.vec_measures = 0
         self.tvecs = None
@@ -247,6 +259,8 @@ class Comp4(object):
         self.cmd_vel_pub = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=1)
         self.twist = Twist()
         self.pose = None
+        self.can_go = False
+        self.pause_until = 0
         
         self.goals = SearchGoals()
         
@@ -310,19 +324,51 @@ class Comp4(object):
             print "LOCKED ONTO TARGET " + name
             print rvecs
             print tvecs
-        
+    
+    # JOYSTICK
+    
+    def joy_cb(msg):
+        if msg.buttons[1]:
+            self.can_go = not self.can_go
     
     # ODOMETRY
 
-    def tick(self):
-        getattr(self, self.state)()
-
     def amcl_cb(self, msg):
         self.pose = msg.pose.pose
+    
+    # TIMER
+    
+    def tick(self):
+        getattr(self, self.state)()
+    
+    # HELPERS    
+        
+    def turn_goal(self):
+        turn = copy.deepcopy(self.pose)
+        turn.orientation.z -= 0.6
+        turn.orientation.w -= 0.4
+        return goal_pose(turn)
 
     def goal_is_active(self):
-        s = self.move.get_status()
-        #TODO
+        # see: http://docs.ros.org/hydro/api/actionlib/html/classactionlib_1_1simple__action__client_1_1SimpleGoalState.html
+        return self.move.simple_state != 2 # 2 = DONE
+    
+    
+    def sound_beep(self):
+        
+        soundhandle = SoundClient()  # blocking = False by default
+        rospy.sleep(0.5)  # Ensure publisher connection is successful.
+    
+        sound_beep = soundhandle.say("beep")
+
+        sleep(1)
+        soundhandle.stopAll()
+    
+    # STATES
+    
+    def waiting(self):
+        if self.can_go:
+            self.state = "searching"
     
     def searching(self):
         if not self.goal_is_active():
@@ -330,23 +376,51 @@ class Comp4(object):
             self.move.send_goal(goal)
     
     def turning(self):
-        self.mid_pts = self.pose
         try:
-            goal = goal_pose(self.pose, self.state)
+            goal = self.turn_goal()
             self.move.send_goal(goal)
             self.move.wait_for_result()
+            self.state = "locking"
         except rospy.ROSInterruptException:
             pass
+    
         
     def locking(self):
         self.twist.angular.z = 0
-        self.twist.linear.x = 0.1
+        self.twist.linear.x = 0.05
         self.cmd_vel_pub.publish(self.twist)
         # takes template tracking position and lock the marker to the center of screen
     
     def docking(self, tvec, rvec):
+        if not self.goal_is_active():
+            pose = copy.deepcopy(self.pose)
+            euler = tf.transformations.euler_from_quaternion(pose.orientation)
+            #roll = euler[0]
+            #pitch = euler[1]
+            yaw = euler[2]
+            xdist = self.tvec[1] # + offset
+            zdist = self.tvec[2]
+            
+            # I think this is correct / not tested...
+            x_offset = zdist * math.cos(yaw)
+            y_offset = zdist * math.sin(yaw)
+            
+            # sin/cos may be reversed here / not tested...
+            x_ofset += xdist * math.sin(yaw)
+            y_ofset += xdist * math.cos(yaw)
+            
+            pose.position.x += x_offset
+            pose.position.y += y_offset
+            
+            self.move.send_goal(goal)
+            self.move.wait_for_result()
+            self.sound_beep()
+            self.pause_until = time.time() + 4 
+            self.state = "pausing"
+            
         print tvec
         print rvec
+        """
         #self.twist.angular.z = - theta[0]  * 180 / 3.1415 / 10
         #self.twist.linear.x = (dist[-1]- 15) / 100
         z = 0
@@ -372,36 +446,29 @@ class Comp4(object):
         self.twist.linear.x = (3*self.twist.linear.x + x) / 4
 
         self.cmd_vel_pub.publish(self.twist)
+        """
 
+    def pausing(self):
+        if time.time() > self.pause_until:
+            self.state = "returning"
+
+    def returning(self):
+        try:
+            goal = self.goals.last_goal
+            self.move.send_goal(goal)
+            self.move.wait_for_result()
+            self.state = "searching"
+        except rospy.ROSInterruptException:
+            pass
         
-    def sound_beep():
-        
-        soundhandle = SoundClient()  # blocking = False by default
-        rospy.sleep(0.5)  # Ensure publisher connection is successful.
     
-        sound_beep = soundhandle.say("beep")
-
-        sleep(1)
-        soundhandle.stopAll()
+    
 
 def goal_pose(pose, movement = "do we need this?"):
     goal_pose = MoveBaseGoal()
     goal_pose.target_pose.header.frame_id = 'map'
     goal_pose.target_pose.header.stamp = rospy.Time.now()
     goal_pose.target_pose.pose = pose
-    """
-    if movement == "turning":
-        # turning right 90 degrees
-        goal_pose.target_pose.pose.position.x = pose[0][0]
-        goal_pose.target_pose.pose.position.y = pose[0][1]
-        goal_pose.target_pose.pose.position.z = pose[0][2]
-        goal_pose.target_pose.pose.orientation.x = pose[1][0]
-        goal_pose.target_pose.pose.orientation.y = pose[1][1]
-        goal_pose.target_pose.pose.orientation.z = pose[1][2] - 0.6
-        goal_pose.target_pose.pose.orientation.w = pose[1][3] - 0.4
-    elif movement == "searching":
-        pass
-    """
     return goal_pose
 
 

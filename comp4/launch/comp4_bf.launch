@@ -1,17 +1,4 @@
-<!-- -*- xml -*-
 
-     This tutorial relies on a live video sequence acquired with an 
-     usb camera in front of a QR code planar target. The model 
-     corresponding to this target is given into the models directory 
-     of this package.
-
-     Camera parameters are set as rosparam parameters. They need to be changed
-     to be the one of your camera.
-
-     See http://www.ros.org/wiki/visp_auto_tracker for more information.
-
-  -->
-<launch>	
 
   <!-- Bring up the turtlebot -->
   <include file="$(find turtlebot_bringup)/launch/minimal.launch" />
