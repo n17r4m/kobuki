@@ -44,6 +44,8 @@ class back2Searching(smach.State):
             
 def main():
     rospy.init_node('simple_state_machine')
+    sis = smach_ros.IntrospectionServer('simple_viewer', sm, '/SM_ROOT')
+    sis.start()
 
     # Create a SMACH state machine
     sm = smach.StateMachine(outcomes=['searching'])
@@ -64,6 +66,8 @@ def main():
 
     # Execute SMACH plan
     outcome = sm.execute()
+    rospy.spin()
+    sis.stop()
 
 
 if __name__ == '__main__':
