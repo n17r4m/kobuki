@@ -279,7 +279,7 @@ class Comp4(object):
         self.bigmap_turning_goal = []
         """
         rospy.sleep(2)
-        self.say("System Is Online. Ready to Begin The Easter Egg Hunt! Please press button one.")
+        self.say("System Is Online! Please set initial pose and then press button one to begin!")
         
     
     # SIDE CAMERA (webcam)
@@ -370,6 +370,7 @@ class Comp4(object):
     
     
     def say(self, message):
+        print("[say]", message)
         self.sound.say(message)
         
     
