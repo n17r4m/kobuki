@@ -238,7 +238,7 @@ class Comp4(object):
 
         rospy.Subscriber('/amcl_pose', PoseWithCovarianceStamped, self.amcl_cb)
         
-        rospy.Subscriber('/joy', Joy, self.joy_cb
+        rospy.Subscriber('/joy', Joy, self.joy_cb)
 
         """
         States are: 
@@ -247,7 +247,7 @@ class Comp4(object):
             turning   (turning towards wall)
             locking   (moving forward, waiting for rvecs & tvecs)
             docking   (moving towards goal computed from locking)
-            pausing   ("easter egg" reached, pause for 3 sec)
+            pausing   (easter egg reached, pause for 3 sec)
             returning (moving back to last position before turn + dock)
         """
         self.state = "waiting"
