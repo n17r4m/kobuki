@@ -36,8 +36,8 @@
 
   <!-- AMCL -->
   <arg name="custom_amcl_launch_file" default="$(find turtlebot_navigation)/launch/includes/amcl/$(arg 3d_sensor)_amcl.launch.xml"/>
-  <arg name="initial_pose_x" default="0.0"/> <!-- Use 17.0 for willow's map in simulation -->
-  <arg name="initial_pose_y" default="0.0"/> <!-- Use 17.0 for willow's map in simulation -->
+  <arg name="initial_pose_x" default="-5.0"/> <!-- Use 17.0 for willow's map in simulation -->
+  <arg name="initial_pose_y" default="1.0"/> <!-- Use 17.0 for willow's map in simulation -->
   <arg name="initial_pose_a" default="0.0"/>
   <include file="$(arg custom_amcl_launch_file)">
     <arg name="initial_pose_x" value="$(arg initial_pose_x)"/>
@@ -49,17 +49,6 @@
   <arg name="custom_param_file" default="$(find turtlebot_navigation)/param/$(arg 3d_sensor)_costmap_params.yaml"/>
   <include file="$(find turtlebot_navigation)/launch/includes/move_base.launch.xml">
     <param name="custom_param_file" value="$(arg custom_param_file)"/>
-    <param name="acc_lim_x" value="1.0" />
-    <param name="acc_lim_y" value="1.00" />
-    <param name="max_vel_x" value="0.25" />
-    <param name="max_vel_y" value="0.05" />
-    <param name="max_vel_theta" value="0.5" />
-    <param name="min_in_place_vel_theta" value="0.25" />
-    <param name="holonomic_robot" value="false" />
-    <param name="yaw_goal_tolerance" value="0.08" />
-    <param name="xy_goal_tolerance" value="0.1" />
-    <param name="latch_xy_goal_tolerance" value="true" />
-    
   </include>
 
   

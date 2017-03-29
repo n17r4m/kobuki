@@ -75,7 +75,7 @@ class OrbTracker(object):
         
         
     def process(self, msg, found_cb):
-        print "ORB process1"
+        print "ORB process1", self.name
         img  = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
         #img = imutils.resize(img, width = int(img.shape[1] * 1))
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -216,7 +216,7 @@ class SearchGoals(object):
             ]
         self.next_goal = goal_pose(self.goals.pop(0)) # take first element
         self.last_goal = self.next_goal
-        self.goal_num = 0
+        self.goal_num = -1
         
     def get_goal(self):
         g = self.next_goal
@@ -260,6 +260,8 @@ class Comp4(object):
         self.tvecs = None
         self.rvecs = None
         
+        self.t_matches = 0
+        
         self.cmd_vel_pub = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=1)
         self.twist = Twist()
         self.pose = None
@@ -271,8 +273,6 @@ class Comp4(object):
         self.sound = SoundClient()  # blocking = False by default
         
         rospy.sleep(1)
-        self.say("Initializing. Please wait.")
-        rospy.sleep(3)
         
         self.move = actionlib.SimpleActionClient('move_base', MoveBaseAction)
         self.move.wait_for_server()
@@ -282,7 +282,7 @@ class Comp4(object):
         # store gloabl turning point on the map when searching
         self.bigmap_turning_goal = []
         """
-        rospy.sleep(2)
+        
         self.say("System Is Online! Please set initial pose and then press button one to begin!")
         
     
@@ -299,13 +299,19 @@ class Comp4(object):
     def found_webcam_match(self, x1, y1, x2, y2, name):
         print "FOUND A TARGET:", x1, y1, x2, y2, name
         if x1 > 150:
-            if name == "ua_small.png":
-                self.found = "ua"
-            if name == "ar_small.png":
-                self.found = "ar"
-            self.template_found_at = [x1, y1, x2, y2]
-            self.move.cancel_goal()
-            self.state = "turning"
+            self.t_matches += 1
+            if self.t_matches > 4:
+                if name == "ua_small.png":
+                    self.found = "ua"
+                if name == "ar_small.png":
+                    self.found = "ar"
+                self.template_found_at = [x1, y1, x2, y2]
+                self.move.cancel_goal()
+                self.state = "turning"
+                cv2.destroyAllWindows()
+                self.t_matches = 0
+        else:
+            self.t_matches = 0
             
     
     # FRONT CAMERA (kinect)
@@ -318,7 +324,6 @@ class Comp4(object):
     
     def kinect_cb(self, msg):
         if self.state == "locking":
-            print "ORBing"
             if self.found == "ua":
                 self.UA_ORB_Tracker.process(msg, self.found_kinect_match)
             if self.found == "ar":
@@ -335,6 +340,7 @@ class Comp4(object):
             self.tvecs += (1.0/measures_needed) * tvecs
         else:
             self.state = "docking"
+            cv2.destroyAllWindows()
             self.vec_measures = 0
             self.say("Locked on to Target!")
             print rvecs
@@ -357,16 +363,17 @@ class Comp4(object):
         if time.time() < self.time_out:
             getattr(self, self.state)()
         else:
-            self.say("times up")
+            self.say("times up!")
             self.time_out = time.time() + 3600
             self.status = "waiting"
+            self.can_go = False
     
     # HELPERS    
         
     def turn_goal(self):
         turn = copy.deepcopy(self.pose)
         qo = np.array([turn.orientation.x, turn.orientation.y, turn.orientation.z, turn.orientation.w])
-        qz = tf.transformations.quaternion_about_axis(3.14159/2.0, (0,0,1))
+        qz = tf.transformations.quaternion_about_axis(-3.14159/2.0, (0,0,1))
         q = tf.transformations.quaternion_multiply(qo, qz)
         turn.orientation.x = q[0]
         turn.orientation.y = q[1]
@@ -433,8 +440,8 @@ class Comp4(object):
             #roll = euler[0]
             #pitch = euler[1]
             yaw = euler[2]
-            xdist = self.tvec[1] + 0.1
-            zdist = self.tvec[2]
+            xdist = self.tvecs[1] + 0.1
+            zdist = self.tvecs[2]
             
             # I think this is correct / not tested...
             x_offset = zdist * math.cos(yaw)
