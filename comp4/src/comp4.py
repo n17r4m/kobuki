@@ -47,7 +47,6 @@ class OrbTracker(object):
         path = rospy.get_param("/pkg_path")
         self.name = template_filename
         self.template = cv2.imread(path + "/img/" + template_filename, 0)
-        self.template = cv2.Canny(self.template, 50, 200)
         self.th, self.tw =  self.template.shape[:2]
         self.min_match_count = min_match_count
         self.imgpts = np.zeros((3, 1, 2), dtype=np.int)
@@ -71,9 +70,8 @@ class OrbTracker(object):
     def process(self, msg, found_cb):
         
         img  = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
-        img = imutils.resize(img, width = int(img.shape[1] * 1))
+        #img = imutils.resize(img, width = int(img.shape[1] * 1))
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        gray = cv2.Canny(gray, 50, 200)
         img2 = gray
         img3 = gray
         
@@ -291,15 +289,17 @@ class Comp4:
         self.cmd_vel_pub.publish(self.twist)
     
     def turning(self):
-        goal = goal_pose(self.pose)
-        self.move.send_goal(goal)
-        self.move.wait_for_result()
+        try:
+            goal = goal_pose(self.pose, self.state)
+            self.move.send_goal(goal)
+            self.move.wait_for_result()
+        except rospy.ROSInterruptException:
+            pass
         
     
     def locking(self, x1, y1, x2, y2):
         pass
         # takes template tracking position and lock the marker to the center of screen
-        #self.cmd_vel_pub.publish(self.twist)
     
     def docking(self, tvec, rvec):
         print tvec
