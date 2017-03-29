@@ -361,8 +361,23 @@ class Comp4(object):
         
     def turn_goal(self):
         turn = copy.deepcopy(self.pose)
-        turn.orientation.z -= 0.707
-        turn.orientation.w -= 0.707
+        qo = np.array([turn.orientation.x, turn.orientation.y, turn.orientation.z, turn.orientation.w])
+        qz = tf.tranformations.quaternion_about_axis(3.14159/2.0, (0,0,1))
+        q = tf.quaternion_multiply(qo, qz)
+        turn.orientation.x = q[0]
+        turn.orientation.y = q[1]
+        turn.orientation.z = q[2]
+        turn.orientation.w = q[3]
+        """
+        quater = (turn.orientation.x, turn.orientation.y, turn.orientation.z, turn.orientation.w)
+        euler = tf.transformations.euler_from_quaternion(quater)
+        euler[1] += 90
+        quater = tf.transformations.quaternion_from_euler(euler)
+        turn.orientation.x = quater[0]
+        turn.orientation.y = quater[1]
+        turn.orientation.z = quater[2]
+        turn.orientation.w = quater[3]
+        """
         return goal_pose(turn)
 
     def goal_is_active(self):
@@ -377,9 +392,10 @@ class Comp4(object):
     
     def waiting(self):
         if self.can_go:
+            self.say("here we go!")
+            rospy.sleep(3)
             self.time_out = time.time() + 60 * 5 # five minutes
             self.state = "searching"
-            self.say("here we go!")
         else:
             print "WAITING FOR JOYSTICK (BUTTON 1)"
     

@@ -49,6 +49,17 @@
   <arg name="custom_param_file" default="$(find turtlebot_navigation)/param/$(arg 3d_sensor)_costmap_params.yaml"/>
   <include file="$(find turtlebot_navigation)/launch/includes/move_base.launch.xml">
     <arg name="custom_param_file" value="$(arg custom_param_file)"/>
+    <arg name="acc_lim_x" value="1.0" />
+    <arg name="acc_lim_y" value="1.00" />
+    <arg name="max_vel_x" value="0.25" />
+    <arg name="max_vel_y" value="0.05" />
+    <arg name="max_vel_theta" value="0.5" />
+    <arg name="min_in_place_vel_theta" value="0.25" />
+    <arg name="holonomic_robot" value="false" />
+    <arg name="yaw_goal_tolerance" value="0.08" />
+    <arg name="xy_goal_tolerance" value="0.1" />
+    <arg name="latch_xy_goal_tolerance" value="true" />
+    
   </include>
 
   
@@ -72,6 +83,7 @@
   <node pkg="comp4" type="comp4.py" name="comp4" output="screen" required="true" />
   <param name="/pkg_path" value="$(find comp4)" />
 
-
+  <!-- Launch rviz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find turtlebot_rviz_launchers)/rviz/navigation.rviz" />
 
 </launch>
