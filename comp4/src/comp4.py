@@ -227,7 +227,7 @@ class Comp4:
         # store each pose before turning
         self.mid_pts = []
         # store gloabl turning point on the map when searching
-        self.searching_turing
+        self.bigmap_turning_goal = []
     
     # SIDE CAMERA (webcam)
     
@@ -265,14 +265,14 @@ class Comp4:
                 self.AR_ORB_Tracker.process(msg, self.found_kinect_match)
     
     def found_kinect_match(self, rvecs, tvecs, name):
-        measures_needed = 100
+        measures_needed = 100.0
         if self.vec_measures == 0:
-            self.rvecs = (1/measures_needed) * rvecs
-            self.tvecs = (1/measures_needed) * tvecs
+            self.rvecs = (1.0/measures_needed) * rvecs
+            self.tvecs = (1.0/measures_needed) * tvecs
         self.vec_measures += 1
         if self.vec_measures < measures_needed:
-            self.rvecs += (1/measures_needed) * rvecs
-            self.tvecs += (1/measures_needed) * tvecs
+            self.rvecs += (1.0/measures_needed) * rvecs
+            self.tvecs += (1.0/measures_needed) * tvecs
         else:
             self.state = "locking" # should be docking
             self.vec_measures = 0
