@@ -362,7 +362,7 @@ class Comp4(object):
     def turn_goal(self):
         turn = copy.deepcopy(self.pose)
         qo = np.array([turn.orientation.x, turn.orientation.y, turn.orientation.z, turn.orientation.w])
-        qz = tf.transformations.quaternion_about_axis(3.14159/2.0, (0,0,1))
+        qz = tf.transformations.quaternion_about_axis(-3.14159/2.0, (0,0,1))
         q = tf.transformations.quaternion_multiply(qo, qz)
         turn.orientation.x = q[0]
         turn.orientation.y = q[1]
