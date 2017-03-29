@@ -46,7 +46,7 @@ class OrbTracker(object):
         # find the keypoints with ORB
         self.kp = self.orb.detect(self.template,None)
         # compute the descriptors with ORB
-        self.kp, self.des = self.orb.compute(self.target_image, self.kp)
+        self.kp, self.des = self.orb.compute(self.template, self.kp)
         self.des = np.float32(self.des)
         
         self.eye = np.identity(3)
@@ -95,7 +95,7 @@ class OrbTracker(object):
             M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
             matchesMask = mask.ravel().tolist()
 
-            h,w = self.target_image.shape #gray.shape
+            h,w = self.template.shape
             rect = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
             rect3d = np.float32([ [0,0,0],[0,h-1,0],[w-1,h-1,0],[w-1,0,0] ]).reshape(-1,1,3)
             rect = cv2.perspectiveTransform(rect,M)
@@ -273,7 +273,7 @@ class Comp4:
 
     def draw(self, img, imgpts, imgpts2, rect):
         
-        offset = np.array([0,0]) #np.absolute((rect[2] - rect[0]) / 2) # np.array([self.target_image.shape[0], self.target_image.shape[1]/2])
+        offset = np.array([0,0]) #np.absolute((rect[2] - rect[0]) / 2) # np.array([self.template.shape[0], self.template.shape[1]/2])
         #mid = tuple(np.array([np.mean(corners[:,:,0]), np.mean(corners[:,:,1])]).astype(int) + offset)
         img = self.line(img, tuple((imgpts[0] + offset).astype(int).ravel()), tuple((imgpts2[0] + offset).astype(int).ravel()), (255,255,255), 5)
         img = self.line(img, tuple((imgpts[1] + offset).astype(int).ravel()), tuple((imgpts2[1] + offset).astype(int).ravel()), (150,150,150), 5)
