@@ -52,7 +52,8 @@ class OrbTracker(object):
         self.imgpts = np.zeros((3, 1, 2), dtype=np.int)
         self.imgpts2 = np.zeros((3, 1, 2), dtype=np.int)
         
-        self.orb = cv2.ORB_create(200)
+        #nfeatures[, scaleFactor[, nlevels[, edgeThreshold[, firstLevel[, WTA_K[, scoreType[, patchSize]
+        self.orb = cv2.ORB_create(300, 1.2, 10, 31, 0, 3, cv2.NORM_HAMMING2, 31)
         self.kp = self.orb.detect(self.template,None)
         self.kp, self.des = self.orb.compute(self.template, self.kp)
         self.des = np.float32(self.des)
@@ -281,7 +282,6 @@ class Comp4:
         
     def amcl_cb(self, msg):
         self.pose = pose.pose.pose
-        
 
     def searching(self):
         self.twist.angular.z = 0
@@ -296,9 +296,10 @@ class Comp4:
         except rospy.ROSInterruptException:
             pass
         
-    
-    def locking(self, x1, y1, x2, y2):
-        pass
+    def locking(self):
+        self.twist.angular.z = 0
+        self.twist.linear.x = 0.1
+        self.cmd_vel_pub.publish(self.twist)
         # takes template tracking position and lock the marker to the center of screen
     
     def docking(self, tvec, rvec):
