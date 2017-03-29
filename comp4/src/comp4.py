@@ -254,8 +254,8 @@ class Comp4(object):
             pausing   (easter egg reached, pause for 3 sec)
             returning (moving back to last position before turn + dock)
         """
-        self.state = "locking"
-        self.found = "ua"
+        self.state = "searching"
+        self.found = None
         self.vec_measures = 0
         self.tvecs = None
         self.rvecs = None
@@ -290,7 +290,6 @@ class Comp4(object):
     
     def webcam_info_cb(self, msg):
         self.tick()
-        print self.state
 
     def webcam_cb(self, msg):
         if self.state == "searching":
@@ -434,7 +433,7 @@ class Comp4(object):
         self.cmd_vel_pub.publish(self.twist)
         
     
-    def docking(self, tvec, rvec):
+    def docking(self):
         if not self.goal_is_active():
             pose = copy.deepcopy(self.pose)
             euler = tf.transformations.euler_from_quaternion(pose.orientation)
