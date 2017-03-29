@@ -223,7 +223,11 @@ class Comp4:
         
         self.move = actionlib.SimpleActionClient('move_base', MoveBaseAction)
         self.move.wait_for_server()
-
+        
+        # store each pose before turning
+        self.mid_pts = []
+        # store gloabl turning point on the map when searching
+        self.searching_turing
     
     # SIDE CAMERA (webcam)
     
@@ -261,7 +265,7 @@ class Comp4:
                 self.AR_ORB_Tracker.process(msg, self.found_kinect_match)
     
     def found_kinect_match(self, rvecs, tvecs, name):
-        measures_needed = 10
+        measures_needed = 100
         if self.vec_measures == 0:
             self.rvecs = (1/measures_needed) * rvecs
             self.tvecs = (1/measures_needed) * tvecs
@@ -272,8 +276,10 @@ class Comp4:
         else:
             self.state = "locking" # should be docking
             self.vec_measures = 0
-            
-        print "[kinect] FOUND IT", rvecs, tvecs, name
+            print self.tvecs
+        
+        #print "[kinect] FOUND IT", rvecs, tvecs, name
+        
     
     # ODOMETRY
 
