@@ -41,7 +41,7 @@ class TemplateMatcher(object):
         
         found = None
         # loop over the scales of the image
-        for scale in np.linspace(0.2, 1.0, 10)[::-1]:
+        for scale in np.linspace(0.1, 1.0, 10)[::-1]:
             # resize the image according to the scale, and keep track
             # of the ratio of the resizing
             resized = imutils.resize(gray, width = int(gray.shape[1] * scale))
