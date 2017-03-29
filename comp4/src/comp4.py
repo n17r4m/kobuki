@@ -287,8 +287,7 @@ class Comp4(object):
     # SIDE CAMERA (webcam)
     
     def webcam_info_cb(self, msg):
-        print "called"
-        pass
+        self.tick()
 
     def webcam_cb(self, msg):
         if self.state == "searching":
