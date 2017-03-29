@@ -39,7 +39,7 @@ def set_interval(func, sec):
     t = threading.Timer(sec, func_wrapper)
     t.daemon = True
     t.start()
-    t.join()
+    t.join(0.0)
     return t
 
 
