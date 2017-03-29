@@ -287,6 +287,7 @@ class Comp4(object):
     # SIDE CAMERA (webcam)
     
     def webcam_info_cb(self, msg):
+        print "called"
         pass
 
     def webcam_cb(self, msg):
@@ -522,5 +523,5 @@ def goal_pose(pose):
 if __name__ == "__main__":
     rospy.init_node('comp4')
     comp4 = Comp4()
-    set_interval(comp4.tick, 0.1)
+    #set_interval(comp4.tick, 0.1)
     rospy.spin()
