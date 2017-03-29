@@ -361,7 +361,7 @@ class Comp4(object):
     
         sound_beep = soundhandle.say("beep")
 
-        sleep(1)
+        rospy.sleep(1)
         soundhandle.stopAll()
     
     # STATES
@@ -475,5 +475,6 @@ def goal_pose(pose, movement = "do we need this?"):
 if __name__ == "__main__":
     rospy.init_node('comp4')
     comp4 = Comp4()
+    comp4.say_beep()
     set_interval(comp4.tick, 0.1)
     rospy.spin()
