@@ -265,15 +265,18 @@ class Comp4(object):
         
         self.goals = SearchGoals()
         self.sound = SoundClient()  # blocking = False by default
-        rospy.sleep(1)
-        self.say("Hello")
+        
         self.move = actionlib.SimpleActionClient('move_base', MoveBaseAction)
         self.move.wait_for_server()
-        
+        """
         # store each pose before turning
         self.mid_pts = []
         # store gloabl turning point on the map when searching
         self.bigmap_turning_goal = []
+        """
+        
+        rospy.sleep(1)
+        self.say("System Online. Greetings User.")
     
     # SIDE CAMERA (webcam)
     
