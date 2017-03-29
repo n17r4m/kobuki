@@ -207,7 +207,7 @@ class Comp4:
         self.kinect_info_sub = rospy.Subscriber('/camera/rgb/camera_info', CameraInfo, self.kinect_info_cb)
         self.kinect_sub = rospy.Subscriber('/camera/rgb/image_rect_color', Image, self.kinect_cb)
 
-        self.state = "searching"
+        self.state = "locking"
         
         self.cmd_vel_pub = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=1)
         self.twist = Twist()
@@ -219,12 +219,13 @@ class Comp4:
         pass
 
     def webcam_cb(self, msg):
-        if False and self.state == "something?":
+        if self.state == "searching":
             self.UA_Template_Tracker.process(msg, self.found_webcam_match)
             self.AR_Template_Tracker.process(msg, self.found_webcam_match)
     
     def found_webcam_match(self, x1, y1, x2, y2, name):
-        print "FOUND IT:", x1, y1, x2, y2, name
+        print "[webcam] FOUND IT:", x1, y1, x2, y2, name
+        self.state = "turning"
     
     # FRONT CAMERA (kinect)
     
@@ -235,12 +236,12 @@ class Comp4:
         self.AR_ORB_Tracker.D = np.array(msg.D)
     
     def kinect_cb(self, msg):
-        if True and self.state == "locking?":
+        if self.state == "locking":
             self.UA_ORB_Tracker.process(msg, self.found_kinect_match)
             self.AR_ORB_Tracker.process(msg, self.found_kinect_match)
     
     def found_kinect_match(self, rvecs, tvecs, name):
-        print "FOUND IT", rvecs, tvecs, name
+        print "[kinect] FOUND IT", rvecs, tvecs, name
     
     def navi(self, tvec, rvec):
         print tvec
