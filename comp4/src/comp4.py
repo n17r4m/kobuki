@@ -266,6 +266,7 @@ class Comp4(object):
         self.goals = SearchGoals()
         self.sound = SoundClient()  # blocking = False by default
         
+        rospy.sleep(1)
         self.say("Starting up.")
         rospy.sleep(3)
         
