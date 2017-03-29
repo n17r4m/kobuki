@@ -41,11 +41,9 @@ class OrbTracker(object):
         self.min_match_count = min_match_count
         self.imgpts = np.zeros((3, 1, 2), dtype=np.int)
         self.imgpts2 = np.zeros((3, 1, 2), dtype=np.int)
-        # Initiate STAR detector
+        
         self.orb = cv2.ORB_create(200)
-        # find the keypoints with ORB
         self.kp = self.orb.detect(self.template,None)
-        # compute the descriptors with ORB
         self.kp, self.des = self.orb.compute(self.template, self.kp)
         self.des = np.float32(self.des)
         
@@ -66,14 +64,12 @@ class OrbTracker(object):
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         img2 = gray
         img3 = gray
-
-
+        
         orb = cv2.ORB_create(800)
         kp = orb.detect(gray, None)
         kp, des = self.orb.compute(gray, kp)
         des = np.float32(des)
 
-        
         FLANN_INDEX_KDTREE = 0
         index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
         search_params = dict(checks = 50)
@@ -112,7 +108,7 @@ class OrbTracker(object):
             imgpts, jac = cv2.projectPoints(self.axis + [w/2,h/2,0], rvecs, tvecs, self.K, self.D)
             imgpts2, jac = cv2.projectPoints(self.axis2 + [w/2,h/2,0], rvecs, tvecs, self.K, self.D)
             img3 = self.draw(img3, imgpts, imgpts2, rect)
-            
+        
             found_cb(rvecs, tvecs, self.name)
             
         else:
@@ -132,13 +128,17 @@ class OrbTracker(object):
         
         img3 = cv2.drawMatches(self.template, self.kp, gray, kp, good, None, **draw_params)
         
-        
         cv2.imshow(self.name, img3)
-        
-
         k = cv2.waitKey(1) & 0xff
         
-        
+    def draw(self, img, imgpts, imgpts2, rect):
+        img = self.line(img, tuple((imgpts[0]).astype(int).ravel()), tuple((imgpts2[0]).astype(int).ravel()), (255,255,255), 5)
+        img = self.line(img, tuple((imgpts[1]).astype(int).ravel()), tuple((imgpts2[1]).astype(int).ravel()), (150,150,150), 5)
+        img = self.line(img, tuple((imgpts[2]).astype(int).ravel()), tuple((imgpts2[2]).astype(int).ravel()), (100,100,100), 5)
+        return img
+    
+    def line(self, img, p1, p2, c, w):
+        return cv2.line(img, tuple(np.maximum(p1, 1)), tuple(np.maximum(p2, 1)), c, w)
         
         
 
@@ -208,6 +208,13 @@ class Comp4:
         self.kinect_sub = rospy.Subscriber('/camera/rgb/image_rect_color', Image, self.kinect_cb)
 
         self.state = "locking"
+        """
+        States are: 
+            searching (wandering around, wall crawling)
+            turning   (turning towards wall)
+            locking   (moving forward, waiting for rvecs & tvecs)
+            docking   (moving towards goal computed from locking)
+        """
         
         self.cmd_vel_pub = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=1)
         self.twist = Twist()
@@ -243,6 +250,8 @@ class Comp4:
     def found_kinect_match(self, rvecs, tvecs, name):
         print "[kinect] FOUND IT", rvecs, tvecs, name
     
+    # ODOMETRY
+    
     def navi(self, tvec, rvec):
         print tvec
         print rvec
@@ -272,25 +281,6 @@ class Comp4:
 
         self.cmd_vel_pub.publish(self.twist)
 
-
-    def draw(self, img, imgpts, imgpts2, rect):
-        
-        offset = np.array([0,0]) #np.absolute((rect[2] - rect[0]) / 2) # np.array([self.template.shape[0], self.template.shape[1]/2])
-        #mid = tuple(np.array([np.mean(corners[:,:,0]), np.mean(corners[:,:,1])]).astype(int) + offset)
-        img = self.line(img, tuple((imgpts[0] + offset).astype(int).ravel()), tuple((imgpts2[0] + offset).astype(int).ravel()), (255,255,255), 5)
-        img = self.line(img, tuple((imgpts[1] + offset).astype(int).ravel()), tuple((imgpts2[1] + offset).astype(int).ravel()), (150,150,150), 5)
-        img = self.line(img, tuple((imgpts[2] + offset).astype(int).ravel()), tuple((imgpts2[2] + offset).astype(int).ravel()), (100,100,100), 5)
-        
-        """
-        mid = tuple(np.array([np.mean(corners[:,:,0]), np.mean(corners[:,:,1])]).astype(int))
-        img = cv2.line(img, mid, tuple((imgpts[0]).astype(int).ravel()), (255,0,0), 5)
-        img = cv2.line(img, mid, tuple((imgpts[1]).astype(int).ravel()), (0,255,0), 5)
-        img = cv2.line(img, mid, tuple((imgpts[2]).astype(int).ravel()), (0,0,255), 5)
-        """
-        return img
-    
-    def line(self, img, p1, p2, c, w):
-        return cv2.line(img, tuple(np.maximum(p1, 1)), tuple(np.maximum(p2, 1)), c, w)
 
 if __name__ == "__main__":
     rospy.init_node('comp4')
