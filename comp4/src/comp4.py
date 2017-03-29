@@ -267,7 +267,7 @@ class Comp4(object):
         self.sound = SoundClient()  # blocking = False by default
         
         rospy.sleep(1)
-        self.say("Starting up.")
+        self.say("Initializing. Please wait.")
         rospy.sleep(3)
         
         self.move = actionlib.SimpleActionClient('move_base', MoveBaseAction)
@@ -278,7 +278,7 @@ class Comp4(object):
         # store gloabl turning point on the map when searching
         self.bigmap_turning_goal = []
         """
-        rospy.sleep(1)
+        rospy.sleep(2)
         self.say("System Is Online. Ready to Begin The Easter Egg Hunt! Please press button one.")
         
     
