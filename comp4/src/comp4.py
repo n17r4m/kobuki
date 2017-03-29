@@ -188,9 +188,8 @@ class TemplateMatcher(object):
         cv2.waitKey(1)
         
         if maxVal > self.threshold:
-            found_cb(startX, startY, endX, endY, maxVal, self.name)
+            found_cb(self.startX, self.startY, self.endX, self.endY, maxVal, self.name)
         
-
 
 class Comp4:
     def __init__(self):
@@ -267,7 +266,7 @@ class Comp4:
             self.rvecs += (1/measures_needed) * rvecs
             self.tvecs += (1/measures_needed) * tvecs
         else:
-            self.state = "docking"
+            self.state = "locking" # should be docking
             self.vec_measures = 0
             
         print "[kinect] FOUND IT", rvecs, tvecs, name
@@ -285,7 +284,7 @@ class Comp4:
     def locking(self):
         pass
         # takes template tracking position and lock the marker to the center of screen
-        
+        if self.UA_Template_Tracker.
     
     def docking(self, tvec, rvec):
         print tvec
