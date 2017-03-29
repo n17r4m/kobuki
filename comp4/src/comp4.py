@@ -23,10 +23,6 @@ import imutils
 MIN_MATCH_COUNT = 10
 
 
-
-# define state Foo
-
-
 class OrbTracker(object):
     def __init__(self, template_filename, min_match_count = 10):
         
@@ -60,7 +56,7 @@ class OrbTracker(object):
     def process(self, msg, found_cb):
         
         img  = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
-        img = imutils.resize(img, width = int(img.shape[1] * 0.5))
+        img = imutils.resize(img, width = int(img.shape[1] * 0.75))
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         img2 = gray
         img3 = gray
@@ -238,8 +234,8 @@ class Comp4:
     
     def kinect_info_cb(self, msg):
         self.UA_ORB_Tracker.K = np.array(msg.K).reshape(3,3)
-        self.UA_ORB_Tracker.K = np.array(msg.K).reshape(3,3)
-        self.AR_ORB_Tracker.D = np.array(msg.D)
+        self.AR_ORB_Tracker.K = np.array(msg.K).reshape(3,3)
+        self.UA_ORB_Tracker.D = np.array(msg.D)
         self.AR_ORB_Tracker.D = np.array(msg.D)
     
     def kinect_cb(self, msg):
@@ -280,6 +276,9 @@ class Comp4:
         self.twist.linear.x = (3*self.twist.linear.x + x) / 4
 
         self.cmd_vel_pub.publish(self.twist)
+
+
+def run_state():
 
 
 if __name__ == "__main__":
