@@ -218,7 +218,7 @@ class Comp4:
         pass
 
     def webcam_cb(self, msg):
-        if True and self.state == "something?":
+        if False and self.state == "something?":
             self.UA_Template_Tracker.process(msg, self.found_webcam_match)
             self.AR_Template_Tracker.process(msg, self.found_webcam_match)
     
