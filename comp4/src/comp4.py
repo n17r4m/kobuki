@@ -376,7 +376,8 @@ class Comp4(object):
             self.state = "searching"
             self.say("here we go")
             print "HERE WE GO!"
-        print "WAITING FOR JOYSTICK (BUTTON 1)"
+        else:
+            print "WAITING FOR JOYSTICK (BUTTON 1)"
     
     def searching(self):
         if not self.goal_is_active():
