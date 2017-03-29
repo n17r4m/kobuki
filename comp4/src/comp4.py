@@ -19,8 +19,15 @@ import smach_ros
 from numpy import cross, eye, dot
 from scipy.linalg import expm3, norm
 import imutils
+import threading
 
-MIN_MATCH_COUNT = 10
+def set_interval(func, sec):
+    def func_wrapper():
+        set_interval(func, sec)
+        func()
+    t = threading.Timer(sec, func_wrapper)
+    t.start()
+    return t
 
 
 class OrbTracker(object):
@@ -148,10 +155,6 @@ class TemplateMatcher(object):
         self.template = cv2.Canny(self.template, 50, 200)
         self.th, self.tw =  self.template.shape[:2]
         self.threshold = threshold
-        self.startX = 0
-        self.startY = 0
-        self.endX = 0
-        self.endY = 0
 
     def process(self, msg, found_cb):
         img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
@@ -180,15 +183,15 @@ class TemplateMatcher(object):
         # unpack the bookkeeping varaible and compute the (x, y) coordinates
         # of the bounding box based on the resized ratio
         (maxVal, maxLoc, r) = found
-        (self.startX, self.startY) = (int(maxLoc[0] * r), int(maxLoc[1] * r))
-        (self.endX, self.endY) = (int((maxLoc[0] + self.tw) * r), int((maxLoc[1] + self.th) * r))
+        (startX, startY) = (int(maxLoc[0] * r), int(maxLoc[1] * r))
+        (endX, endY) = (int((maxLoc[0] + self.tw) * r), int((maxLoc[1] + self.th) * r))
         # draw a bounding box around the detected result and display the image
-        cv2.rectangle(img, (self.startX, self.startY), (self.endX, self.endY), (0, 0, 255), 2)
+        cv2.rectangle(img, (startX, startY), (endX, endY), (0, 0, 255), 2)
         cv2.imshow(self.name, img)
         cv2.waitKey(1)
         
         if maxVal > self.threshold:
-            found_cb(self.startX, self.startY, self.endX, self.endY, maxVal, self.name)
+            found_cb(startX, startY, endX, endY, maxVal, self.name)
         
 
 class Comp4:
@@ -273,6 +276,11 @@ class Comp4:
     
     # ODOMETRY
 
+    def tick(self):
+        print "tick tock"
+        if self.state == "turning":
+            self.turning()
+
     def searching(self):
         self.twist.angular.z = 0
         self.twist.linear.x = 0.1
@@ -281,10 +289,19 @@ class Comp4:
         self.twist.angular.z = 0.2
         self.twist.linear.x = 0
     
-    def locking(self):
+    def locking(self, x1, y1, x2, y2):
         pass
         # takes template tracking position and lock the marker to the center of screen
-        if self.UA_Template_Tracker.
+        if abs(x1-x2) < 640 / 3:
+            # go back
+            self.twist.angular.z = 0
+            self.twist.linear.x = -0.1
+        elif 640 / 3 <= abs(x1-x2) < 640 / 3 * 2:
+            self.twist.angular.z = 0
+            self.twist.linear.x = 0
+        elif 640 / 3 * 2 <= abs(x1-x2):
+            self.twist.angular.z = 0
+            self.twist.linear.x = 0.1
     
     def docking(self, tvec, rvec):
         print tvec
@@ -322,4 +339,5 @@ class Comp4:
 if __name__ == "__main__":
     rospy.init_node('comp4')
     comp4 = Comp4()
+    set_interval(comp4.tick, 0.1)
     rospy.spin()
