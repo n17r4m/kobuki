@@ -16,6 +16,7 @@ from matplotlib import pyplot as plt
 import os
 import smach
 import smach_ros
+import actionlib
 
 from numpy import cross, eye, dot
 from scipy.linalg import expm3, norm
@@ -85,7 +86,6 @@ class OrbTracker(object):
         flann = cv2.FlannBasedMatcher(index_params, search_params)
         matches = flann.knnMatch(self.des, des, k=2)
         
-        
         # store all the good matches as per Lowe's ratio test.
         good = []
         for m,n in matches:
@@ -126,14 +126,12 @@ class OrbTracker(object):
             imgpts = np.zeros((3, 1, 2), dtype=np.int)
             imgpts2 = imgpts
             
-        
         draw_params = dict(matchColor = (0,255,0), # draw matches in green color
                        singlePointColor = None,
                        matchesMask = matchesMask, # draw only inliers
                        flags = 2)
         
         #img3 = cv2.cvtColor(img3, cv2.COLOR_GRAY2BGR)
-        
         img3 = cv2.drawMatches(self.template, self.kp, gray, kp, good, None, **draw_params)
         
         cv2.imshow(self.name, img3)
@@ -166,31 +164,19 @@ class TemplateMatcher(object):
         img = imutils.resize(img, width = int(img.shape[1] * 0.5))
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         found = None
-        # loop over the scales of the image
         for scale in np.linspace(0.1, 1.0, 10)[::-1]:
-            # resize the image according to the scale, and keep track
-            # of the ratio of the resizing
             resized = imutils.resize(gray, width = int(gray.shape[1] * scale))
             r = gray.shape[1] / float(resized.shape[1])
-            # if the resized image is smaller than the template, then break
-            # from the loop
             if resized.shape[0] < self.th or resized.shape[1] < self.tw:
                 break
-            # detect edges in the resized, grayscale image and apply template
-            # matching to find the template in the image
             edged = cv2.Canny(resized, 50, 200)
             result = cv2.matchTemplate(edged, self.template, cv2.TM_CCOEFF_NORMED)
             (_, maxVal, _, maxLoc) = cv2.minMaxLoc(result)
-            # if we have found a new maximum correlation value, then update
-            # the bookkeeping variable
             if found is None or maxVal > found[0]:
                 found = (maxVal, maxLoc, r)
-        # unpack the bookkeeping varaible and compute the (x, y) coordinates
-        # of the bounding box based on the resized ratio
         (maxVal, maxLoc, r) = found
         (startX, startY) = (int(maxLoc[0] * r), int(maxLoc[1] * r))
         (endX, endY) = (int((maxLoc[0] + self.tw) * r), int((maxLoc[1] + self.th) * r))
-        # draw a bounding box around the detected result and display the image
         cv2.rectangle(img, (startX, startY), (endX, endY), (0, 0, 255), 2)
         cv2.imshow(self.name, img)
         cv2.waitKey(1)
@@ -299,6 +285,11 @@ class Comp4:
         self.cmd_vel_pub.publish(self.twist)
     
     def turning(self):
+        current_pose = self.pose
+        client = client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+        client.wait_for_server()
+        
+        
         self.twist.angular.z = 0.2
         self.twist.linear.x = 0
         self.cmd_vel_pub.publish(self.twist)
@@ -343,9 +334,10 @@ class Comp4:
         soundhandle = SoundClient()  # blocking = False by default
         rospy.sleep(0.5)  # Ensure publisher connection is successful.
     
-        sound_beep = soundhandle.waveSound("say-beep.wav", volume=0.5)
+        sound_beep = soundhandle.say("beep", volume=0.5)
 
-
+        sleep(1)
+        soundhandle.stopAll()
 
 if __name__ == "__main__":
     rospy.init_node('comp4')
