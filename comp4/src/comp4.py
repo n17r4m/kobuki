@@ -266,6 +266,9 @@ class Comp4(object):
         self.goals = SearchGoals()
         self.sound = SoundClient()  # blocking = False by default
         
+        rospy.sleep(1)
+        self.say("Greetings. System Is Online. Ready to Begin Easter Egg Hunt.")
+        
         self.move = actionlib.SimpleActionClient('move_base', MoveBaseAction)
         self.move.wait_for_server()
         """
@@ -275,8 +278,7 @@ class Comp4(object):
         self.bigmap_turning_goal = []
         """
         
-        rospy.sleep(1)
-        self.say("Greetings. System Is Online. Ready to Begin Easter Egg Hunt.")
+        
     
     # SIDE CAMERA (webcam)
     
