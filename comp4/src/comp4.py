@@ -56,7 +56,7 @@ class OrbTracker(object):
     def process(self, msg, found_cb):
         
         img  = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
-        img = imutils.resize(img, width = int(img.shape[1] * 0.75))
+        img = imutils.resize(img, width = int(img.shape[1] * 1))
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         img2 = gray
         img3 = gray
@@ -278,8 +278,6 @@ class Comp4:
         self.cmd_vel_pub.publish(self.twist)
 
 
-def run_state(comp4):
-    pass
 
 if __name__ == "__main__":
     rospy.init_node('comp4')
