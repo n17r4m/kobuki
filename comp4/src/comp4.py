@@ -337,7 +337,7 @@ class Comp4(object):
     
     # JOYSTICK
     
-    def joy_cb(msg):
+    def joy_cb(self, msg):
         if msg.buttons[1]:
             self.can_go = not self.can_go
     
