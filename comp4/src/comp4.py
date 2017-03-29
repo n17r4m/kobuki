@@ -38,7 +38,9 @@ class TemplateMatcher(object):
 
     def process(self, msg, onFoundFn):
         img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        img = imutils.resize(img, width = int(img.shape[1] * 0.5))
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        
         
         found = None
         # loop over the scales of the image
