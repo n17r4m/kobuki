@@ -83,7 +83,7 @@ class TemplateMatcher(object):
 class Comp4:
     def __init__(self):
         
-        self.UA_Tracker = TemplateMatcher("ua.png")
+        self.UA_Tracker = TemplateMatcher("ua_small.png")
         #self.AR_Tracker = TemplateMatcher("ar.png")
     
         self.webcam_info_sub = rospy.Subscriber('/cv_camera/camera_info', CameraInfo, self.webcam_info_cb)
@@ -112,6 +112,9 @@ class Comp4:
         self.found = False
         self.rot = None
         self.trans = None
+        
+        self.cmd_vel_pub = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=1)
+        self.twist = Twist()
 
     
     # SIDE CAMERA (webcam)
@@ -222,19 +225,19 @@ class Comp4:
         #self.twist.linear.x = (dist[-1]- 15) / 100
         z = 0
         if rvec[0] > 0.2:
-            dist[0] -= 6
+            tvec[0] -= 6
         elif rvec[0] < -0.2:
-            dist[0] += 6
+            tvec[0] += 6
 
-        if 0 > dist[0]:
+        if 0 > tvec[0]:
             z = 0.2
-        elif 0 < dist[0]:
+        elif 0 < tvec[0]:
             z = -0.2
         else:
             z = 0
 
 
-        if dist[-1] > 10:
+        if tvec[-1] > 10:
             x = 0.2
         else:
             x = 0
