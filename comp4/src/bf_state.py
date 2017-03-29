@@ -9,55 +9,38 @@ import smach_ros
 
 class templateMatcher(smach.State):
     def __init__(self):
-        smach.State.__init__(self, outcomes = ['locking'],
-                                   input_keys = ['matching'],
-                                   output_keys = ['template_matched'])
+        smach.State.__init__(self, outcomes = ['template_matched'])
         
     def execute(self, usrdata):
         rospy.loginfo('Executing template matcher on the side camera')
-        if usrdata.matching:
-            usrdata.template_matched = True
-            return 'locking'
-        else:
-            return 'searching'
-
+        # do stuff
+        return 'template_matched'
 
 class orbMatcher(smach.State):
     def __init__(self):
-        smach.State.__init__(self, outcomes = ['docking'],
-                                   input_keys = ['template_matched'],
-                                   output_keys = ['locked'])
+        smach.State.__init__(self, outcomes = ['pose_found'])
                                    
     def execute(self, usrdata):
         rospy.loginfo('Executing orb matching on front camera')
-        if usrdata.template_matched:
-            # do stuff
-            usrdata.locked = True
-            return 'docking'
-            
+        # do stuff
+        return 'pose_found'
+        
 class Docking(smach.State):
     def __init__(self):
-        smach.State.__init__(self, outcomes = ['returning'],
-                                   input_keys = ['locked'], 
-                                   output_keys = ['docked'])
+        smach.State.__init__(self, outcomes = ['docked'])
     
     def execute(self, usrdata):
         rospy.loginfo('Executing docking.')
-        if usrdata.locked:
-            # do stuff
-            usrdata.docked = True
-            return 'returning'
+        # do stuff
+        return 'docked'
             
 class back2Searching(smach.State):
     def __init__(self):
-        smach.State.__init__(self, outcomes = ['searching'],
-                                   input_keys = ['docked'],
-                                   output_keys = ['back_to_seach'])
+        smach.State.__init__(self, outcomes = ['returned'])
     def execute(self, usrdata):
-        if usrdata.docked:
-            # do stuff
-            usrdata.back_to_seach = True
-            return 'searching'
+        rospy.loginfo('Returning back to the track')
+        # do stuff
+        return 'returned'
             
 def main():
     rospy.init_node('simple_state_machine')
@@ -69,14 +52,14 @@ def main():
     # Open the container
     with sm:
         # Add states to the container
-        smach.StateMachine.add('templateMatching', templateMatcher(), 
-                               transitions={'searching':'locking'})
-        smach.StateMachine.add('orbMatching', orbMatcher(), 
-                               transitions={'locking':'docking'})
+        smach.StateMachine.add('searching', templateMatcher(), 
+                               transitions={'template_matched':'locking'})
+        smach.StateMachine.add('locking', orbMatcher(), 
+                               transitions={'pose_found':'docking'})
         smach.StateMachine.add('docking', Docking(),
-                               transitions={'docking':'returning'})
+                               transitions={'docked':'returning'})
         smach.StateMachine.add('returning', back2Searching(),
-                               transitions={'returning':'searching'})
+                               transitions={'returned':'searching'})
 
 
     # Execute SMACH plan
