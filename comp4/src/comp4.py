@@ -17,6 +17,7 @@ import os
 import smach
 import smach_ros
 import actionlib
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 
 from numpy import cross, eye, dot
 from scipy.linalg import expm3, norm
@@ -218,6 +219,9 @@ class Comp4:
         self.cmd_vel_pub = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=1)
         self.twist = Twist()
         self.pose = None
+        
+        self.move = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+        move.wait_for_server()
 
     
     # SIDE CAMERA (webcam)
@@ -285,9 +289,11 @@ class Comp4:
         self.cmd_vel_pub.publish(self.twist)
     
     def turning(self):
-        client = client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
-        client.wait_for_server()
+        
         goal = self.pose
+        
+        self.move.send_goal(goal)
+        self.move.wait_for_result()
         
     
     def locking(self, x1, y1, x2, y2):
