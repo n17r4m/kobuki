@@ -189,7 +189,7 @@ class TemplateMatcher(object):
         cv2.waitKey(1)
         
         if maxVal > self.threshold:
-            found_cb(startX, startY, endX, endY, maxVal, self.name)
+            found_cb(startX, startY, endX, endY, self.name)
 
 class SearchGoals(object):
     def __init__(self):
@@ -211,15 +211,16 @@ class SearchGoals(object):
             # in front of elevator (again), facing east
             #{"position": {"x": -5.51, "y": 0.15, z: 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}}, 
             ]
-        self.next_goal = self.goals.pop(0) # take first element
+        self.next_goal = goal_pose(self.goals.pop(0)) # take first element
         self.last_goal = self.next_goal
         self.goal_num = 0
+        
     def get_goal(self):
         g = self.next_goal
         self.last_goal = self.next_goal
-        self.next_goal = self.goals[self.goal_num]
+        self.next_goal = goal_pose(self.goals[self.goal_num])
         self.goal_num = (self.goal_num + 1) % len(self.goals)
-        return goal_pose(g)
+        return g
 
 class Comp4(object):
     def __init__(self):
@@ -386,6 +387,7 @@ class Comp4(object):
         if not self.goal_is_active():
             self.say("Searching Waypoint " + str(self.goals.goal_num + 1) + "!")
             goal = self.goals.get_goal()
+            print goal
             self.move.send_goal(goal)
     
     def turning(self):
