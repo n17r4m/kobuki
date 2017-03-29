@@ -6,15 +6,18 @@ import roslib
 import rospy
 import smach
 import smach_ros
+from comp4_bf import *
 
 class templateMatcher(smach.State):
     def __init__(self):
-        smach.State.__init__(self, outcomes = ['template_matched'])
+        smach.State.__init__(self, outcomes = ['template_matched'], input_keys = ['start_matching'], output_keys=['tm_done'])
         
     def execute(self, usrdata):
         rospy.loginfo('Executing template matcher on the side camera')
-        # do stuff
-        return 'template_matched'
+        if usrdata.start_matching:
+            # do matching
+        if usrdata.tm_done:
+            return 'template_matched'
 
 class orbMatcher(smach.State):
     def __init__(self):
@@ -44,6 +47,7 @@ class back2Searching(smach.State):
             
 def main():
     rospy.init_node('simple_state_machine')
+    comp4 = Comp4()
 
     # Create a SMACH state machine
     sm = smach.StateMachine(outcomes=['searching'])    
