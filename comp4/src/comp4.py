@@ -491,13 +491,16 @@ def goal_pose(pose):
     goal_pose = MoveBaseGoal()
     goal_pose.target_pose.header.frame_id = 'map'
     goal_pose.target_pose.header.stamp = rospy.Time.now()
-    goal_pose.target_pose.pose.position.x = pose["position"]["x"]
-    goal_pose.target_pose.pose.position.y = pose["position"]["y"]
-    goal_pose.target_pose.pose.position.z = pose["position"]["z"]
-    goal_pose.target_pose.pose.orientation.w = pose["orientation"]["w"]
-    goal_pose.target_pose.pose.orientation.x = pose["orientation"]["x"]
-    goal_pose.target_pose.pose.orientation.y = pose["orientation"]["y"]
-    goal_pose.target_pose.pose.orientation.z = pose["orientation"]["z"]
+    if isinstance(pose, dict):
+        goal_pose.target_pose.pose.position.x = pose["position"]["x"]
+        goal_pose.target_pose.pose.position.y = pose["position"]["y"]
+        goal_pose.target_pose.pose.position.z = pose["position"]["z"]
+        goal_pose.target_pose.pose.orientation.w = pose["orientation"]["w"]
+        goal_pose.target_pose.pose.orientation.x = pose["orientation"]["x"]
+        goal_pose.target_pose.pose.orientation.y = pose["orientation"]["y"]
+        goal_pose.target_pose.pose.orientation.z = pose["orientation"]["z"]
+    else:
+        goal_pose.target_pose.pose = pose
     
     return goal_pose
 
