@@ -221,7 +221,7 @@ class Comp4:
         self.pose = None
         
         self.move = actionlib.SimpleActionClient('move_base', MoveBaseAction)
-        move.wait_for_server()
+        self.move.wait_for_server()
 
     
     # SIDE CAMERA (webcam)
@@ -289,7 +289,6 @@ class Comp4:
         self.cmd_vel_pub.publish(self.twist)
     
     def turning(self):
-        
         goal = self.pose
         
         self.move.send_goal(goal)
