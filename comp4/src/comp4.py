@@ -412,10 +412,9 @@ class Comp4(object):
             self.say("Turning")
             self.move.send_goal(goal)
             self.move.wait_for_result()
-            self.say("Turn Complete!")
-            rospy.sleep(2)
-            self.say("Locking on to target!")
             self.state = "locking"
+            self.say("Locking on to target!")
+            
         
     def locking(self):
         self.twist.angular.z = 0
