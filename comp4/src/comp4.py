@@ -27,13 +27,14 @@ def R(axis, theta):
 
 # define state Foo
 class TemplateMatcher(object):
-    def __init__(self, template_filename):
+    def __init__(self, template_filename, threshold = 0.2):
         self.bridge = cv_bridge.CvBridge()
         path = rospy.get_param("/pkg_path")
         self.name = template_filename
         self.template = cv2.imread(path + "/img/" + template_filename, 0)
         self.template = cv2.Canny(self.template, 50, 200)
         self.th, self.tw =  self.template.shape[:2]
+        self.threshold = threshold
 
     def process(self, msg, onFoundFn):
         img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
@@ -67,23 +68,26 @@ class TemplateMatcher(object):
         # of the bounding box based on the resized ratio
         (maxVal, maxLoc, r) = found
         
-        print maxVal
+        
         (startX, startY) = (int(maxLoc[0] * r), int(maxLoc[1] * r))
         (endX, endY) = (int((maxLoc[0] + self.tw) * r), int((maxLoc[1] + self.th) * r))
         
         # draw a bounding box around the detected result and display the image
-        image = img.copy()
-        cv2.rectangle(image, (startX, startY), (endX, endY), (0, 0, 255), 2)
-        cv2.imshow(self.name, image)
+        
+        cv2.rectangle(img, (startX, startY), (endX, endY), (0, 0, 255), 2)
+        cv2.imshow(self.name, img)
         cv2.waitKey(1)
-
+        
+        if maxVal > self.threshold:
+            onFoundFn(startX, startY, endX, endY)
+        
 
 
 
 class Comp4:
     def __init__(self):
         
-        self.UA_Tracker = TemplateMatcher("ua_small.png")
+        self.UA_Tracker = TemplateMatcher("ua_small.png", 0.2)
         #self.AR_Tracker = TemplateMatcher("ar_small.png")
     
         self.webcam_info_sub = rospy.Subscriber('/cv_camera/camera_info', CameraInfo, self.webcam_info_cb)
@@ -126,8 +130,8 @@ class Comp4:
     def webcam_cb(self, msg):
         self.UA_Tracker.process(msg, self.found_webcam_match)
     
-    def found_webcam_match(self):
-        print "FOUND IT!"
+    def found_webcam_match(self, x1, y1, x2, y2):
+        print "FOUND IT:", x1, y1, x2, y2
     
     # FRONT CAMERA (kinect)
     
