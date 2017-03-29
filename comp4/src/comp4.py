@@ -148,6 +148,10 @@ class TemplateMatcher(object):
         self.template = cv2.Canny(self.template, 50, 200)
         self.th, self.tw =  self.template.shape[:2]
         self.threshold = threshold
+        self.startX = 0
+        self.startY = 0
+        self.endX = 0
+        self.endY = 0
 
     def process(self, msg, found_cb):
         img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
@@ -203,7 +207,6 @@ class Comp4:
         self.kinect_info_sub = rospy.Subscriber('/camera/rgb/camera_info', CameraInfo, self.kinect_info_cb)
         self.kinect_sub = rospy.Subscriber('/camera/rgb/image_rect_color', Image, self.kinect_cb)
 
-        self.state = "locking"
         """
         States are: 
             searching (wandering around, wall crawling)
@@ -211,6 +214,11 @@ class Comp4:
             locking   (moving forward, waiting for rvecs & tvecs)
             docking   (moving towards goal computed from locking)
         """
+        self.state = "locking"
+        self.found = None 
+        self.vec_measures = 0
+        self.tvecs = None
+        self.rvecs = None
         
         self.cmd_vel_pub = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=1)
         self.twist = Twist()
@@ -228,6 +236,10 @@ class Comp4:
     
     def found_webcam_match(self, x1, y1, x2, y2, name):
         print "[webcam] FOUND IT:", x1, y1, x2, y2, name
+        if name == "ua_small.png":
+            self.found = "ua"
+        if name == "ar_small.png":
+            self.found = "ar"
         self.state = "turning"
     
     # FRONT CAMERA (kinect)
@@ -240,15 +252,42 @@ class Comp4:
     
     def kinect_cb(self, msg):
         if self.state == "locking":
-            self.UA_ORB_Tracker.process(msg, self.found_kinect_match)
-            self.AR_ORB_Tracker.process(msg, self.found_kinect_match)
+            if self.found == "ua":
+                self.UA_ORB_Tracker.process(msg, self.found_kinect_match)
+            if self.found == "ar":
+                self.AR_ORB_Tracker.process(msg, self.found_kinect_match)
     
     def found_kinect_match(self, rvecs, tvecs, name):
+        measures_needed = 10
+        if self.vec_measures == 0:
+            self.rvecs = (1/measures_needed) * rvecs
+            self.tvecs = (1/measures_needed) * rvecstvecs
+        self.vec_measures += 1
+        if self.vec_measures < measures_needed:
+            self.rvecs += (1/measures_needed) * rvecs
+            self.tvecs += (1/measures_needed) * rvecstvecs
+        else:
+            self.state = "docking"
+            self.vec_measures = 0
+            
         print "[kinect] FOUND IT", rvecs, tvecs, name
     
     # ODOMETRY
+
+    def searching(self):
+        self.twist.angular.z = 0
+        self.twist.linear.x = 0.1
     
-    def navi(self, tvec, rvec):
+    def turning(self):
+        self.twist.angular.z = 0.2
+        self.twist.linear.x = 0
+    
+    def locking(self):
+        pass
+        # takes template tracking position and lock the marker to the center of screen
+        
+    
+    def docking(self, tvec, rvec):
         print tvec
         print rvec
         #self.twist.angular.z = - theta[0]  * 180 / 3.1415 / 10
@@ -277,7 +316,7 @@ class Comp4:
 
         self.cmd_vel_pub.publish(self.twist)
         
-    def 
+
 
 
 
