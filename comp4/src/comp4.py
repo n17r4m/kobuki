@@ -392,7 +392,7 @@ class Comp4(object):
             self.move.send_goal(goal)
     
     def turning(self):
-        try:
+        if not self.goal_is_active():
             goal = self.turn_goal()
             self.say("Turning")
             self.move.send_goal(goal)
@@ -401,8 +401,6 @@ class Comp4(object):
             rospy.sleep(2)
             self.say("Locking on to target!")
             self.state = "locking"
-        except rospy.ROSInterruptException:
-            pass
         
     def locking(self):
         self.twist.angular.z = 0
