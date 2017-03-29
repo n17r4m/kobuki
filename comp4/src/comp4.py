@@ -41,7 +41,7 @@ class TemplateMatcher(object):
         
         found = None
         # loop over the scales of the image
-        for scale in np.linspace(0.2, 1.0, 20)[::-1]:
+        for scale in np.linspace(0.2, 1.0, 10)[::-1]:
             # resize the image according to the scale, and keep track
             # of the ratio of the resizing
             resized = imutils.resize(gray, width = int(gray.shape[1] * scale))
@@ -84,7 +84,7 @@ class Comp4:
     def __init__(self):
         
         self.UA_Tracker = TemplateMatcher("ua_small.png")
-        #self.AR_Tracker = TemplateMatcher("ar.png")
+        #self.AR_Tracker = TemplateMatcher("ar_small.png")
     
         self.webcam_info_sub = rospy.Subscriber('/cv_camera/camera_info', CameraInfo, self.webcam_info_cb)
         self.webcam_sub = rospy.Subscriber('/cv_camera/image_rect_color', Image, self.webcam_cb)
