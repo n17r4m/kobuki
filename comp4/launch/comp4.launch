@@ -25,7 +25,7 @@
   </include>
 
   <!-- Map server -->
-  <arg name="map_file" default="$(env TURTLEBOT_MAP_FILE)"/>
+  <arg name="map_file" default="$(find comp4)/maps/map.yaml"/>
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 
   <!-- AMCL -->

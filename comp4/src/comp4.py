@@ -211,7 +211,7 @@ class Comp4:
             locking   (moving forward, waiting for rvecs & tvecs)
             docking   (moving towards goal computed from locking)
         """
-        self.state = "locking"
+        self.state = "searching"
         self.found = "ua" 
         self.vec_measures = 0
         self.tvecs = None
@@ -265,7 +265,7 @@ class Comp4:
                 self.AR_ORB_Tracker.process(msg, self.found_kinect_match)
     
     def found_kinect_match(self, rvecs, tvecs, name):
-        measures_needed = 100.0
+        measures_needed = 50.0
         if self.vec_measures == 0:
             self.rvecs = (1.0/measures_needed) * rvecs
             self.tvecs = (1.0/measures_needed) * tvecs
@@ -274,11 +274,11 @@ class Comp4:
             self.rvecs += (1.0/measures_needed) * rvecs
             self.tvecs += (1.0/measures_needed) * tvecs
         else:
-            self.state = "locking" # should be docking
+            self.state = "docking"
             self.vec_measures = 0
-            print self.tvecs
-        
-        #print "[kinect] FOUND IT", rvecs, tvecs, name
+            print "LOCKED ONTO TARGET " + name
+            print rvecs
+            print tvecs
         
     
     # ODOMETRY
@@ -291,7 +291,7 @@ class Comp4:
 
     def searching(self):
         self.twist.angular.z = 0
-        self.twist.linear.x = 0.1
+        self.twist.linear.x = 0
         self.cmd_vel_pub.publish(self.twist)
     
     def turning(self):
