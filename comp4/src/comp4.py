@@ -265,6 +265,8 @@ class Comp4(object):
         
         self.goals = SearchGoals()
         self.sound = SoundClient()  # blocking = False by default
+        rospy.sleep(1)
+        self.say("Hello")
         self.move = actionlib.SimpleActionClient('move_base', MoveBaseAction)
         self.move.wait_for_server()
         
@@ -490,6 +492,5 @@ def goal_pose(pose, movement = "do we need this?"):
 if __name__ == "__main__":
     rospy.init_node('comp4')
     comp4 = Comp4()
-    comp4.say("Hello")
     set_interval(comp4.tick, 0.1)
     rospy.spin()
