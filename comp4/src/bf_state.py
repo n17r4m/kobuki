@@ -44,12 +44,12 @@ class back2Searching(smach.State):
             
 def main():
     rospy.init_node('simple_state_machine')
-    sis = smach_ros.IntrospectionServer('simple_viewer', sm, '/SM_ROOT')
-    sis.start()
 
     # Create a SMACH state machine
-    sm = smach.StateMachine(outcomes=['searching'])
-    sm.userdata.sm_counter = 0
+    sm = smach.StateMachine(outcomes=['searching'])    
+    
+    sis = smach_ros.IntrospectionServer('simple_viewer', sm, '/SM_ROOT')
+    sis.start()
 
     # Open the container
     with sm:
