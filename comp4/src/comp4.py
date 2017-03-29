@@ -254,8 +254,8 @@ class Comp4(object):
             pausing   (easter egg reached, pause for 3 sec)
             returning (moving back to last position before turn + dock)
         """
-        self.state = "waiting"
-        self.found = None
+        self.state = "locking"
+        self.found = "ua"
         self.vec_measures = 0
         self.tvecs = None
         self.rvecs = None
@@ -290,6 +290,7 @@ class Comp4(object):
     
     def webcam_info_cb(self, msg):
         self.tick()
+        print self.state
 
     def webcam_cb(self, msg):
         if self.state == "searching":

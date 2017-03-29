@@ -6,7 +6,7 @@ import roslib
 import rospy
 import smach
 import smach_ros
-from comp4_bf import *
+from bf_alg import *
 
 class templateMatcher(smach.State):
     def __init__(self):
