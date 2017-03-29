@@ -261,11 +261,11 @@ class Comp4:
         measures_needed = 10
         if self.vec_measures == 0:
             self.rvecs = (1/measures_needed) * rvecs
-            self.tvecs = (1/measures_needed) * rvecstvecs
+            self.tvecs = (1/measures_needed) * tvecs
         self.vec_measures += 1
         if self.vec_measures < measures_needed:
             self.rvecs += (1/measures_needed) * rvecs
-            self.tvecs += (1/measures_needed) * rvecstvecs
+            self.tvecs += (1/measures_needed) * tvecs
         else:
             self.state = "docking"
             self.vec_measures = 0
