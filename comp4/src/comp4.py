@@ -119,7 +119,7 @@ class OrbTracker(object):
             imgpts2, jac = cv2.projectPoints(self.axis2 + [w/2,h/2,0], rvecs, tvecs, self.K, self.D)
             img3 = self.draw(img3, imgpts, imgpts2, rect)
         
-            found_cb(rvecs, tvecs / 900, self.name)
+            found_cb(rvecs, tvecs / 900.0, self.name)
             
         else:
             #print "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT)
