@@ -299,7 +299,7 @@ class Comp4:
     def locking(self, x1, y1, x2, y2):
         pass
         # takes template tracking position and lock the marker to the center of screen
-        self.cmd_vel_pub.publish(self.twist)
+        #self.cmd_vel_pub.publish(self.twist)
     
     def docking(self, tvec, rvec):
         print tvec
@@ -346,13 +346,14 @@ def goal_pose(pose, movement):
     goal_pose.target_pose.header.frame_id = 'map'
     goal_pose.target_pose.header.stamp = rospy.Time.now()
     if movement == "turning":
+        #
         goal_pose.target_pose.pose.position.x = pose[0][0]
         goal_pose.target_pose.pose.position.y = pose[0][1]
         goal_pose.target_pose.pose.position.z = pose[0][2]
         goal_pose.target_pose.pose.orientation.x = pose[1][0]
         goal_pose.target_pose.pose.orientation.y = pose[1][1]
-        goal_pose.target_pose.pose.orientation.z = pose[1][2]
-        goal_pose.target_pose.pose.orientation.w = pose[1][3]
+        goal_pose.target_pose.pose.orientation.z = pose[1][2] - 0.6
+        goal_pose.target_pose.pose.orientation.w = pose[1][3] - 0.4
     elif movement = "searching":
         pass
 
