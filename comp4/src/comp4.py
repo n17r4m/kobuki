@@ -251,7 +251,7 @@ class Comp4(object):
             returning (moving back to last position before turn + dock)
         """
         self.state = "waiting"
-        self.found = "ua" 
+        self.found = None
         self.vec_measures = 0
         self.tvecs = None
         self.rvecs = None
