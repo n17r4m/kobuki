@@ -180,10 +180,10 @@ class TemplateMatcher(object):
         # unpack the bookkeeping varaible and compute the (x, y) coordinates
         # of the bounding box based on the resized ratio
         (maxVal, maxLoc, r) = found
-        (startX, startY) = (int(maxLoc[0] * r), int(maxLoc[1] * r))
-        (endX, endY) = (int((maxLoc[0] + self.tw) * r), int((maxLoc[1] + self.th) * r))
+        (self.startX, self.startY) = (int(maxLoc[0] * r), int(maxLoc[1] * r))
+        (self.endX, self.endY) = (int((maxLoc[0] + self.tw) * r), int((maxLoc[1] + self.th) * r))
         # draw a bounding box around the detected result and display the image
-        cv2.rectangle(img, (startX, startY), (endX, endY), (0, 0, 255), 2)
+        cv2.rectangle(img, (self.startX, self.startY), (self.endX, self.endY), (0, 0, 255), 2)
         cv2.imshow(self.name, img)
         cv2.waitKey(1)
         
@@ -215,7 +215,7 @@ class Comp4:
             docking   (moving towards goal computed from locking)
         """
         self.state = "locking"
-        self.found = None 
+        self.found = "ua" 
         self.vec_measures = 0
         self.tvecs = None
         self.rvecs = None
