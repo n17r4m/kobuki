@@ -108,7 +108,7 @@ class OrbTracker(object):
             found_cb(rvecs, tvecs, self.name)
             
         else:
-            print "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT)
+            #print "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT)
             matchesMask = None
             rect = np.zeros((4, 1, 2), dtype=np.int)
             imgpts = np.zeros((3, 1, 2), dtype=np.int)
@@ -276,6 +276,8 @@ class Comp4:
         self.twist.linear.x = (3*self.twist.linear.x + x) / 4
 
         self.cmd_vel_pub.publish(self.twist)
+        
+    def 
 
 
 
