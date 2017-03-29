@@ -368,11 +368,9 @@ class Comp4(object):
         # see: http://docs.ros.org/hydro/api/actionlib/html/classactionlib_1_1simple__action__client_1_1SimpleGoalState.html
         return self.move.simple_state != 2 # 2 = DONE
     
-    
     def say(self, message):
         print "[  SAY]", message
         self.sound.say(message)
-        
     
     # STATES
     
@@ -397,16 +395,16 @@ class Comp4(object):
             self.move.send_goal(goal)
             self.move.wait_for_result()
             self.say("Turn Complete!")
+            rospy.sleep(2)
+            self.say("Locking on to target!")
             self.state = "locking"
         except rospy.ROSInterruptException:
             pass
-    
         
     def locking(self):
         self.twist.angular.z = 0
         self.twist.linear.x = 0.05
         self.cmd_vel_pub.publish(self.twist)
-        self.say("Locking on to target!")
         
     
     def docking(self, tvec, rvec):
@@ -416,7 +414,7 @@ class Comp4(object):
             #roll = euler[0]
             #pitch = euler[1]
             yaw = euler[2]
-            xdist = self.tvec[1] # + offset
+            xdist = self.tvec[1] + 0.1
             zdist = self.tvec[2]
             
             # I think this is correct / not tested...
@@ -424,8 +422,8 @@ class Comp4(object):
             y_offset = zdist * math.sin(yaw)
             
             # sin/cos may be reversed here / not tested...
-            x_ofset += xdist * math.sin(yaw)
-            y_ofset += xdist * math.cos(yaw)
+            x_ofset += xdist * math.cos(yaw)
+            y_ofset += xdist * math.sin(yaw)
             
             pose.position.x += x_offset
             pose.position.y += y_offset
@@ -433,7 +431,7 @@ class Comp4(object):
             self.move.send_goal(goal)
             self.move.wait_for_result()
             
-            self.say("Target Reached! beep beep beep.")
+            self.say("Target Reached! beep boop beep boop.")
 
             self.pause_until = time.time() + 4 
             self.state = "pausing"
@@ -486,7 +484,7 @@ class Comp4(object):
     
     
 
-def goal_pose(pose, movement = "do we need this?"):
+def goal_pose(pose):
     goal_pose = MoveBaseGoal()
     goal_pose.target_pose.header.frame_id = 'map'
     goal_pose.target_pose.header.stamp = rospy.Time.now()
