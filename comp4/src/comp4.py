@@ -88,7 +88,7 @@ class Comp4:
     def __init__(self):
         
         self.UA_Tracker = TemplateMatcher("ua_small.png", 0.2)
-        #self.AR_Tracker = TemplateMatcher("ar_small.png")
+        self.AR_Tracker = TemplateMatcher("ar_small.png", 0.2)
     
         self.webcam_info_sub = rospy.Subscriber('/cv_camera/camera_info', CameraInfo, self.webcam_info_cb)
         self.webcam_sub = rospy.Subscriber('/cv_camera/image_rect_color', Image, self.webcam_cb)
