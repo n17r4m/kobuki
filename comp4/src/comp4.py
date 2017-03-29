@@ -342,7 +342,7 @@ class Comp4(object):
     def tick(self):
         if time.time() < self.time_out:
             getattr(self, self.state)()
-        else
+        else:
             self.say("times up")
             self.time_out = time.time() + 3600
             self.status = "waiting"
