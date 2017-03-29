@@ -292,7 +292,7 @@ class Comp4:
     def searching(self):
         self.twist.angular.z = 0
         self.twist.linear.x = 0
-        self.cmd_vel_pub.publish(self.twist)
+        #self.cmd_vel_pub.publish(self.twist)
     
     def turning(self):
         self.mid_pts = self.pose
