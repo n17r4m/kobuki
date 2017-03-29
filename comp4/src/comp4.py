@@ -266,8 +266,8 @@ class Comp4(object):
         self.goals = SearchGoals()
         self.sound = SoundClient()  # blocking = False by default
         
-        rospy.sleep(1)
-        self.say("Greetings. System Is Online. Ready to Begin Easter Egg Hunt.")
+        self.say("Starting up.")
+        rospy.sleep(3)
         
         self.move = actionlib.SimpleActionClient('move_base', MoveBaseAction)
         self.move.wait_for_server()
@@ -277,7 +277,8 @@ class Comp4(object):
         # store gloabl turning point on the map when searching
         self.bigmap_turning_goal = []
         """
-        
+        rospy.sleep(1)
+        self.say("System Is Online. Ready to Begin The Easter Egg Hunt! Please press button one.")
         
     
     # SIDE CAMERA (webcam)
@@ -329,7 +330,7 @@ class Comp4(object):
         else:
             self.state = "docking"
             self.vec_measures = 0
-            print "LOCKED ONTO TARGET " + name
+            self.say("Locked on to Target!")
             print rvecs
             print tvecs
     
@@ -368,7 +369,6 @@ class Comp4(object):
     
     
     def say(self, message):
-        print "saying", message
         self.sound.say(message)
         
     
@@ -378,24 +378,23 @@ class Comp4(object):
         if self.can_go:
             self.time_out = time.time() + 60 * 5 # five minutes
             self.state = "searching"
-            self.say("here we go")
-            print "HERE WE GO!"
+            self.say("here we go!")
         else:
             print "WAITING FOR JOYSTICK (BUTTON 1)"
     
     def searching(self):
         if not self.goal_is_active():
-            print "SEARCHING WAYPOINT", self.goals.goal_num + 1
+            self.say("Searching Waypoint " + str(self.goals.goal_num + 1) + "!")
             goal = self.goals.get_goal()
             self.move.send_goal(goal)
     
     def turning(self):
         try:
             goal = self.turn_goal()
-            print "TURNING"
+            self.say("Turning")
             self.move.send_goal(goal)
             self.move.wait_for_result()
-            print "TURN COMPLETE"
+            self.say("Turn Complete!")
             self.state = "locking"
         except rospy.ROSInterruptException:
             pass
@@ -405,8 +404,8 @@ class Comp4(object):
         self.twist.angular.z = 0
         self.twist.linear.x = 0.05
         self.cmd_vel_pub.publish(self.twist)
-        print "LOCKING ON TO TARGET"
-        # takes template tracking position and lock the marker to the center of screen
+        self.say("Locking on to target!")
+        
     
     def docking(self, tvec, rvec):
         if not self.goal_is_active():
@@ -432,9 +431,8 @@ class Comp4(object):
             self.move.send_goal(goal)
             self.move.wait_for_result()
             
-            print "TARGET REACHED"
-            
-            self.say("beep")
+            self.say("Target Reached! beep beep beep.")
+
             self.pause_until = time.time() + 4 
             self.state = "pausing"
             
@@ -470,7 +468,7 @@ class Comp4(object):
 
     def pausing(self):
         if time.time() > self.pause_until:
-            print "RETURNING TO SEARCH"
+            self.say("Returning to search!")
             self.state = "returning"
 
     def returning(self):
@@ -478,7 +476,7 @@ class Comp4(object):
             goal = self.goals.last_goal
             self.move.send_goal(goal)
             self.move.wait_for_result()
-            print "RESUMING SEARCH"
+            self.say("Resuming Search!")
             self.state = "searching"
         except rospy.ROSInterruptException:
             pass
