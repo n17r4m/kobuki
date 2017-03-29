@@ -264,7 +264,7 @@ class Comp4(object):
         self.time_out = time.time() + 3600
         
         self.goals = SearchGoals()
-        
+        self.sound = SoundClient()  # blocking = False by default
         self.move = actionlib.SimpleActionClient('move_base', MoveBaseAction)
         self.move.wait_for_server()
         
@@ -361,12 +361,9 @@ class Comp4(object):
     
     
     def say(self, message):
-        soundhandle = SoundClient()  # blocking = False by default
-        rospy.sleep(0.5)  # Ensure publisher connection is successful.
-        sound_beep = soundhandle.say(message)
-        rospy.sleep(float(len(message)) / 3.0)
-        soundhandle.stopAll()
-    
+        print "saying", message
+        self.sound.say(message)
+        
     
     # STATES
     
