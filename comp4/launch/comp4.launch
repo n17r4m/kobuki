@@ -30,6 +30,9 @@
 
   <!-- Joystick -->
   <node name="joy_node" pkg="joy" type="joy_node" />
+  
+  <!-- Sound -->
+  <node name="sound_play" pkg="sound_play" type="soundplay_node.py" />
 
   <!-- AMCL -->
   <arg name="custom_amcl_launch_file" default="$(find turtlebot_navigation)/launch/includes/amcl/$(arg 3d_sensor)_amcl.launch.xml"/>
