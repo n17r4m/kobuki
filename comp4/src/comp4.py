@@ -287,7 +287,7 @@ class Comp4:
         getattr(self, self.state)()
         
     def amcl_cb(self, msg):
-        self.pose = pose.pose.pose
+        self.pose = msg.pose.pose.pose
 
     def searching(self):
         self.twist.angular.z = 0
