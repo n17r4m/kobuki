@@ -278,8 +278,8 @@ class Comp4:
         self.cmd_vel_pub.publish(self.twist)
 
 
-def run_state():
-
+def run_state(comp4):
+    pass
 
 if __name__ == "__main__":
     rospy.init_node('comp4')
