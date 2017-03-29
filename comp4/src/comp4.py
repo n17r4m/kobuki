@@ -26,6 +26,7 @@ def set_interval(func, sec):
         set_interval(func, sec)
         func()
     t = threading.Timer(sec, func_wrapper)
+    t.daemon = True
     t.start()
     return t
 
@@ -284,10 +285,12 @@ class Comp4:
     def searching(self):
         self.twist.angular.z = 0
         self.twist.linear.x = 0.1
+        self.cmd_vel_pub.publish(self.twist)
     
     def turning(self):
         self.twist.angular.z = 0.2
         self.twist.linear.x = 0
+        self.cmd_vel_pub.publish(self.twist)
     
     def locking(self, x1, y1, x2, y2):
         pass
@@ -302,6 +305,7 @@ class Comp4:
         elif 640 / 3 * 2 <= abs(x1-x2):
             self.twist.angular.z = 0
             self.twist.linear.x = 0.1
+        self.cmd_vel_pub.publish(self.twist)
     
     def docking(self, tvec, rvec):
         print tvec
