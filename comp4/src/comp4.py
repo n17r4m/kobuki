@@ -276,7 +276,7 @@ class Comp4(object):
         """
         
         rospy.sleep(1)
-        self.say("System Online. Greetings User.")
+        self.say("Greetings. System Is Online. Ready to Begin Easter Egg Hunt.")
     
     # SIDE CAMERA (webcam)
     
