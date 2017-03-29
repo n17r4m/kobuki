@@ -2,7 +2,7 @@
 
 # experimenting for fun
 
-import roslib; roslib.load_manifest('smach_exp')
+import roslib
 import rospy
 import smach
 import smach_ros
