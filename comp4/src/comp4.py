@@ -207,6 +207,7 @@ class Comp4:
         self.kinect_info_sub = rospy.Subscriber('/camera/rgb/camera_info', CameraInfo, self.kinect_info_cb)
         self.kinect_sub = rospy.Subscriber('/camera/rgb/image_rect_color', Image, self.kinect_cb)
 
+        self.state = "searching"
         
         self.cmd_vel_pub = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=1)
         self.twist = Twist()
