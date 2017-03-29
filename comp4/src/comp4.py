@@ -8,6 +8,7 @@ import rospy, cv2, cv_bridge
 import numpy as np
 from sensor_msgs.msg import Image, CameraInfo
 from sensor_msgs.msg import CompressedImage
+from geometry_msgs.msg import PoseWithCovarianceStamped
 from geometry_msgs.msg import Twist
 import math
 import time
@@ -20,6 +21,9 @@ from numpy import cross, eye, dot
 from scipy.linalg import expm3, norm
 import imutils
 import threading
+
+from sound_play.msg import SoundRequest
+from sound_play.libsoundplay import SoundClient
 
 def set_interval(func, sec):
     def func_wrapper():
@@ -210,6 +214,8 @@ class Comp4:
         self.kinect_info_sub = rospy.Subscriber('/camera/rgb/camera_info', CameraInfo, self.kinect_info_cb)
         self.kinect_sub = rospy.Subscriber('/camera/rgb/image_rect_color', Image, self.kinect_cb)
 
+        rospy.Subscriber('/amcl_pose', PoseWithCovarianceStamped, self.amcl_cb)
+
         """
         States are: 
             searching (wandering around, wall crawling)
@@ -225,6 +231,7 @@ class Comp4:
         
         self.cmd_vel_pub = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=1)
         self.twist = Twist()
+        self.pose = None
 
     
     # SIDE CAMERA (webcam)
@@ -239,11 +246,13 @@ class Comp4:
     
     def found_webcam_match(self, x1, y1, x2, y2, name):
         print "[webcam] FOUND IT:", x1, y1, x2, y2, name
-        if name == "ua_small.png":
-            self.found = "ua"
-        if name == "ar_small.png":
-            self.found = "ar"
-        self.state = "turning"
+        if x1 > 150:
+            if name == "ua_small.png":
+                self.found = "ua"
+            if name == "ar_small.png":
+                self.found = "ar"
+            self.template_found_at = [x1, y1, x2, y2]
+            self.state = "turning"
     
     # FRONT CAMERA (kinect)
     
@@ -278,9 +287,11 @@ class Comp4:
     # ODOMETRY
 
     def tick(self):
-        print "tick tock"
-        if self.state == "turning":
-            self.turning()
+        self[self.state]()
+        
+    def amcl_cb(self, msg):
+        self.pose = pose.pose.pose
+        
 
     def searching(self):
         self.twist.angular.z = 0
@@ -295,16 +306,6 @@ class Comp4:
     def locking(self, x1, y1, x2, y2):
         pass
         # takes template tracking position and lock the marker to the center of screen
-        if abs(x1-x2) < 640 / 3:
-            # go back
-            self.twist.angular.z = 0
-            self.twist.linear.x = -0.1
-        elif 640 / 3 <= abs(x1-x2) < 640 / 3 * 2:
-            self.twist.angular.z = 0
-            self.twist.linear.x = 0
-        elif 640 / 3 * 2 <= abs(x1-x2):
-            self.twist.angular.z = 0
-            self.twist.linear.x = 0.1
         self.cmd_vel_pub.publish(self.twist)
     
     def docking(self, tvec, rvec):
@@ -336,7 +337,13 @@ class Comp4:
 
         self.cmd_vel_pub.publish(self.twist)
         
-
+        
+    def sound_beep():
+        
+        soundhandle = SoundClient()  # blocking = False by default
+        rospy.sleep(0.5)  # Ensure publisher connection is successful.
+    
+        sound_beep = soundhandle.waveSound("say-beep.wav", volume=0.5)
 
 
 
