@@ -346,7 +346,6 @@ class Comp4(object):
 
     def amcl_cb(self, msg):
         self.pose = msg.pose.pose
-        print self.pose
     
     # TIMER
     
