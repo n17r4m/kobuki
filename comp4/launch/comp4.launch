@@ -42,7 +42,7 @@
   <param name="amcl/initial_cov_xx" value="15.0"/>
   <param name="amcl/initial_cov_yy" value="15.0"/>
   <param name="amcl/initial_cov_aa" value="3.14"/>
-  <param name="amcl/max_particles" value="20000" />
+  <param name="amcl/max_particles" value="60000" />
   <param name="amcl/min_particles" value="250" />
   <include file="$(arg custom_amcl_launch_file)">
     <!--
