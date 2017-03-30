@@ -445,8 +445,8 @@ class Comp4(object):
             y_offset = zdist * math.sin(yaw)
             
             # sin/cos may be reversed here / not tested...
-            x_offset += xdist * math.sin(yaw)
-            y_offset += xdist * math.cos(yaw)
+            #x_offset += xdist * math.sin(yaw)
+            #y_offset += xdist * math.cos(yaw)
             
             print x_offset, y_offset
             
