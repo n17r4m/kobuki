@@ -75,7 +75,7 @@ class OrbTracker(object):
         
         
     def process(self, msg, found_cb):
-        print "ORB process1", self.name
+        
         img  = self.bridge.imgmsg_to_cv2(msg,desired_encoding='bgr8')
         #img = imutils.resize(img, width = int(img.shape[1] * 1))
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -86,7 +86,7 @@ class OrbTracker(object):
         kp = orb.detect(gray, None)
         kp, des = self.orb.compute(gray, kp)
         des = np.float32(des)
-        print "ORB process2"
+        
         FLANN_INDEX_KDTREE = 0
         index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
         search_params = dict(checks = 50)
@@ -94,12 +94,15 @@ class OrbTracker(object):
         flann = cv2.FlannBasedMatcher(index_params, search_params)
         matches = flann.knnMatch(self.des, des, k=2)
         
+        #bf = cv2.BFMatcher()
+        #matches = bf.match(self.des, des)
+        
         # store all the good matches as per Lowe's ratio test.
         good = []
         for m,n in matches:
             if m.distance < 0.75*n.distance:
                 good.append(m)
-        print "ORB process3"
+        
         if len(good) > self.min_match_count:
             src_pts = np.float32([ self.kp[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
             dst_pts = np.float32([ kp[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
@@ -113,7 +116,7 @@ class OrbTracker(object):
             rect = cv2.perspectiveTransform(rect,M)
 
             img2 = cv2.polylines(gray,[np.int32(rect)],True,255,3, cv2.LINE_AA)
-            print "ORB process4"
+            
             #dst2 = dst_pts[matchesMask].reshape(dst_pts.shape[0], 2)
             #src2 = src_pts[matchesMask].reshape(dst_pts.shape[0], 2)
             #src2 = np.concatenate(src2, [0], axis=1)
@@ -124,9 +127,9 @@ class OrbTracker(object):
             imgpts, jac = cv2.projectPoints(self.axis + [w/2,h/2,0], rvecs, tvecs, self.K, self.D)
             imgpts2, jac = cv2.projectPoints(self.axis2 + [w/2,h/2,0], rvecs, tvecs, self.K, self.D)
             img3 = self.draw(img3, imgpts, imgpts2, rect)
-            print "ORB process5"
+            
             found_cb(rvecs, tvecs / 900.0, self.name)
-            print "ORB process6"
+            
             
         else:
             #print "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT)
@@ -134,7 +137,7 @@ class OrbTracker(object):
             rect = np.zeros((4, 1, 2), dtype=np.int)
             imgpts = np.zeros((3, 1, 2), dtype=np.int)
             imgpts2 = imgpts
-            print "ORB process7"
+            
         draw_params = dict(matchColor = (0,255,0), # draw matches in green color
                        singlePointColor = None,
                        matchesMask = matchesMask, # draw only inliers
@@ -142,7 +145,7 @@ class OrbTracker(object):
         
         #img3 = cv2.cvtColor(img3, cv2.COLOR_GRAY2BGR)
         #img3 = cv2.drawMatches(self.template, self.kp, gray, kp, good, None, **draw_params)
-        print "ORB process8"
+        
         #cv2.imshow(self.name, img3)
         #k = cv2.waitKey(1) & 0xff
         print "ORB process9"
@@ -230,7 +233,7 @@ class Comp4(object):
     def __init__(self):
         
         self.UA_Template_Tracker = TemplateMatcher("ua_small.png", 0.2)
-        self.AR_Template_Tracker = TemplateMatcher("ar_small.png", 0.28)
+        self.AR_Template_Tracker = TemplateMatcher("ar_small.png", 0.29)
         
         self.UA_ORB_Tracker = OrbTracker("ua.png")
         self.AR_ORB_Tracker = OrbTracker("ar.png")
