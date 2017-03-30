@@ -497,7 +497,7 @@ class Comp4(object):
 
     def returning(self):
         try:
-            goal = self.goals.last_goal
+            goal = self.goals.get_goal()
             self.move.send_goal(goal)
             self.move.wait_for_result()
             self.say("Resuming Search!")
