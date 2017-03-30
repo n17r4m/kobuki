@@ -438,7 +438,7 @@ class Comp4(object):
             #pitch = euler[1]
             yaw = euler[2]
             xdist = self.tvecs[0] + 0.1
-            zdist = self.tvecs[2] - 0.35
+            zdist = self.tvecs[2] - 0.22
             
             # I think this is correct / not tested...
             x_offset = zdist * math.cos(yaw)
