@@ -411,7 +411,7 @@ class Comp4(object):
     def turning(self):
         if not self.goal_is_active():
             goal = self.turn_goal()
-            self.say("Turning")
+            self.say("Found One!")
             self.move.send_goal(goal)
             self.move.wait_for_result()
             self.state = "locking"
@@ -448,6 +448,8 @@ class Comp4(object):
             x_offset += xdist * math.cos(yaw)
             y_offset += xdist * math.sin(yaw)
             
+            print x_offset, y_offset
+            
             pose.position.x += x_offset
             pose.position.y += y_offset
             goal = goal_pose(pose)
@@ -459,8 +461,7 @@ class Comp4(object):
             self.pause_until = time.time() + 4 
             self.state = "pausing"
             
-        print tvec
-        print rvec
+        print self.tvecs
         """
         #self.twist.angular.z = - theta[0]  * 180 / 3.1415 / 10
         #self.twist.linear.x = (dist[-1]- 15) / 100
