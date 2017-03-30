@@ -309,7 +309,7 @@ class Comp4(object):
     
     def found_webcam_match(self, x1, y1, x2, y2, name):
         print "FOUND A TARGET:", x1, y1, x2, y2, name
-        if x1 > 100:
+        if x1 > 5:
             self.t_matches += 1
             if self.t_matches > 3:
                 if name == "ua_small.png":
