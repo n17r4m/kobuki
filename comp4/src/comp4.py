@@ -343,7 +343,6 @@ class Comp4(object):
             self.state = "docking"
             #cv2.destroyAllWindows()
             self.vec_measures = 0
-            self.time_lock = time.time() + 15
             self.say("Locked on to Target!")
             
             print rvecs
@@ -386,7 +385,10 @@ class Comp4(object):
 
     def goal_is_active(self):
         # see: http://docs.ros.org/hydro/api/actionlib/html/classactionlib_1_1simple__action__client_1_1SimpleGoalState.html
+        print self.move.simple_state
         return self.move.simple_state != 2 # 2 = DONE
+        
+        
     
     def say(self, message):
         print "[  SAY]", message
@@ -414,6 +416,7 @@ class Comp4(object):
             self.move.send_goal(goal)
             self.move.wait_for_result()
             self.state = "locking"
+            self.time_lock = time.time() + 15
             self.say("Locking on to target!")
             
         
