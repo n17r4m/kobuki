@@ -228,6 +228,12 @@ class SearchGoals(object):
         self.next_goal = goal_pose(self.goals[self.goal_num])
         self.goal_num = (self.goal_num + 1) % len(self.goals)
         return g
+    
+    def reset_goal(self):
+        self.next_goal = self.last_goal
+        self.goal_num -= 1
+        if self.goal_num < 0:
+            self.goal_num = len(self.goals) - 1
 
 class Comp4(object):
     def __init__(self):
@@ -501,9 +507,7 @@ class Comp4(object):
 
     def returning(self):
         try:
-            goal = self.goals.last_goal
-            self.move.send_goal(goal)
-            self.move.wait_for_result()
+            self.goals.reset_goal()
             self.say("Resuming Search!")
             self.state = "searching"
         except rospy.ROSInterruptException:
