@@ -31,7 +31,7 @@ class orbMatcher(smach.State):
         try:
             orb = OrbTracker()
             if orb.status == 'notyet':
-                orb.process()
+                pass
             elif orb.status == 'docked':
                 return 'docked'
         except rospy.ROSInterruptException:
