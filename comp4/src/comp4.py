@@ -190,7 +190,8 @@ class TemplateMatcher(object):
         cv2.rectangle(img, (startX, startY), (endX, endY), (0, 0, 255), 2)
         #cv2.imshow(self.name, img)
         #cv2.waitKey(1)
-        
+        if self.name == "ar_small.png":
+            print maxVal
         if maxVal > self.threshold:
             found_cb(startX, startY, endX, endY, self.name)
 
@@ -438,7 +439,7 @@ class Comp4(object):
             #pitch = euler[1]
             yaw = euler[2]
             xdist = self.tvecs[0] + 0.1
-            zdist = self.tvecs[2] - 0.22
+            zdist = self.tvecs[2] - 0.27
             
             # I think this is correct / not tested...
             x_offset = zdist * math.cos(yaw)
