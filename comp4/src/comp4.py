@@ -425,7 +425,7 @@ class Comp4(object):
             self.move.send_goal(goal)
             self.move.wait_for_result()
             self.state = "locking"
-            self.time_lock = time.time() + 15
+            self.time_lock = time.time() + 7
             self.say("Locking on to target!")
             
         
