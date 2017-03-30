@@ -73,8 +73,10 @@ class TemplateMatcher:
         cv2.imshow('templateresult', img)
         cv2.waitKey(1)
 
-        if maxVal > self.threshold:
+        if maxVal > self.threshold and startX > 640 /3:
             self.status = 'found'
+
+        self.navi()
 
     def navi(self):
         if self.status == 'searching':
