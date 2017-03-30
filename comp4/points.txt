@@ -1,0 +1,92 @@
+Facing Elevator
+    position: 
+      x: -5.4855998582
+      y: 0.925357269284
+      z: 0.0
+    orientation: 
+      x: 0.0
+      y: 0.0
+      z: -0.70813620072
+      w: 0.706075860818
+
+
+Near elevator facing east
+    position: 
+      x: -5.31445309787
+      y: -0.136081194533
+      z: 0.0
+    orientation: 
+      x: 0.0
+      y: 0.0
+      z: 0.0534451224902
+      w: 0.998570788118
+
+south east corner
+position: 
+      x: -0.189663574018
+      y: 0.245898395796
+      z: 0.0
+    orientation: 
+      x: 0.0
+      y: 0.0
+      z: 0.734625612149
+      w: 0.678472703928
+
+north east corner
+position: 
+      x: -0.219844744997
+      y: 4.17753343228
+      z: 0.0
+    orientation: 
+      x: 0.0
+      y: 0.0
+      z: -0.98906076495
+      w: 0.147508654786
+
+
+in front of garbage
+position: 
+      x: -4.56945336048
+      y: 3.65360631129
+      z: 0.0
+    orientation: 
+      x: 0.0
+      y: 0.0
+      z: -0.999734497862
+      w: 0.0230420004542
+
+
+north west corner
+position: 
+      x: -10.8946393295
+      y: 3.72754188671
+      z: 0.0
+    orientation: 
+      x: 0.0
+      y: 0.0
+      z: -0.729196802439
+      w: 0.684304043034
+      
+
+south west corner
+ position: 
+      x: -10.4253273551
+      y: -0.348166634882
+      z: 0.0
+    orientation: 
+      x: 0.0
+      y: 0.0
+      z: 0.155545970112
+      w: 0.987828654769
+
+
+back to elevator
+ position: 
+      x: -5.51578960451
+      y: 0.147463634591
+      z: 0.0
+    orientation: 
+      x: 0.0
+      y: 0.0
+      z: -0.007489099767
+      w: 0.999971956299

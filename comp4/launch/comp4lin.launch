@@ -1,0 +1,89 @@
+<!-- -*- xml -*-
+
+     This tutorial relies on a live video sequence acquired with an 
+     usb camera in front of a QR code planar target. The model 
+     corresponding to this target is given into the models directory 
+     of this package.
+
+     Camera parameters are set as rosparam parameters. They need to be changed
+     to be the one of your camera.
+
+     See http://www.ros.org/wiki/visp_auto_tracker for more information.
+
+  -->
+<launch>	
+
+  <!-- Bring up the turtlebot -->
+  <include file="$(find turtlebot_bringup)/launch/minimal.launch" />
+  
+  <!-- 3D sensor -->
+  <arg name="3d_sensor" default="$(env TURTLEBOT_3D_SENSOR)"/>  <!-- r200, kinect, asus_xtion_pro -->
+  <include file="$(find turtlebot_bringup)/launch/3dsensor.launch">
+    <!-- We must specify an absolute topic name because if not it will be prefixed by "$(arg camera)".
+         Probably is a bug in the nodelet manager: https://github.com/ros/nodelet_core/issues/7 --> 
+    <arg name="scan_topic" value="/scan" />
+  </include>
+
+  <!-- Map server -->
+  <arg name="map_file" default="$(find comp4)/maps/map.yaml"/>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+
+  <!-- Joystick -->
+  <node name="joy_node" pkg="joy" type="joy_node" />
+  
+  <!-- Sound -->
+  <node name="soundplay_node" pkg="sound_play" type="soundplay_node.py"/>
+
+  <!-- AMCL -->
+  <arg name="custom_amcl_launch_file" default="$(find turtlebot_navigation)/launch/includes/amcl/$(arg 3d_sensor)_amcl.launch.xml"/>
+  <arg name="initial_pose_x" default="-5.0"/> <!-- Use 17.0 for willow's map in simulation -->
+  <arg name="initial_pose_y" default="1.0"/> <!-- Use 17.0 for willow's map in simulation -->
+  <arg name="initial_pose_a" default="0.0"/>
+  <param name="amcl/initial_cov_xx" value="15.0"/>
+  <param name="amcl/initial_cov_yy" value="15.0"/>
+  <param name="amcl/initial_cov_aa" value="3.14"/>
+  <param name="amcl/max_particles" value="60000" />
+  <param name="amcl/min_particles" value="250" />
+  <include file="$(arg custom_amcl_launch_file)">
+    <!--
+    <arg name="initial_pose_x" value="$(arg initial_pose_x)"/>
+    <arg name="initial_pose_y" value="$(arg initial_pose_y)"/>
+    <arg name="initial_pose_a" value="$(arg initial_pose_a)"/>
+    -->
+    <arg name="initial_pose_x" value="-5.0"/>
+    <arg name="initial_pose_y" value="1.0"/>
+    <arg name="initial_pose_a" value="$(arg initial_pose_a)"/>
+    
+  </include>
+
+  <!-- Move base -->
+  <arg name="custom_param_file" default="$(find turtlebot_navigation)/param/$(arg 3d_sensor)_costmap_params.yaml"/>
+  <include file="$(find turtlebot_navigation)/launch/includes/move_base.launch.xml">
+    <param name="custom_param_file" value="$(arg custom_param_file)"/>
+  </include>
+
+  
+  <!-- Launch the usb camera acquisition node -->
+  <node pkg="cv_camera" type="cv_camera_node" name="cv_camera" output="screen">      
+    <param name="image_width" value="640" />
+    <param name="image_height" value="480" />
+  </node>
+  
+  <!-- Launch image_proc -->
+  <node pkg="image_proc" type="image_proc" name="image_proc" output="screen">      
+    <env name="ROS_NAMESPACE" value="/cv_camera" />
+    <!--
+    <remap from="/cv_camera" to="/camera" />
+    <remap from="/camera/rgb" to="/camera" />
+    -->
+    <param name="camera_prefix" value="/cv_camera" />
+  </node>
+
+  <!-- Launch the tracker -->
+  <node pkg="comp4" type="comp4lin.py" name="comp4" output="screen" required="true" />
+  <param name="/pkg_path" value="$(find comp4)" />
+
+  <!-- Launch rviz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find turtlebot_rviz_launchers)/rviz/navigation.rviz" />
+
+</launch>

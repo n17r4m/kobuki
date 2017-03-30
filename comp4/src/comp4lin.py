@@ -87,20 +87,20 @@ class OrbTracker(object):
         kp, des = self.orb.compute(gray, kp)
         des = np.float32(des)
         
-        #FLANN_INDEX_KDTREE = 0
-        #index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
-        #search_params = dict(checks = 50)
+        FLANN_INDEX_KDTREE = 0
+        index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
+        search_params = dict(checks = 50)
 
-        #flann = cv2.FlannBasedMatcher(index_params, search_params)
-        #matches = flann.knnMatch(self.des, des, k=2)
+        flann = cv2.FlannBasedMatcher(index_params, search_params)
+        matches = flann.knnMatch(self.des, des, k=2)
         
-        bf = cv2.BFMatcher()
-        matches = bf.match(self.des, des)
+        #bf = cv2.BFMatcher()
+        #matches = bf.match(self.des, des)
         
         # store all the good matches as per Lowe's ratio test.
         good = []
-        for m in matches:
-            if m.distance < 0.75:
+        for m,n in matches:
+            if m.distance < 0.75*n.distance:
                 good.append(m)
         
         if len(good) > self.min_match_count:
@@ -280,6 +280,9 @@ class Comp4(object):
         self.time_out = time.time() + 3600
         self.time_lock = time.time() + 3600
         
+        self.dock_timer_default = 5
+        self.dock_timer = 5
+        
         self.goals = SearchGoals()
         self.sound = SoundClient()  # blocking = False by default
         
@@ -440,66 +443,36 @@ class Comp4(object):
         
     
     def docking(self):
-        if not self.goal_is_active():
+        if self.dock_timer > 0:
             pose = copy.deepcopy(self.pose)
             q = np.array([pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w])
             euler = tf.transformations.euler_from_quaternion(q)
-            
             #roll = euler[0]
             #pitch = euler[1]
             yaw = euler[2]
             xdist = self.tvecs[0] + 0.1
-            zdist = self.tvecs[2] - 0.28
+            self.twist.angular.z = xdist/5
+            self.twist.linear.x = 0
+            self.dock_timer -= 1
+            self.cmd_vel_pub.publish(self.twist)
             
-            # I think this is correct / not tested...
-            x_offset = zdist * math.cos(yaw)
-            y_offset = zdist * math.sin(yaw)
-            
-            # sin/cos may be reversed here / not tested...
-            x_offset += xdist * math.cos(yaw)
-            y_offset += xdist * math.sin(yaw)
-            
-            print x_offset, y_offset
-            
-            pose.position.x += x_offset
-            pose.position.y += y_offset
-            goal = goal_pose(pose)
-            self.move.send_goal(goal)
-            self.move.wait_for_result()
-            
-            self.say("Target Reached! beep boop beep boop.")
-
-            self.pause_until = time.time() + 4 
+        elif self.dock_timer > -15:
+            self.twist.angular.z = 0
+            self.twist.linear.x = 0.15
+            self.dock_timer -= 1
+            self.cmd_vel_pub.publish(self.twist)
+        else:
             self.state = "pausing"
+            self.dock_timer = self.dock_timer_default
+            self.say("Target Reached! beep boop beep boop.")
+            self.pause_until = time.time() + 4 
             
-        print self.tvecs
-        """
-        #self.twist.angular.z = - theta[0]  * 180 / 3.1415 / 10
-        #self.twist.linear.x = (dist[-1]- 15) / 100
-        z = 0
-        if rvec[0] > 0.2:
-            tvec[0] -= 6
-        elif rvec[0] < -0.2:
-            tvec[0] += 6
-
-        if 0 > tvec[0]:
-            z = 0.2
-        elif 0 < tvec[0]:
-            z = -0.2
-        else:
-            z = 0
-
-
-        if tvec[-1] > 10:
-            x = 0.2
-        else:
-            x = 0
-
-        self.twist.angular.z = (3*self.twist.angular.z + z) / 4
-        self.twist.linear.x = (3*self.twist.linear.x + x) / 4
-
-        self.cmd_vel_pub.publish(self.twist)
-        """
+            
+            
+            
+        
+            
+        
 
     def pausing(self):
         if time.time() > self.pause_until:
@@ -514,6 +487,8 @@ class Comp4(object):
         except rospy.ROSInterruptException:
             pass
         
+    
+    
 
 def goal_pose(pose):
     goal_pose = MoveBaseGoal()
