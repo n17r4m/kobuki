@@ -8,7 +8,6 @@ import smach
 import smach_ros
 from bf_alg import *
 
-
 class templateMatcher(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes = ['template_matched'])
@@ -44,6 +43,10 @@ class back2Searching(smach.State):
         rospy.loginfo('Returning back to the track')
         # do stuff
         return 'returned'
+        
+def joy_cb(msg):
+    if msg.buttons[1]:
+        can_go = not can_go
             
 def main():
     rospy.init_node('simple_state_machine')
@@ -73,4 +76,5 @@ def main():
 
 
 if __name__ == '__main__':
+    can_go = False
     main()
