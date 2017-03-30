@@ -230,7 +230,7 @@ class Comp4(object):
     def __init__(self):
         
         self.UA_Template_Tracker = TemplateMatcher("ua_small.png", 0.2)
-        self.AR_Template_Tracker = TemplateMatcher("ar_small.png", 0.3)
+        self.AR_Template_Tracker = TemplateMatcher("ar_small.png", 0.27)
         
         self.UA_ORB_Tracker = OrbTracker("ua.png")
         self.AR_ORB_Tracker = OrbTracker("ar.png")
@@ -439,7 +439,7 @@ class Comp4(object):
             #pitch = euler[1]
             yaw = euler[2]
             xdist = self.tvecs[0] + 0.1
-            zdist = self.tvecs[2] - 0.27
+            zdist = self.tvecs[2] - 0.3
             
             # I think this is correct / not tested...
             x_offset = zdist * math.cos(yaw)
