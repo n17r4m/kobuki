@@ -239,7 +239,7 @@ class Comp4(object):
     def __init__(self):
         
         self.UA_Template_Tracker = TemplateMatcher("ua_small.png", 0.2)
-        self.AR_Template_Tracker = TemplateMatcher("ar_small.png", 0.29)
+        self.AR_Template_Tracker = TemplateMatcher("ar_small.png", 0.32)
         
         self.UA_ORB_Tracker = OrbTracker("ua.png")
         self.AR_ORB_Tracker = OrbTracker("ar.png")
