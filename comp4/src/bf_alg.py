@@ -85,7 +85,7 @@ class TemplateMatcher:
         elif self.status == 'found':
             # mark down current position
             global returning_point
-            returning_point.append(self.pose)
+            returning_points.append(self.pose)
             self.status = 'ready2dock'
 
 
