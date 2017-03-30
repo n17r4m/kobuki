@@ -32,7 +32,7 @@ returning_points = []
 
 class TemplateMatcher:
 
-    def __init__(self, template_name, threshold = 0.3):
+    def __init__(self, template_name, threshold = 0.2):
 
         self.cmd_vel_pub = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=1)
         rospy.Subscriber('/cv_camera/image_rect_color', Image, self.webcam_cb)
@@ -50,9 +50,6 @@ class TemplateMatcher:
 
     def amcl_cb(self, msg):
         self.pose = msg.pose.pose
-
-    def cam_cb(self, msg):
-        pass
 
     def webcam_cb(self, msg):
         img = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
@@ -73,7 +70,7 @@ class TemplateMatcher:
         (startX, startY) = (int(maxLoc[0] * r), int(maxLoc[1] * r))
         (endX, endY) = (int((maxLoc[0] + self.tw) * r), int((maxLoc[1] + self.th) * r))
         cv2.rectangle(img, (startX, startY), (endX, endY), (0, 0, 255), 2)
-        cv2.imshow('result', img)
+        cv2.imshow('templateresult', img)
         cv2.waitKey(1)
 
         if maxVal > self.threshold:
@@ -128,6 +125,7 @@ class OrbTracker:
         self.status = 'notyet'
 
         self.matching_counter = 0
+        self.min_match_count = 10
 
     def cam_info_cb(self, msg):
         self.K = np.array(msg.K).reshape(3,3)
@@ -144,13 +142,13 @@ class OrbTracker:
         kp, des = self.orb.compute(gray, kp)
         des = np.float32(des)
 
-        bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+        bf = cv2.BFMatcher()
         matches = bf.match(self.des,des)
 
         # store all the good matches as per Lowe's ratio test.
         good = []
-        for m,n in matches:
-            if m.distance < 0.75*n.distance:
+        for m in matches:
+            if m.distance < 0.7:
                 good.append(m)
 
         if len(good) > self.min_match_count:
@@ -177,11 +175,11 @@ class OrbTracker:
             self.matching_counter += 1
             if self.matching_counter > 3:
                 self.status = 'docking'
-                self.navi(rvecs, tvecs / 525 * 0.5)
+                self.navi(rvecs, tvecs / 900)
 
         else:
-            self.matching -= 1
-            print "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT)
+            self.matching_counter -= 1
+            print "Not enough matches are found - %d/%d" % (len(good),self.min_match_count)
             matchesMask = None
             rect = np.zeros((4, 1, 2), dtype=np.int)
             imgpts = np.zeros((3, 1, 2), dtype=np.int)
@@ -194,7 +192,7 @@ class OrbTracker:
 
         img3 = cv2.drawMatches(self.template, self.kp, gray, kp, good, None, **draw_params)
 
-        cv2.imshow(self.name, img3)
+        cv2.imshow("orb result", img3)
         k = cv2.waitKey(1) & 0xff
 
     def navi(self, rvec, tvec):

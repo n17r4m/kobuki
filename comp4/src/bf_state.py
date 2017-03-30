@@ -21,8 +21,8 @@ turning_goals = [
 class templateMatcher(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes = ['template_matched'])
-        self.template1 = TemplateMatcher('ua_small.png')
-        self.template2 = TemplateMatcher('ar_small.png')
+        self.template1 = TemplateMatcher('ua_small.png', threshold = 0.2)
+        self.template2 = TemplateMatcher('ar_small.png', threshold = 0.29)
         self.sound = SoundClient()
 
     def execute(self):
@@ -60,8 +60,8 @@ class turning90(smach.State):
 class orbMatcher(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes = ['docked'])
-        self.orb1 = OrbTracker('ua_small.png')
-        self.orb2 = OrbTracker('ar_small.png')
+        self.orb1 = OrbTracker('ua.png')
+        self.orb2 = OrbTracker('ar.png')
 
     def execute(self):
         rospy.loginfo('Executing orb matching on front camera')
