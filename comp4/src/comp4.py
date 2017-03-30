@@ -425,6 +425,7 @@ class Comp4(object):
             self.twist.linear.x = 0.05
             self.cmd_vel_pub.publish(self.twist)
         else:
+            self.say("Giving Up!")
             self.state = "returning"
         
     
@@ -449,7 +450,7 @@ class Comp4(object):
             
             pose.position.x += x_offset
             pose.position.y += y_offset
-            
+            goal = goal_pose(pose)
             self.move.send_goal(goal)
             self.move.wait_for_result()
             
