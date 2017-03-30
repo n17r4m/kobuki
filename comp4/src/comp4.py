@@ -385,7 +385,6 @@ class Comp4(object):
 
     def goal_is_active(self):
         # see: http://docs.ros.org/hydro/api/actionlib/html/classactionlib_1_1simple__action__client_1_1SimpleGoalState.html
-        print self.move.simple_state
         return self.move.simple_state != 2 # 2 = DONE
         
         
