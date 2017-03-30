@@ -8,17 +8,19 @@ import smach
 import smach_ros
 from bf_alg import *
 
+
 class templateMatcher(smach.State):
     def __init__(self):
-        smach.State.__init__(self, outcomes = ['template_matched'], input_keys = ['start_matching'], output_keys=['tm_done'])
+        smach.State.__init__(self, outcomes = ['template_matched'])
         
     def execute(self, usrdata):
         rospy.loginfo('Executing template matcher on the side camera')
-        if usrdata.start_matching:
-            pass
-            # do matching
-        if usrdata.tm_done:
-            return 'template_matched'
+        try:
+            template = TemplateMatcher()
+            if template.status == 'searching':
+                pass
+            elif template.status == 'ready2dock':
+                return 'template_matched'
 
 class orbMatcher(smach.State):
     def __init__(self):
@@ -26,21 +28,15 @@ class orbMatcher(smach.State):
                                    
     def execute(self, usrdata):
         rospy.loginfo('Executing orb matching on front camera')
-        orb = OrbTracker()
-        if orb.status == 'notyet':
-            orb.process()
-        elif orb.status == 'docked':
-            return 'docked'
-        
-class Docking(smach.State):
-    def __init__(self):
-        smach.State.__init__(self, outcomes = ['docked'])
-    
-    def execute(self, usrdata):
-        rospy.loginfo('Executing docking.')
-        # do stuff
-        return 'docked'
-            
+        try:
+            orb = OrbTracker()
+            if orb.status == 'notyet':
+                orb.process()
+            elif orb.status == 'docked':
+                return 'docked'
+        except rospy.ROSInterruptException:
+            pass
+
 class back2Searching(smach.State):
     def __init__(self):
         smach.State.__init__(self, outcomes = ['returned'])
@@ -65,8 +61,6 @@ def main():
         smach.StateMachine.add('searching', templateMatcher(), 
                                transitions={'template_matched':'locking'})
         smach.StateMachine.add('locking', orbMatcher(), 
-                               transitions={'pose_found':'docking'})
-        smach.StateMachine.add('docking', Docking(),
                                transitions={'docked':'returning'})
         smach.StateMachine.add('returning', back2Searching(),
                                transitions={'returned':'searching'})

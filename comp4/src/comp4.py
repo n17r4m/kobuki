@@ -200,9 +200,9 @@ class SearchGoals(object):
             # middle, facing elevator
             {"position": {"x": -5.48, "y": 0.93, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": -0.707, "w": 0.707}}, 
             # in front of elevator, facing east
-            {"position": {"x": -5.31, "y": 0.14, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}}, 
+            {"position": {"x": -5.31, "y": 0.3, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}}, 
             # south east corner, facing north
-            {"position": {"x": -0.20, "y": 0.20, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.707, "w": 0.707}}, 
+            {"position": {"x": -0.20, "y": 0.3, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.707, "w": 0.707}}, 
             # north east corner, facing west
             {"position": {"x": -0.20, "y": 4.17, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": -1.0, "w": 0.0}}, 
             # in front of garbage, facing west
@@ -214,9 +214,9 @@ class SearchGoals(object):
             # in front of elevator (again), facing east
             #{"position": {"x": -5.51, "y": 0.15, z: 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}}, 
             ]
-        self.next_goal = goal_pose(self.goals.pop(0)) # take first element
+        self.next_goal = goal_pose(self.goals.pop(0)) # take first element, do not return here
         self.last_goal = self.next_goal
-        self.goal_num = -1
+        self.goal_num = 0
         
     def get_goal(self):
         g = self.next_goal
@@ -268,6 +268,7 @@ class Comp4(object):
         self.can_go = False
         self.pause_until = 0
         self.time_out = time.time() + 3600
+        self.time_lock = time.time() + 3600
         
         self.goals = SearchGoals()
         self.sound = SoundClient()  # blocking = False by default
@@ -298,9 +299,9 @@ class Comp4(object):
     
     def found_webcam_match(self, x1, y1, x2, y2, name):
         print "FOUND A TARGET:", x1, y1, x2, y2, name
-        if x1 > 150:
+        if x1 > 100:
             self.t_matches += 1
-            if self.t_matches > 4:
+            if self.t_matches > 3:
                 if name == "ua_small.png":
                     self.found = "ua"
                 if name == "ar_small.png":
@@ -342,7 +343,9 @@ class Comp4(object):
             self.state = "docking"
             #cv2.destroyAllWindows()
             self.vec_measures = 0
+            self.time_lock = time.time() + 15
             self.say("Locked on to Target!")
+            
             print rvecs
             print tvecs
     
@@ -379,16 +382,6 @@ class Comp4(object):
         turn.orientation.y = q[1]
         turn.orientation.z = q[2]
         turn.orientation.w = q[3]
-        """
-        quater = (turn.orientation.x, turn.orientation.y, turn.orientation.z, turn.orientation.w)
-        euler = tf.transformations.euler_from_quaternion(quater)
-        euler[1] += 90
-        quater = tf.transformations.quaternion_from_euler(euler)
-        turn.orientation.x = quater[0]
-        turn.orientation.y = quater[1]
-        turn.orientation.z = quater[2]
-        turn.orientation.w = quater[3]
-        """
         return goal_pose(turn)
 
     def goal_is_active(self):
@@ -412,9 +405,8 @@ class Comp4(object):
     
     def searching(self):
         if not self.goal_is_active():
-            self.say("Searching Waypoint " + str(self.goals.goal_num + 1) + "!")
+            self.say("Searching Waypoint " + str(self.goals.goal_num) + "!")
             goal = self.goals.get_goal()
-            print goal
             self.move.send_goal(goal)
     
     def turning(self):
@@ -428,19 +420,23 @@ class Comp4(object):
             
         
     def locking(self):
-        self.twist.angular.z = 0
-        self.twist.linear.x = 0.05
-        self.cmd_vel_pub.publish(self.twist)
+        if time.time() < self.time_lock:
+            self.twist.angular.z = 0
+            self.twist.linear.x = 0.05
+            self.cmd_vel_pub.publish(self.twist)
+        else:
+            self.state = "returning"
         
     
     def docking(self):
         if not self.goal_is_active():
             pose = copy.deepcopy(self.pose)
-            euler = tf.transformations.euler_from_quaternion(pose.orientation)
+            q = np.array([pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w])
+            euler = tf.transformations.euler_from_quaternion(q)
             #roll = euler[0]
             #pitch = euler[1]
             yaw = euler[2]
-            xdist = self.tvecs[1] + 0.1
+            xdist = self.tvecs[0] + 0.1
             zdist = self.tvecs[2]
             
             # I think this is correct / not tested...
