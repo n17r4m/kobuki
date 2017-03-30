@@ -228,6 +228,12 @@ class SearchGoals(object):
         self.next_goal = goal_pose(self.goals[self.goal_num])
         self.goal_num = (self.goal_num + 1) % len(self.goals)
         return g
+    
+    def reset_goal(self):
+        self.next_goal = self.last_goal
+        self.goal_num -= 1
+        if self.goal_num < 0:
+            self.goal_num = len(self.goals) - 1
 
 class Comp4(object):
     def __init__(self):
@@ -303,7 +309,7 @@ class Comp4(object):
     
     def found_webcam_match(self, x1, y1, x2, y2, name):
         print "FOUND A TARGET:", x1, y1, x2, y2, name
-        if x1 > 100:
+        if x1 > 5:
             self.t_matches += 1
             if self.t_matches > 3:
                 if name == "ua_small.png":
@@ -419,7 +425,7 @@ class Comp4(object):
             self.move.send_goal(goal)
             self.move.wait_for_result()
             self.state = "locking"
-            self.time_lock = time.time() + 15
+            self.time_lock = time.time() + 7
             self.say("Locking on to target!")
             
         
@@ -442,7 +448,7 @@ class Comp4(object):
             #pitch = euler[1]
             yaw = euler[2]
             xdist = self.tvecs[0] + 0.1
-            zdist = self.tvecs[2] - 0.3
+            zdist = self.tvecs[2] - 0.28
             
             # I think this is correct / not tested...
             x_offset = zdist * math.cos(yaw)
@@ -501,9 +507,7 @@ class Comp4(object):
 
     def returning(self):
         try:
-            goal = self.goals.last_goal
-            self.move.send_goal(goal)
-            self.move.wait_for_result()
+            self.goals.reset_goal()
             self.say("Resuming Search!")
             self.state = "searching"
         except rospy.ROSInterruptException:
