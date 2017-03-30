@@ -400,8 +400,6 @@ class Comp4(object):
             rospy.sleep(3)
             self.time_out = time.time() + 60 * 5 # five minutes
             self.state = "searching"
-        else:
-            print "WAITING FOR JOYSTICK (BUTTON 1)"
     
     def searching(self):
         if not self.goal_is_active():
