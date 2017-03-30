@@ -284,7 +284,7 @@ class Comp4(object):
         self.bigmap_turning_goal = []
         """
         
-        self.say("System Is Online! Please set initial pose and then press button one to begin!")
+        self.say("System Is Online! Please press joystick button to begin searching!")
         
     
     # SIDE CAMERA (webcam)

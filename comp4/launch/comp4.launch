@@ -39,10 +39,10 @@
   <arg name="initial_pose_x" default="-5.0"/> <!-- Use 17.0 for willow's map in simulation -->
   <arg name="initial_pose_y" default="1.0"/> <!-- Use 17.0 for willow's map in simulation -->
   <arg name="initial_pose_a" default="0.0"/>
-  <param name="amcl/initial_cov_xx" value="8.0"/>
-  <param name="amcl/initial_cov_yy" value="8.0"/>
+  <param name="amcl/initial_cov_xx" value="15.0"/>
+  <param name="amcl/initial_cov_yy" value="15.0"/>
   <param name="amcl/initial_cov_aa" value="3.14"/>
-  <param name="amcl/max_particles" value="15000" />
+  <param name="amcl/max_particles" value="20000" />
   <param name="amcl/min_particles" value="250" />
   <include file="$(arg custom_amcl_launch_file)">
     <!--
