@@ -438,15 +438,15 @@ class Comp4(object):
             #pitch = euler[1]
             yaw = euler[2]
             xdist = self.tvecs[0] + 0.1
-            zdist = self.tvecs[2]
+            zdist = self.tvecs[2] - 0.35
             
             # I think this is correct / not tested...
             x_offset = zdist * math.cos(yaw)
             y_offset = zdist * math.sin(yaw)
             
             # sin/cos may be reversed here / not tested...
-            x_offset += xdist * math.cos(yaw)
-            y_offset += xdist * math.sin(yaw)
+            x_offset += xdist * math.sin(yaw)
+            y_offset += xdist * math.cos(yaw)
             
             print x_offset, y_offset
             
@@ -497,7 +497,7 @@ class Comp4(object):
 
     def returning(self):
         try:
-            goal = self.goals.get_goal()
+            goal = self.goals.last_goal
             self.move.send_goal(goal)
             self.move.wait_for_result()
             self.say("Resuming Search!")
