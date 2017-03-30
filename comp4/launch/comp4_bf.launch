@@ -80,7 +80,7 @@
   </node>
 
   <!-- Launch the tracker -->
-  <node pkg="comp4" type="comp4.py" name="comp4" output="screen" required="true" />
+  <node pkg="comp4" type="comp4_bf.py" name="comp4" output="screen" required="true" />
   <param name="/pkg_path" value="$(find comp4)" />
 
   <!-- Launch rviz -->
