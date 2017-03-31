@@ -17,7 +17,7 @@
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 
   <!-- Joystick -->
-  <!--node name="joy_node" pkg="joy" type="joy_node" /-->
+  <node name="joy_node" pkg="joy" type="joy_node" />
 
   <!-- Sound -->
   <node name="soundplay_node" pkg="sound_play" type="soundplay_node.py"/>

@@ -1,8 +1,8 @@
 <!-- -*- xml -*-
 
-     This tutorial relies on a live video sequence acquired with an 
-     usb camera in front of a QR code planar target. The model 
-     corresponding to this target is given into the models directory 
+     This tutorial relies on a live video sequence acquired with an
+     usb camera in front of a QR code planar target. The model
+     corresponding to this target is given into the models directory
      of this package.
 
      Camera parameters are set as rosparam parameters. They need to be changed
@@ -11,16 +11,16 @@
      See http://www.ros.org/wiki/visp_auto_tracker for more information.
 
   -->
-<launch>	
+<launch>
 
   <!-- Bring up the turtlebot -->
   <include file="$(find turtlebot_bringup)/launch/minimal.launch" />
-  
+
   <!-- 3D sensor -->
   <arg name="3d_sensor" default="$(env TURTLEBOT_3D_SENSOR)"/>  <!-- r200, kinect, asus_xtion_pro -->
   <include file="$(find turtlebot_bringup)/launch/3dsensor.launch">
     <!-- We must specify an absolute topic name because if not it will be prefixed by "$(arg camera)".
-         Probably is a bug in the nodelet manager: https://github.com/ros/nodelet_core/issues/7 --> 
+         Probably is a bug in the nodelet manager: https://github.com/ros/nodelet_core/issues/7 -->
     <arg name="scan_topic" value="/scan" />
   </include>
 
@@ -30,7 +30,7 @@
 
   <!-- Joystick -->
   <node name="joy_node" pkg="joy" type="joy_node" />
-  
+
   <!-- Sound -->
   <node name="soundplay_node" pkg="sound_play" type="soundplay_node.py"/>
 
@@ -53,7 +53,7 @@
     <arg name="initial_pose_x" value="-5.0"/>
     <arg name="initial_pose_y" value="1.0"/>
     <arg name="initial_pose_a" value="$(arg initial_pose_a)"/>
-    
+
   </include>
 
   <!-- Move base -->
@@ -62,15 +62,15 @@
     <param name="custom_param_file" value="$(arg custom_param_file)"/>
   </include>
 
-  
+
   <!-- Launch the usb camera acquisition node -->
-  <node pkg="cv_camera" type="cv_camera_node" name="cv_camera" output="screen">      
+  <node pkg="cv_camera" type="cv_camera_node" name="cv_camera" output="screen">
     <param name="image_width" value="640" />
     <param name="image_height" value="480" />
   </node>
-  
+
   <!-- Launch image_proc -->
-  <node pkg="image_proc" type="image_proc" name="image_proc" output="screen">      
+  <node pkg="image_proc" type="image_proc" name="image_proc" output="screen">
     <env name="ROS_NAMESPACE" value="/cv_camera" />
     <!--
     <remap from="/cv_camera" to="/camera" />
@@ -80,7 +80,7 @@
   </node>
 
   <!-- Launch the tracker -->
-  <node pkg="comp4" type="comp4.py" name="comp4" output="screen" required="true" />
+  <node pkg="comp4" type="bf_2.py" name="comp4" output="screen" required="true" />
   <param name="/pkg_path" value="$(find comp4)" />
 
   <!-- Launch rviz -->

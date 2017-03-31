@@ -37,6 +37,7 @@ class TemplateMatcher:
         self.cmd_vel_pub = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=1)
         rospy.Subscriber('/cv_camera/image_rect_color', Image, self.webcam_cb)
         rospy.Subscriber('/amcl_pose', PoseWithCovarianceStamped, self.amcl_cb)
+        rospy.Subscriber('/joy', Joy, self.joy_cb)
 
         self.bridge = cv_bridge.CvBridge()
         path = rospy.get_param("/pkg_path")
@@ -47,6 +48,12 @@ class TemplateMatcher:
         self.status = 'searching'
         self.twist = Twist()
         self.pose = None
+
+        self.can_go = False
+
+    def joy_cb(self, msg):
+        if msg.buttons[1]:
+            self.can_go = not self.can_go
 
     def amcl_cb(self, msg):
         self.pose = msg.pose.pose
@@ -73,10 +80,12 @@ class TemplateMatcher:
         cv2.imshow('templateresult', img)
         cv2.waitKey(1)
 
-        if maxVal > self.threshold and startX > 640 /3:
+        if maxVal > self.threshold:
             self.status = 'found'
+            print '------------------------------------------------------------'
 
-        self.navi()
+        if self.can_go:
+            self.navi()
 
     def navi(self):
         if self.status == 'searching':
