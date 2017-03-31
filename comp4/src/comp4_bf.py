@@ -86,7 +86,6 @@ class OrbTracker(object):
         kp = orb.detect(gray, None)
         kp, des = self.orb.compute(gray, kp)
         des = np.float32(des)
-<<<<<<< HEAD
         
         #FLANN_INDEX_KDTREE = 0
         #index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
@@ -102,23 +101,6 @@ class OrbTracker(object):
         good = []
         for m in matches:
             if m.distance < 0.75:
-=======
-
-        FLANN_INDEX_KDTREE = 0
-        index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
-        search_params = dict(checks = 50)
-
-        #flann = cv2.FlannBasedMatcher(index_params, search_params)
-        #matches = flann.knnMatch(self.des, des, k=2)
-
-        bf = cv2.BFMatcher()
-        matches = bf.match(self.des, des)
-
-        # store all the good matches as per Lowe's ratio test.
-        good = []
-        for m in matches:
-            if m.distance < 0.7:
->>>>>>> 3cd6d64917c2956a74810c8656c545c7e8725d1e
                 good.append(m)
 
         if len(good) > self.min_match_count:
@@ -531,13 +513,7 @@ class Comp4(object):
             self.state = "searching"
         except rospy.ROSInterruptException:
             pass
-<<<<<<< HEAD
         
-=======
-
-
-
->>>>>>> 3cd6d64917c2956a74810c8656c545c7e8725d1e
 
 def goal_pose(pose):
     goal_pose = MoveBaseGoal()
