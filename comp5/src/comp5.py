@@ -246,7 +246,7 @@ class Comp5(object):
     def __init__(self):
 
         self.UA_Template_Tracker = TemplateMatcher("ua_small.png", 0.3)
-        self.AR_Template_Tracker = TemplateMatcher("ar_small.png", 0.35)
+        self.AR_Template_Tracker = TemplateMatcher("ar_small.png", 0.3)
 
         self.UA_ORB_Tracker = OrbTracker("ua.png")
         self.AR_ORB_Tracker = OrbTracker("ar.png")
@@ -388,7 +388,9 @@ class Comp5(object):
     def scan_cb(self, msg):
         if not (msg.ranges[len(msg.ranges)/2] != msg.ranges[len(msg.ranges)/2]):
             self.range_ahead = msg.ranges[len(msg.ranges)/2]
-        print self.range_ahead
+        else:
+            self.range_ahead = 0
+        #print self.range_ahead
 
     # TIMER
 
@@ -407,9 +409,11 @@ class Comp5(object):
         turn = copy.deepcopy(self.pose)
         qo = np.array([turn.orientation.x, turn.orientation.y, turn.orientation.z, turn.orientation.w])
         mid = (self.template_found_at[0] + self.template_found_at[2]) / 2.0
-        angle_offset = (160 - mid) / (3.14159 / 2.0)
+        angle_offset = (160 - mid) / 200
         qz = tf.transformations.quaternion_about_axis((-3.14159/2.0) + angle_offset, (0,0,1))
         q = tf.transformations.quaternion_multiply(qo, qz)
+
+        print "Values: ", mid, " ", angle_offset, " ", qz, " "
         turn.orientation.x = q[0]
         turn.orientation.y = q[1]
         turn.orientation.z = q[2]
@@ -440,12 +444,12 @@ class Comp5(object):
     def localizing(self):
         if time.time() < self.time_loc:
             if self.range_ahead > 2.0:
-                self.twist.angular.z = 0.1
-                self.twist.linear.x = 0.2
+                self.twist.angular.z = (self.twist.angular.z + math.sin(time.time()/2.0) / 2.0) / 2.0
+                self.twist.linear.x = (4.0 * self.twist.linear.x + 0.5) / 5.0
                 self.cmd_vel_pub.publish(self.twist)
             else:
-                self.twist.angular.z = 0.3
-                self.twist.linear.x = 0
+                self.twist.angular.z = (self.twist.angular.z + 0.5) / 2.0
+                self.twist.linear.x = (self.twist.linear.x + 0.0) / 2.0
                 self.cmd_vel_pub.publish(self.twist)
         else:
             print "Finish localization"
