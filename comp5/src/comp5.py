@@ -252,6 +252,7 @@ class Comp5(object):
         self.kinect_sub = rospy.Subscriber('/camera/rgb/image_rect_color', Image, self.kinect_cb)
 
         rospy.Subscriber('/amcl_pose', PoseWithCovarianceStamped, self.amcl_cb)
+        #rospy.Subscriber('')
 
         rospy.Subscriber('/joy', Joy, self.joy_cb)
 
@@ -415,17 +416,19 @@ class Comp5(object):
             self.say("here we go!")
             rospy.sleep(1)
             self.time_out = time.time() + 60 * 5 # five minutes
-            self.time_loc = time.time() + 15
+            self.time_loc = time.time() + 20
             self.state = "localizing"
 
 
     def localizing(self):
         if time.time() < self.time_loc:
             self.twist.angular.z = 0.1
-            self.twist.linear.x = 0.1
+            self.twist.linear.x = 0.05
             self.cmd_vel_pub.publish(self.twist)
         else:
+            print "Finish localization"
             self.state = "searching"
+
 
     def searching(self):
         if not self.goal_is_active():
