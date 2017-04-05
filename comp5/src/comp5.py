@@ -463,6 +463,7 @@ class Comp5(object):
             self.move.send_goal(goal)
             self.move.wait_for_result(rospy.Duration.from_sec(10))
             if self.goal_is_active():
+                self.move.cancel_goal()
                 self.state = "returning"
             else:
                 self.state = "docking"
