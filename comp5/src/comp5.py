@@ -197,10 +197,9 @@ class TemplateMatcher(object):
         (startX, startY) = (int(maxLoc[0] * r), int(maxLoc[1] * r))
         (endX, endY) = (int((maxLoc[0] + self.tw) * r), int((maxLoc[1] + self.th) * r))
         cv2.rectangle(img, (startX, startY), (endX, endY), (0, 0, 255), 2)
-        #cv2.imshow(self.name, img)
-        #cv2.waitKey(1)
-        if self.name == "ar_small.png":
-            print maxVal
+        cv2.imshow(self.name, img)
+        cv2.waitKey(1)
+        
         if maxVal > self.threshold:
             found_cb(startX, startY, endX, endY, self.name)
 
@@ -530,6 +529,18 @@ def goal_pose(pose):
 
 if __name__ == "__main__":
     rospy.init_node('Comp5')
-    Comp5 = Comp5()
-    #set_interval(Comp5.tick, 0.1)
+    
+    if False:
+        Comp5 = Comp5()
+    else:
+        def match(x1, y1, x2, y2, name):
+            print name, x1, y1, x2, y2
+        def cam_cb(msg)
+            global UA
+            global AR
+            UA.process(msg, match)
+            AR.process(msg, match)
+        UA = OrbTracker("ua.png")
+        AR = OrbTracker("ar.png")
+        rospy.Subscriber('/cv_camera/camera_info', CameraInfo, cam_cb)
     rospy.spin()
