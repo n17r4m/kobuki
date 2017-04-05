@@ -461,10 +461,13 @@ class Comp5(object):
             goal = self.turn_goal()
             self.say("Found One!")
             self.move.send_goal(goal)
-            self.move.wait_for_result()
-            self.state = "docking"
-            self.time_lock = time.time() + 7
-            self.say("Docking with target!")
+            self.move.wait_for_result(rospy.Duration.from_sec(10))
+            if self.goal_is_active():
+                self.state = "returning"
+            else:
+                self.state = "docking"
+                self.time_lock = time.time() + 7
+                self.say("Docking with target!")
 
 
     def docking(self):
