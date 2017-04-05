@@ -199,7 +199,7 @@ class TemplateMatcher(object):
         
         if maxVal > self.threshold:
             cv2.rectangle(img, (startX, startY), (endX, endY), (0, 0, 255), 2)
-            found_cb(startX, startY, endX, endY, self.name)
+            found_cb(startX, startY, endX, endY, self.name, maxVal)
             
         cv2.imshow(self.name, img)
         cv2.waitKey(1)
@@ -319,8 +319,8 @@ class Comp5(object):
                 self.UA_Template_Tracker.process(msg, self.found_webcam_match)
                 self.AR_Template_Tracker.process(msg, self.found_webcam_match)
 
-    def found_webcam_match(self, x1, y1, x2, y2, name):
-        print "FOUND A TARGET:", x1, y1, x2, y2, name
+    def found_webcam_match(self, x1, y1, x2, y2, name, val):
+        print "FOUND A TARGET:", x1, y1, x2, y2, name, val
         if x1 > 5:
             self.t_matches += 1
             if self.t_matches > 3:
@@ -533,8 +533,8 @@ if __name__ == "__main__":
     if False:
         Comp5 = Comp5()
     else:
-        def match(x1, y1, x2, y2, name):
-            print name, x1, y1, x2, y2
+        def match(x1, y1, x2, y2, name, val):
+            print name, (x1 + x2) / 2.0, val
         def cam_cb(msg):
             global UA
             global AR
