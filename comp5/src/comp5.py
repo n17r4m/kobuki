@@ -429,7 +429,7 @@ class Comp5(object):
             self.say("here we go!")
             rospy.sleep(1)
             self.time_out = time.time() + 60 * 5 # five minutes
-            self.time_loc = time.time() + 30
+            self.time_loc = time.time() + 40
             self.state = "localizing"
 
 
@@ -437,7 +437,7 @@ class Comp5(object):
         if time.time() < self.time_loc:
             if self.range_ahead > 2.0:
                 self.twist.angular.z = 0
-                self.twist.linear.x = 0.2
+                self.twist.linear.x = 0.1
                 self.cmd_vel_pub.publish(self.twist)
             else:
                 self.twist.angular.z = 0.3
