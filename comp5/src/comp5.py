@@ -253,7 +253,7 @@ class Comp5(object):
         self.kinect_sub = rospy.Subscriber('/camera/rgb/image_rect_color', Image, self.kinect_cb)
 
         rospy.Subscriber('/amcl_pose', PoseWithCovarianceStamped, self.amcl_cb)
-        rospy.Subscriber('/scan', Scan, self.scan_cb)
+        rospy.Subscriber('/scan', LaserScan, self.scan_cb)
         self.range_ahead = 0
 
         rospy.Subscriber('/joy', Joy, self.joy_cb)
@@ -380,6 +380,7 @@ class Comp5(object):
     # LASERSCAN
     def scan_cb(self, msg):
         self.range_ahead = msg.ranges[len(msg.ranges)/2]
+        print self.range_ahead
 
     # TIMER
 
@@ -428,12 +429,12 @@ class Comp5(object):
 
     def localizing(self):
         if time.time() < self.time_loc:
-            if self.range_ahead > 0.5:
+            if self.range_ahead > 1.0:
                 self.twist.angular.z = 0
                 self.twist.linear.x = 0.1
                 self.cmd_vel_pub.publish(self.twist)
             else:
-                self.twist.angular.z = 0.1
+                self.twist.angular.z = 0.3
                 self.twist.linear.x = 0
                 self.cmd_vel_pub.publish(self.twist)
         else:
