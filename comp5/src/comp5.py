@@ -542,5 +542,5 @@ if __name__ == "__main__":
             AR.process(msg, match)
         UA = OrbTracker("ua.png")
         AR = OrbTracker("ar.png")
-        rospy.Subscriber('/cv_camera/camera_info', CameraInfo, cam_cb)
+        rospy.Subscriber('/cv_camera/image_rect_color', Image, cam_cb)
     rospy.spin()
