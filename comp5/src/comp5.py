@@ -174,7 +174,7 @@ class TemplateMatcher(object):
         path = rospy.get_param("/pkg_path")
         self.name = template_filename
         self.template = cv2.imread(path + "/img/" + template_filename, 0)
-        self.template = cv2.Canny(self.template, 50, 200)
+        self.template = cv2.Canny(self.template, 100, 300)
         self.th, self.tw =  self.template.shape[:2]
         self.threshold = threshold
 
@@ -245,7 +245,7 @@ class SearchGoals(object):
 class Comp5(object):
     def __init__(self):
 
-        self.UA_Template_Tracker = TemplateMatcher("ua_small.png", 0.2)
+        self.UA_Template_Tracker = TemplateMatcher("ua_small.png", 0.3)
         self.AR_Template_Tracker = TemplateMatcher("ar_small.png", 0.32)
 
         self.UA_ORB_Tracker = OrbTracker("ua.png")
@@ -436,8 +436,8 @@ class Comp5(object):
     def localizing(self):
         if time.time() < self.time_loc:
             if self.range_ahead > 2.0:
-                self.twist.angular.z = 0
-                self.twist.linear.x = 0.1
+                self.twist.angular.z = 0.1
+                self.twist.linear.x = 0.2
                 self.cmd_vel_pub.publish(self.twist)
             else:
                 self.twist.angular.z = 0.3
