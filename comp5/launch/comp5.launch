@@ -1,8 +1,8 @@
 <!-- -*- xml -*-
 
-     This tutorial relies on a live video sequence acquired with an 
-     usb camera in front of a QR code planar target. The model 
-     corresponding to this target is given into the models directory 
+     This tutorial relies on a live video sequence acquired with an
+     usb camera in front of a QR code planar target. The model
+     corresponding to this target is given into the models directory
      of this package.
 
      Camera parameters are set as rosparam parameters. They need to be changed
@@ -11,16 +11,16 @@
      See http://www.ros.org/wiki/visp_auto_tracker for more information.
 
   -->
-<launch>	
+<launch>
 
   <!-- Bring up the turtlebot -->
   <include file="$(find turtlebot_bringup)/launch/minimal.launch" />
-  
+
   <!-- 3D sensor -->
   <arg name="3d_sensor" default="$(env TURTLEBOT_3D_SENSOR)"/>  <!-- r200, kinect, asus_xtion_pro -->
   <include file="$(find turtlebot_bringup)/launch/3dsensor.launch">
     <!-- We must specify an absolute topic name because if not it will be prefixed by "$(arg camera)".
-         Probably is a bug in the nodelet manager: https://github.com/ros/nodelet_core/issues/7 --> 
+         Probably is a bug in the nodelet manager: https://github.com/ros/nodelet_core/issues/7 -->
     <arg name="scan_topic" value="/scan" />
   </include>
 
@@ -30,7 +30,7 @@
 
   <!-- Joystick -->
   <node name="joy_node" pkg="joy" type="joy_node" />
-  
+
   <!-- Sound -->
   <node name="soundplay_node" pkg="sound_play" type="soundplay_node.py"/>
 
@@ -47,18 +47,18 @@
   <param name="amcl/kld_err" value="0.05" />
   <param name="amcl/recovery_alpha_slow" value="0.001" />
   <param name="amcl/recovery_alpha_fast" value="0.1" />
-  
+
   <include file="$(arg custom_amcl_launch_file)">
     <!--
     <arg name="initial_pose_x" value="$(arg initial_pose_x)"/>
     <arg name="initial_pose_y" value="$(arg initial_pose_y)"/>
     <arg name="initial_pose_a" value="$(arg initial_pose_a)"/>
     -->
-    
+
     <arg name="initial_pose_x" value="-5.0"/>
     <arg name="initial_pose_y" value="1.0"/>
     <arg name="initial_pose_a" value="$(arg initial_pose_a)"/>
-    
+
   </include>
 
   <!-- Move base -->
@@ -67,29 +67,29 @@
     <param name="custom_param_file" value="$(arg custom_param_file)"/>
     <rosparam file="$(find comp5)/param/dwa_local_planner_params.yaml" command="load" />
   </include-->
-  
+
   <include file="$(find turtlebot_navigation)/launch/includes/velocity_smoother.launch.xml"/>
   <include file="$(find turtlebot_navigation)/launch/includes/safety_controller.launch.xml"/>
-  
+
   <arg name="odom_frame_id"   default="odom"/>
   <arg name="base_frame_id"   default="base_footprint"/>
   <arg name="global_frame_id" default="map"/>
   <arg name="odom_topic" default="odom" />
   <arg name="laser_topic" default="scan" />
-  <arg name="custom_param_file" default="$(find turtlebot_navigation)/param/dummy.yaml"/>
+  <arg name="custom_param_file_1" default="$(find turtlebot_navigation)/param/dummy.yaml"/>
 
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
     <rosparam file="$(find turtlebot_navigation)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find turtlebot_navigation)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />   
-    <rosparam file="$(find turtlebot_navigation)/param/local_costmap_params.yaml" command="load" />   
+    <rosparam file="$(find turtlebot_navigation)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find turtlebot_navigation)/param/local_costmap_params.yaml" command="load" />
     <rosparam file="$(find turtlebot_navigation)/param/global_costmap_params.yaml" command="load" />
     <rosparam file="$(find comp5)/param/dwa_local_planner_params.yaml" command="load" />
     <rosparam file="$(find turtlebot_navigation)/param/move_base_params.yaml" command="load" />
     <rosparam file="$(find turtlebot_navigation)/param/global_planner_params.yaml" command="load" />
     <rosparam file="$(find turtlebot_navigation)/param/navfn_global_planner_params.yaml" command="load" />
     <!-- external params file that could be loaded into the move_base namespace -->
-    <rosparam file="$(arg custom_param_file)" command="load" />
-    
+    <rosparam file="$(arg custom_param_file_1)" command="load" />
+
     <!-- reset frame_id parameters using user input data -->
     <param name="global_costmap/global_frame" value="$(arg global_frame_id)"/>
     <param name="global_costmap/robot_base_frame" value="$(arg base_frame_id)"/>
@@ -101,15 +101,15 @@
     <remap from="odom" to="$(arg odom_topic)"/>
     <remap from="scan" to="$(arg laser_topic)"/>
   </node>
-  
+
   <!-- Launch the usb camera acquisition node -->
-  <node pkg="cv_camera" type="cv_camera_node" name="cv_camera" output="screen">      
+  <node pkg="cv_camera" type="cv_camera_node" name="cv_camera" output="screen">
     <param name="image_width" value="640" />
     <param name="image_height" value="480" />
   </node>
-  
+
   <!-- Launch image_proc -->
-  <node pkg="image_proc" type="image_proc" name="image_proc" output="screen">      
+  <node pkg="image_proc" type="image_proc" name="image_proc" output="screen">
     <env name="ROS_NAMESPACE" value="/cv_camera" />
     <!--
     <remap from="/cv_camera" to="/camera" />
