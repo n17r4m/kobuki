@@ -188,7 +188,7 @@ class TemplateMatcher(object):
             r = gray.shape[1] / float(resized.shape[1])
             if resized.shape[0] < self.th or resized.shape[1] < self.tw:
                 break
-            edged = cv2.Canny(resized, 70, 250, 11)
+            edged = cv2.Canny(resized, 70, 250, 7)
             result = cv2.matchTemplate(edged, self.template, cv2.TM_CCOEFF_NORMED)
             (_, maxVal, _, maxLoc) = cv2.minMaxLoc(result)
             if found is None or maxVal > found[0]:
@@ -196,13 +196,13 @@ class TemplateMatcher(object):
         (maxVal, maxLoc, r) = found
         (startX, startY) = (int(maxLoc[0] * r), int(maxLoc[1] * r))
         (endX, endY) = (int((maxLoc[0] + self.tw) * r), int((maxLoc[1] + self.th) * r))
-        cv2.rectangle(img, (startX, startY), (endX, endY), (0, 0, 255), 2)
-        cv2.imshow(self.name, img)
-        cv2.waitKey(1)
         
         if maxVal > self.threshold:
+            cv2.rectangle(img, (startX, startY), (endX, endY), (0, 0, 255), 2)
             found_cb(startX, startY, endX, endY, self.name)
-
+            
+        cv2.imshow(self.name, img)
+        cv2.waitKey(1)
 
 class SearchGoals(object):
     def __init__(self):
