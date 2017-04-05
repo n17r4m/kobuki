@@ -92,22 +92,22 @@ class OrbTracker(object):
         index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
         search_params = dict(checks = 50)
 
-        #flann = cv2.FlannBasedMatcher(index_params, search_params)
-        #matches = flann.knnMatch(self.des, des, k=2)
+        flann = cv2.FlannBasedMatcher(index_params, search_params)
+        matches = flann.knnMatch(self.des, des, k=2)
 
-        # store all the good matches as per Lowe's ratio test.
-        #good = []
-        #for m,n in matches:
-        #    if m.distance < 0.75*n.distance:
-        #        good.append(m)
-
-        bf = cv2.BFMatcher()
-        matches = bf.match(self.des, des)
-
+        #store all the good matches as per Lowe's ratio test.
         good = []
-        for m in matches:
-            if m.distance < 0.75:
+        for m,n in matches:
+            if m.distance < 0.75*n.distance:
                 good.append(m)
+
+        # bf = cv2.BFMatcher()
+        # matches = bf.match(self.des, des)
+
+        # good = []
+        # for m in matches:
+        #     if m.distance < 0.75:
+        #         good.append(m)
 
         if len(good) > self.min_match_count:
             src_pts = np.float32([ self.kp[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
@@ -174,7 +174,7 @@ class TemplateMatcher(object):
         path = rospy.get_param("/pkg_path")
         self.name = template_filename
         self.template = cv2.imread(path + "/img/" + template_filename, 0)
-        self.template = cv2.Canny(self.template, 100, 300)
+        self.template = cv2.Canny(self.template, 50, 200)
         self.th, self.tw =  self.template.shape[:2]
         self.threshold = threshold
 
@@ -188,7 +188,7 @@ class TemplateMatcher(object):
             r = gray.shape[1] / float(resized.shape[1])
             if resized.shape[0] < self.th or resized.shape[1] < self.tw:
                 break
-            edged = cv2.Canny(resized, 50, 200)
+            edged = cv2.Canny(resized, 100, 300)
             result = cv2.matchTemplate(edged, self.template, cv2.TM_CCOEFF_NORMED)
             (_, maxVal, _, maxLoc) = cv2.minMaxLoc(result)
             if found is None or maxVal > found[0]:
@@ -245,7 +245,7 @@ class SearchGoals(object):
 class Comp5(object):
     def __init__(self):
 
-        self.UA_Template_Tracker = TemplateMatcher("ua_small.png", 0.3)
+        self.UA_Template_Tracker = TemplateMatcher("ua_small.png", 0.23)
         self.AR_Template_Tracker = TemplateMatcher("ar_small.png", 0.32)
 
         self.UA_ORB_Tracker = OrbTracker("ua.png")
@@ -347,11 +347,13 @@ class Comp5(object):
         self.AR_ORB_Tracker.D = np.array(msg.D)
 
     def kinect_cb(self, msg):
+        """
         if self.state == "locking":
             if self.found == "ua":
                 self.UA_ORB_Tracker.process(msg, self.found_kinect_match)
             if self.found == "ar":
                 self.AR_ORB_Tracker.process(msg, self.found_kinect_match)
+        """
 
     def found_kinect_match(self, rvecs, tvecs, name):
         measures_needed = 50.0
@@ -460,81 +462,22 @@ class Comp5(object):
             self.say("Found One!")
             self.move.send_goal(goal)
             self.move.wait_for_result()
-            self.state = "locking"
+            self.state = "docking"
             self.time_lock = time.time() + 7
-            self.say("Locking on to target!")
-
-
-    def locking(self):
-        if time.time() < self.time_lock:
-            self.twist.angular.z = 0
-            self.twist.linear.x = 0.05
-            self.cmd_vel_pub.publish(self.twist)
-        else:
-            self.say("Giving Up!")
-            self.state = "returning"
+            self.say("Docking with target!")
 
 
     def docking(self):
-        if not self.goal_is_active():
-            pose = copy.deepcopy(self.pose)
-            q = np.array([pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w])
-            euler = tf.transformations.euler_from_quaternion(q)
-            #roll = euler[0]
-            #pitch = euler[1]
-            yaw = euler[2]
-            xdist = self.tvecs[0] + 0.1
-            zdist = self.tvecs[2] - 0.3
-
-            # I think this is correct / not tested...
-            x_offset = zdist * math.cos(yaw)
-            y_offset = zdist * math.sin(yaw)
-
-            # sin/cos may be reversed here / not tested...
-            x_offset += xdist * math.cos(yaw)
-            y_offset += xdist * math.sin(yaw)
-
-            print x_offset, y_offset
-
-            pose.position.x += x_offset
-            pose.position.y += y_offset
-            goal = goal_pose(pose)
-            self.move.send_goal(goal)
-            self.move.wait_for_result()
-
+        if time.time() < self.time_lock and self.range_ahead >= 0:
+            self.twist.angular.z = 0
+            self.twist.linear.x = 0.1
+            self.cmd_vel_pub.publish(self.twist)
+        else:
+            
             self.say("Target Reached! beep boop beep boop.")
 
-            self.pause_until = time.time() + 4
+            self.pause_until = time.time() + 4.0
             self.state = "pausing"
-
-        print self.tvecs
-        """
-        #self.twist.angular.z = - theta[0]  * 180 / 3.1415 / 10
-        #self.twist.linear.x = (dist[-1]- 15) / 100
-        z = 0
-        if rvec[0] > 0.2:
-            tvec[0] -= 6
-        elif rvec[0] < -0.2:
-            tvec[0] += 6
-
-        if 0 > tvec[0]:
-            z = 0.2
-        elif 0 < tvec[0]:
-            z = -0.2
-        else:
-            z = 0
-
-
-        if tvec[-1] > 10:
-            x = 0.2
-        else:
-            x = 0
-
-        self.twist.angular.z = (3*self.twist.angular.z + z) / 4
-        self.twist.linear.x = (3*self.twist.linear.x + x) / 4
-
-        self.cmd_vel_pub.publish(self.twist)
-        """
 
     def pausing(self):
         if time.time() > self.pause_until:
@@ -545,7 +488,7 @@ class Comp5(object):
         try:
             self.goals.reset_goal()
             self.say("Resuming Search!")
-            self.time_wait_search = time.time() + 15
+            self.time_wait_search = time.time() + 7.0
             self.state = "searching"
         except rospy.ROSInterruptException:
             pass
