@@ -304,7 +304,6 @@ class Comp5(object):
     # SIDE CAMERA (webcam)
 
     def webcam_info_cb(self, msg):
-        print "inside camera callback"
         self.tick()
 
     def webcam_cb(self, msg):
