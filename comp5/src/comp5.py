@@ -518,13 +518,13 @@ class Comp4(object):
     def pausing(self):
         if time.time() > self.pause_until:
             self.say("Returning to search!")
-            self.time_wait_search = time.time() + 15
             self.state = "returning"
 
     def returning(self):
         try:
             self.goals.reset_goal()
             self.say("Resuming Search!")
+            self.time_wait_search = time.time() + 15
             self.state = "searching"
         except rospy.ROSInterruptException:
             pass
