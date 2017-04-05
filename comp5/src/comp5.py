@@ -535,7 +535,7 @@ if __name__ == "__main__":
     else:
         def match(x1, y1, x2, y2, name):
             print name, x1, y1, x2, y2
-        def cam_cb(msg)
+        def cam_cb(msg):
             global UA
             global AR
             UA.process(msg, match)
