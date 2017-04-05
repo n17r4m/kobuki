@@ -189,7 +189,7 @@ class TemplateMatcher(object):
             if resized.shape[0] < self.th or resized.shape[1] < self.tw:
                 break
             edged = cv2.Canny(resized, 70, 250, 7)
-            result = cv2.matchTemplate(edged, self.template, cv2.TM_CCOEFF_NORMED)
+            result = cv2.matchTemplate(edged, self.template, cv2.TM_SQDIFF)
             (_, maxVal, _, maxLoc) = cv2.minMaxLoc(result)
             if found is None or maxVal > found[0]:
                 found = (maxVal, maxLoc, r)
