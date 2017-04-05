@@ -95,13 +95,18 @@ class OrbTracker(object):
         #flann = cv2.FlannBasedMatcher(index_params, search_params)
         #matches = flann.knnMatch(self.des, des, k=2)
 
+        # store all the good matches as per Lowe's ratio test.
+        #good = []
+        #for m,n in matches:
+        #    if m.distance < 0.75*n.distance:
+        #        good.append(m)
+
         bf = cv2.BFMatcher()
         matches = bf.match(self.des, des)
 
-        # store all the good matches as per Lowe's ratio test.
         good = []
-        for m,n in matches:
-            if m.distance < 0.75*n.distance:
+        for m in matches:
+            if m.distance < 0.75:
                 good.append(m)
 
         if len(good) > self.min_match_count:
@@ -429,9 +434,9 @@ class Comp5(object):
 
     def localizing(self):
         if time.time() < self.time_loc:
-            if self.range_ahead > 1.0:
+            if self.range_ahead > 2.0:
                 self.twist.angular.z = 0
-                self.twist.linear.x = 0.1
+                self.twist.linear.x = 0.2
                 self.cmd_vel_pub.publish(self.twist)
             else:
                 self.twist.angular.z = 0.3
