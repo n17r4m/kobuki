@@ -431,7 +431,7 @@ class Comp5(object):
             self.say("here we go!")
             rospy.sleep(1)
             self.time_out = time.time() + 60 * 5 # five minutes
-            self.time_loc = time.time() + 40
+            self.time_loc = time.time() + 20
             self.state = "localizing"
 
 
@@ -483,6 +483,10 @@ class Comp5(object):
         if time.time() > self.pause_until:
             self.say("Returning to search!")
             self.state = "returning"
+        else:
+            self.twist.angular.z = 0.6
+            self.twist.linear.x = 0
+            self.cmd_vel_pub.publish(self.twist)
 
     def returning(self):
         try:
