@@ -384,7 +384,8 @@ class Comp5(object):
 
     # LASERSCAN
     def scan_cb(self, msg):
-        self.range_ahead = msg.ranges[len(msg.ranges)/2]
+        if not (msg.ranges[len(msg.ranges)/2] != msg.ranges[len(msg.ranges)/2]):
+            self.range_ahead = msg.ranges[len(msg.ranges)/2]
         print self.range_ahead
 
     # TIMER
