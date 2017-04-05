@@ -183,12 +183,12 @@ class TemplateMatcher(object):
         img = imutils.resize(img, width = int(img.shape[1] * 0.5))
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         found = None
-        for scale in np.linspace(0.1, 1.0, 10)[::-1]:
+        for scale in np.linspace(0.1, 1.0, 15)[::-1]:
             resized = imutils.resize(gray, width = int(gray.shape[1] * scale))
             r = gray.shape[1] / float(resized.shape[1])
             if resized.shape[0] < self.th or resized.shape[1] < self.tw:
                 break
-            edged = cv2.Canny(resized, 70, 250)
+            edged = cv2.Canny(resized, 70, 250, 11)
             result = cv2.matchTemplate(edged, self.template, cv2.TM_CCOEFF_NORMED)
             (_, maxVal, _, maxLoc) = cv2.minMaxLoc(result)
             if found is None or maxVal > found[0]:
@@ -245,8 +245,8 @@ class SearchGoals(object):
 class Comp5(object):
     def __init__(self):
 
-        self.UA_Template_Tracker = TemplateMatcher("ua_small.png", 0.23)
-        self.AR_Template_Tracker = TemplateMatcher("ar_small.png", 0.32)
+        self.UA_Template_Tracker = TemplateMatcher("ua_small.png", 0.3)
+        self.AR_Template_Tracker = TemplateMatcher("ar_small.png", 0.35)
 
         self.UA_ORB_Tracker = OrbTracker("ua.png")
         self.AR_ORB_Tracker = OrbTracker("ar.png")
@@ -406,7 +406,9 @@ class Comp5(object):
     def turn_goal(self):
         turn = copy.deepcopy(self.pose)
         qo = np.array([turn.orientation.x, turn.orientation.y, turn.orientation.z, turn.orientation.w])
-        qz = tf.transformations.quaternion_about_axis(-3.14159/2.0, (0,0,1))
+        mid = (self.template_found_at[0] + self.template_found_at[2]) / 2.0
+        angle_offset = (160 - mid) / (3.14159 / 2.0)
+        qz = tf.transformations.quaternion_about_axis((-3.14159/2.0) + angle_offset, (0,0,1))
         q = tf.transformations.quaternion_multiply(qo, qz)
         turn.orientation.x = q[0]
         turn.orientation.y = q[1]
@@ -461,23 +463,23 @@ class Comp5(object):
             goal = self.turn_goal()
             self.say("Found One!")
             self.move.send_goal(goal)
-            self.move.wait_for_result(rospy.Duration.from_sec(10))
+            self.move.wait_for_result(rospy.Duration.from_sec(15))
             if self.goal_is_active():
                 self.move.cancel_goal()
                 self.state = "returning"
             else:
                 self.state = "docking"
-                self.time_lock = time.time() + 7
+                self.time_lock = time.time() + 10
                 self.say("Docking with target!")
 
 
     def docking(self):
         if time.time() < self.time_lock and self.range_ahead > 0:
             self.twist.angular.z = 0
-            self.twist.linear.x = 0.1
+            self.twist.linear.x = 0.4
             self.cmd_vel_pub.publish(self.twist)
         else:
-            
+
             self.say("Target Reached! beep boop beep boop.")
 
             self.pause_until = time.time() + 4.0
@@ -489,7 +491,7 @@ class Comp5(object):
             self.state = "returning"
         else:
             self.twist.angular.z = 0.6
-            self.twist.linear.x = 0
+            self.twist.linear.x = -0.1
             self.cmd_vel_pub.publish(self.twist)
 
     def returning(self):
