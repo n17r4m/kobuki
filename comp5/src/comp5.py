@@ -188,7 +188,7 @@ class TemplateMatcher(object):
             r = gray.shape[1] / float(resized.shape[1])
             if resized.shape[0] < self.th or resized.shape[1] < self.tw:
                 break
-            edged = cv2.Canny(resized, 100, 300)
+            edged = cv2.Canny(resized, 70, 250)
             result = cv2.matchTemplate(edged, self.template, cv2.TM_CCOEFF_NORMED)
             (_, maxVal, _, maxLoc) = cv2.minMaxLoc(result)
             if found is None or maxVal > found[0]:
@@ -468,7 +468,7 @@ class Comp5(object):
 
 
     def docking(self):
-        if time.time() < self.time_lock and self.range_ahead >= 0:
+        if time.time() < self.time_lock and self.range_ahead > 0:
             self.twist.angular.z = 0
             self.twist.linear.x = 0.1
             self.cmd_vel_pub.publish(self.twist)
