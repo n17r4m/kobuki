@@ -431,7 +431,7 @@ class Comp5(object):
             self.say("here we go!")
             rospy.sleep(1)
             self.time_out = time.time() + 60 * 5 # five minutes
-            self.time_loc = time.time() + 40
+            self.time_loc = time.time() + 20
             self.state = "localizing"
 
 
