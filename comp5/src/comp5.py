@@ -484,7 +484,7 @@ class Comp5(object):
             self.say("Returning to search!")
             self.state = "returning"
         else:
-            self.twist.angular.z = -0.2
+            self.twist.angular.z = 0.6
             self.twist.linear.x = 0
             self.cmd_vel_pub.publish(self.twist)
 
