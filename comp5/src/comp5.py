@@ -95,7 +95,7 @@ class OrbTracker(object):
         flann = cv2.FlannBasedMatcher(index_params, search_params)
         matches = flann.knnMatch(self.des, des, k=2)
 
-        store all the good matches as per Lowe's ratio test.
+        #store all the good matches as per Lowe's ratio test.
         good = []
         for m,n in matches:
             if m.distance < 0.75*n.distance:
