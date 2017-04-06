@@ -541,6 +541,6 @@ if __name__ == "__main__":
             UA.process(msg, match)
             AR.process(msg, match)
         UA = TemplateMatcher("ua_small.png", 0.4)
-        AR = TemplateMatcher("ar_small.png", 0.4)
+        AR = TemplateMatcher("ar_small.png", 0.2)
         rospy.Subscriber('/cv_camera/image_rect_color', Image, cam_cb)
     rospy.spin()
