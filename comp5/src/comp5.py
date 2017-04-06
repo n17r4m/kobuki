@@ -530,7 +530,7 @@ def goal_pose(pose):
 if __name__ == "__main__":
     rospy.init_node('Comp5')
     
-    if True:
+    if False:
         Comp5 = Comp5()
     else:
         def match(x1, y1, x2, y2, name, val):
@@ -540,7 +540,7 @@ if __name__ == "__main__":
             global AR
             UA.process(msg, match)
             AR.process(msg, match)
-        UA = TemplateMatcher("ua_small.png", 0.4)
-        AR = TemplateMatcher("ar_small.png", 0.4)
+        UA = TemplateMatcher("ua_small.png", 0.2)
+        AR = TemplateMatcher("ar_small.png", 0.5)
         rospy.Subscriber('/cv_camera/image_rect_color', Image, cam_cb)
     rospy.spin()
