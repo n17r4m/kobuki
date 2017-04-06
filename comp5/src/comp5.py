@@ -198,11 +198,11 @@ class TemplateMatcher(object):
         (endX, endY) = (int((maxLoc[0] + self.tw) * r), int((maxLoc[1] + self.th) * r))
         
         if maxVal > self.threshold:
-            cv2.rectangle(img, (startX, startY), (endX, endY), (0, 0, 255), 2)
+            #cv2.rectangle(img, (startX, startY), (endX, endY), (0, 0, 255), 2)
             found_cb(startX, startY, endX, endY, self.name, maxVal)
             
-        cv2.imshow(self.name, img)
-        cv2.waitKey(1)
+        #cv2.imshow(self.name, img)
+        #cv2.waitKey(1)
 
 class SearchGoals(object):
     def __init__(self):
@@ -530,7 +530,7 @@ def goal_pose(pose):
 if __name__ == "__main__":
     rospy.init_node('Comp5')
     
-    if False:
+    if True:
         Comp5 = Comp5()
     else:
         def match(x1, y1, x2, y2, name, val):
