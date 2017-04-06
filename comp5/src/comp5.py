@@ -198,11 +198,11 @@ class TemplateMatcher(object):
         (endX, endY) = (int((maxLoc[0] + self.tw) * r), int((maxLoc[1] + self.th) * r))
         
         if maxVal > self.threshold:
-            #cv2.rectangle(img, (startX, startY), (endX, endY), (0, 0, 255), 2)
+            cv2.rectangle(img, (startX, startY), (endX, endY), (0, 0, 255), 2)
             found_cb(startX, startY, endX, endY, self.name, maxVal)
             
-        #cv2.imshow(self.name, img)
-        #cv2.waitKey(1)
+        cv2.imshow(self.name, img)
+        cv2.waitKey(1)
 
 class SearchGoals(object):
     def __init__(self):
@@ -212,15 +212,15 @@ class SearchGoals(object):
             # in front of elevator, facing east
             {"position": {"x": -5.31, "y": 0.3, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}},
             # south east corner, facing north
-            {"position": {"x": -0.20, "y": 0.3, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.707, "w": 0.707}},
+            {"position": {"x": -0.20, "y": -0.2, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.707, "w": 0.707}},
             # north east corner, facing west
             {"position": {"x": -0.20, "y": 4.17, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": -1.0, "w": 0.0}},
             # in front of garbage, facing west
             {"position": {"x": -4.56, "y": 3.65, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": -1.0, "w": 0.0}},
             # north west corner, facing south
-            {"position": {"x": -10.89, "y": 3.73, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": -0.707, "w": 0.707}},
+            {"position": {"x": -10, "y": 3.73, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": -0.707, "w": 0.707}},
             # south west corner, facing east
-            {"position": {"x": -10.45, "y": -0.34, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}},
+            {"position": {"x": -10, "y": -0.34, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}},
             # in front of elevator (again), facing east
             #{"position": {"x": -5.51, "y": 0.15, z: 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}},
             ]
