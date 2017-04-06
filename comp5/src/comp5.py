@@ -477,7 +477,7 @@ class Comp5(object):
 
 
     def docking(self):
-        if time.time() < self.time_lock and self.range_ahead > 0.3:
+        if time.time() < self.time_lock and self.range_ahead > 0.7:
             self.twist.angular.z = 0
             self.twist.linear.x = 0.4
             self.cmd_vel_pub.publish(self.twist)
