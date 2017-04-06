@@ -189,7 +189,7 @@ class TemplateMatcher(object):
             if resized.shape[0] < self.th or resized.shape[1] < self.tw:
                 break
             edged = cv2.Canny(resized, 70, 250, 7)
-            result = cv2.matchTemplate(edged, self.template, cv2.TM_SQDIFF)
+            result = cv2.matchTemplate(edged, self.template, cv2.TM_CCORR_NORMED)
             (_, maxVal, _, maxLoc) = cv2.minMaxLoc(result)
             if found is None or maxVal > found[0]:
                 found = (maxVal, maxLoc, r)
@@ -540,7 +540,7 @@ if __name__ == "__main__":
             global AR
             UA.process(msg, match)
             AR.process(msg, match)
-        UA = TemplateMatcher("ua_small.png", 74000000.0)
-        AR = TemplateMatcher("ar_small.png", 85000000.0)
+        UA = TemplateMatcher("ua_small.png", 0.2)
+        AR = TemplateMatcher("ar_small.png", 0.2)
         rospy.Subscriber('/cv_camera/image_rect_color', Image, cam_cb)
     rospy.spin()
