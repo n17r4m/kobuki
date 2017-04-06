@@ -503,7 +503,7 @@ class Comp5(object):
         else:
             if time.time() > self.pause_until - 2.0:
                 self.twist.angular.z = 0.3
-                self.twist.linear.x = -0.3
+                self.twist.linear.x = -0.5
                 self.cmd_vel_pub.publish(self.twist)
             else:
                 pass
