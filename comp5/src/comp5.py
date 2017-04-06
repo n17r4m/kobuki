@@ -409,7 +409,7 @@ class Comp5(object):
         qo = np.array([turn.orientation.x, turn.orientation.y, turn.orientation.z, turn.orientation.w])
         #mid = (self.template_found_at[0] + self.template_found_at[2]) / 2.0
         #angle_offset = (160 - mid) / 200
-        qz = tf.transformations.quaternion_about_axis((-3.14159/2.0 + 0.0), (0,0,1))
+        qz = tf.transformations.quaternion_about_axis((-3/2.0 + 0.0), (0,0,1))
         q = tf.transformations.quaternion_multiply(qo, qz)
 
         
