@@ -321,7 +321,7 @@ class Comp5(object):
 
     def found_webcam_match(self, x1, y1, x2, y2, name, val):
         print "FOUND A TARGET:", x1, y1, x2, y2, name, val
-        if x1 > 5:
+        if x1 > 3:
             self.t_matches += 1
             if self.t_matches > 3:
                 if name == "ua_small.png":
@@ -530,7 +530,7 @@ def goal_pose(pose):
 if __name__ == "__main__":
     rospy.init_node('Comp5')
     
-    if False:
+    if True:
         Comp5 = Comp5()
     else:
         def match(x1, y1, x2, y2, name, val):
@@ -540,7 +540,7 @@ if __name__ == "__main__":
             global AR
             UA.process(msg, match)
             AR.process(msg, match)
-        UA = TemplateMatcher("ua_small.png", 0.2)
-        AR = TemplateMatcher("ar_small.png", 0.5)
+        UA = TemplateMatcher("ua_small.png", 0.4)
+        AR = TemplateMatcher("ar_small.png", 0.4)
         rospy.Subscriber('/cv_camera/image_rect_color', Image, cam_cb)
     rospy.spin()
