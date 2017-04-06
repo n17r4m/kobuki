@@ -485,7 +485,7 @@ class Comp5(object):
 
             self.say("Target Reached! beep boop beep boop.")
 
-            self.pause_until = time.time() + 4.0
+            self.pause_until = time.time() + 6.0
             self.state = "pausing"
 
     def pausing(self):
@@ -493,9 +493,12 @@ class Comp5(object):
             self.say("Returning to search!")
             self.state = "returning"
         else:
-            self.twist.angular.z = 0.6
-            self.twist.linear.x = -0.1
-            self.cmd_vel_pub.publish(self.twist)
+            if time.time() > self.pause_until - 2.0:
+                self.twist.angular.z = 0.6
+                self.twist.linear.x = -0.1
+                self.cmd_vel_pub.publish(self.twist)
+            else:
+                pass
 
     def returning(self):
         try:
