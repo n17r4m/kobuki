@@ -412,7 +412,7 @@ class Comp5(object):
         qz = tf.transformations.quaternion_about_axis((-3.14159/2.0 + 0.0), (0,0,1))
         q = tf.transformations.quaternion_multiply(qo, qz)
 
-        print "Values: ", mid, " ", angle_offset, " ", qz, " "
+        
         turn.orientation.x = q[0]
         turn.orientation.y = q[1]
         turn.orientation.z = q[2]
