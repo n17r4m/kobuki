@@ -218,9 +218,9 @@ class SearchGoals(object):
             # in front of garbage, facing west
             {"position": {"x": -4.56, "y": 3.65, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": -1.0, "w": 0.0}},
             # north west corner, facing south
-            {"position": {"x": -10, "y": 3.73, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": -0.707, "w": 0.707}},
+            {"position": {"x": -10.25, "y": 3.73, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": -0.707, "w": 0.707}},
             # south west corner, facing east
-            {"position": {"x": -10, "y": -0.34, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}},
+            {"position": {"x": -10.25, "y": -0.34, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}},
             # in front of elevator (again), facing east
             #{"position": {"x": -5.51, "y": 0.15, z: 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}},
             ]
