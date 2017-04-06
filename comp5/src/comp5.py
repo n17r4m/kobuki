@@ -253,6 +253,18 @@ class Comp5(object):
         self.time_loc = time.time() + 3600
         self.time_wait_search = time.time()
         self.t = 0
+        self.state = "waiting"
+        self.found = None
+        self.vec_measures = 0
+        self.tvecs = None
+        self.rvecs = None
+
+        self.t_matches = 0
+
+
+        self.goals = SearchGoals()
+        self.sound = SoundClient()  # blocking = False by default
+
         
         self.UA_Template_Tracker = TemplateMatcher("ua_small.png", 0.4)
         self.AR_Template_Tracker = TemplateMatcher("ar_small.png", 0.4)
@@ -283,19 +295,9 @@ class Comp5(object):
             pausing    (easter egg reached, pause for 3 sec)
             returning  (moving back to last position before turn + dock)
         """
-        self.state = "waiting"
-        self.found = None
-        self.vec_measures = 0
-        self.tvecs = None
-        self.rvecs = None
-
-        self.t_matches = 0
-
+        
         self.cmd_vel_pub = rospy.Publisher('cmd_vel_mux/input/navi', Twist, queue_size=1)
         
-
-        self.goals = SearchGoals()
-        self.sound = SoundClient()  # blocking = False by default
         
         rospy.sleep(1)
 
