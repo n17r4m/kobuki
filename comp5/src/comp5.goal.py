@@ -95,7 +95,7 @@ class OrbTracker(object):
         flann = cv2.FlannBasedMatcher(index_params, search_params)
         matches = flann.knnMatch(self.des, des, k=2)
 
-        #store all the good matches as per Lowe's ratio test.
+        store all the good matches as per Lowe's ratio test.
         good = []
         for m,n in matches:
             if m.distance < 0.75*n.distance:
@@ -183,26 +183,27 @@ class TemplateMatcher(object):
         img = imutils.resize(img, width = int(img.shape[1] * 0.5))
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         found = None
-        for scale in np.linspace(0.1, 1.0, 15)[::-1]:
+        for scale in np.linspace(0.1, 1.0, 10)[::-1]:
             resized = imutils.resize(gray, width = int(gray.shape[1] * scale))
             r = gray.shape[1] / float(resized.shape[1])
             if resized.shape[0] < self.th or resized.shape[1] < self.tw:
                 break
-            edged = cv2.Canny(resized, 70, 250, 5)
-            result = cv2.matchTemplate(edged, self.template, cv2.TM_CCORR_NORMED)
+            edged = cv2.Canny(resized, 100, 300)
+            result = cv2.matchTemplate(edged, self.template, cv2.TM_CCOEFF_NORMED)
             (_, maxVal, _, maxLoc) = cv2.minMaxLoc(result)
             if found is None or maxVal > found[0]:
                 found = (maxVal, maxLoc, r)
         (maxVal, maxLoc, r) = found
         (startX, startY) = (int(maxLoc[0] * r), int(maxLoc[1] * r))
         (endX, endY) = (int((maxLoc[0] + self.tw) * r), int((maxLoc[1] + self.th) * r))
-        
-        if maxVal > self.threshold:
-            #cv2.rectangle(img, (startX, startY), (endX, endY), (0, 0, 255), 2)
-            found_cb(startX, startY, endX, endY, self.name, maxVal)
-            
+        cv2.rectangle(img, (startX, startY), (endX, endY), (0, 0, 255), 2)
         #cv2.imshow(self.name, img)
         #cv2.waitKey(1)
+        if self.name == "ar_small.png":
+            print maxVal
+        if maxVal > self.threshold:
+            found_cb(startX, startY, endX, endY, self.name)
+
 
 class SearchGoals(object):
     def __init__(self):
@@ -212,15 +213,15 @@ class SearchGoals(object):
             # in front of elevator, facing east
             {"position": {"x": -5.31, "y": 0.3, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}},
             # south east corner, facing north
-            {"position": {"x": -0.20, "y": -0.2, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.707, "w": 0.707}},
+            {"position": {"x": -0.20, "y": 0.3, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.707, "w": 0.707}},
             # north east corner, facing west
             {"position": {"x": -0.20, "y": 4.17, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": -1.0, "w": 0.0}},
             # in front of garbage, facing west
             {"position": {"x": -4.56, "y": 3.65, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": -1.0, "w": 0.0}},
             # north west corner, facing south
-            {"position": {"x": -10.25, "y": 3.73, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": -0.707, "w": 0.707}},
+            {"position": {"x": -10.89, "y": 3.73, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": -0.707, "w": 0.707}},
             # south west corner, facing east
-            {"position": {"x": -10.25, "y": -0.34, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}},
+            {"position": {"x": -10.45, "y": -0.34, "z": 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}},
             # in front of elevator (again), facing east
             #{"position": {"x": -5.51, "y": 0.15, z: 0.0}, "orientation": {"x": 0.0, "y": 0.0, "z": 0.0, "w": 1.0}},
             ]
@@ -244,8 +245,8 @@ class SearchGoals(object):
 class Comp5(object):
     def __init__(self):
 
-        self.UA_Template_Tracker = TemplateMatcher("ua_small.png", 0.4)
-        self.AR_Template_Tracker = TemplateMatcher("ar_small.png", 0.4)
+        self.UA_Template_Tracker = TemplateMatcher("ua_small.png", 0.23)
+        self.AR_Template_Tracker = TemplateMatcher("ar_small.png", 0.32)
 
         self.UA_ORB_Tracker = OrbTracker("ua.png")
         self.AR_ORB_Tracker = OrbTracker("ar.png")
@@ -319,9 +320,9 @@ class Comp5(object):
                 self.UA_Template_Tracker.process(msg, self.found_webcam_match)
                 self.AR_Template_Tracker.process(msg, self.found_webcam_match)
 
-    def found_webcam_match(self, x1, y1, x2, y2, name, val):
-        print "FOUND A TARGET:", x1, y1, x2, y2, name, val
-        if x1 > 3:
+    def found_webcam_match(self, x1, y1, x2, y2, name):
+        print "FOUND A TARGET:", x1, y1, x2, y2, name
+        if x1 > 5:
             self.t_matches += 1
             if self.t_matches > 3:
                 if name == "ua_small.png":
@@ -346,13 +347,11 @@ class Comp5(object):
         self.AR_ORB_Tracker.D = np.array(msg.D)
 
     def kinect_cb(self, msg):
-        """
         if self.state == "locking":
             if self.found == "ua":
                 self.UA_ORB_Tracker.process(msg, self.found_kinect_match)
             if self.found == "ar":
                 self.AR_ORB_Tracker.process(msg, self.found_kinect_match)
-        """
 
     def found_kinect_match(self, rvecs, tvecs, name):
         measures_needed = 50.0
@@ -387,9 +386,7 @@ class Comp5(object):
     def scan_cb(self, msg):
         if not (msg.ranges[len(msg.ranges)/2] != msg.ranges[len(msg.ranges)/2]):
             self.range_ahead = msg.ranges[len(msg.ranges)/2]
-        else:
-            self.range_ahead = 0
-        #print self.range_ahead
+        print self.range_ahead
 
     # TIMER
 
@@ -407,12 +404,8 @@ class Comp5(object):
     def turn_goal(self):
         turn = copy.deepcopy(self.pose)
         qo = np.array([turn.orientation.x, turn.orientation.y, turn.orientation.z, turn.orientation.w])
-        #mid = (self.template_found_at[0] + self.template_found_at[2]) / 2.0
-        #angle_offset = (160 - mid) / 200
-        qz = tf.transformations.quaternion_about_axis((-3.1/2.0 + 0.0), (0,0,1))
+        qz = tf.transformations.quaternion_about_axis(-3.14159/2.0, (0,0,1))
         q = tf.transformations.quaternion_multiply(qo, qz)
-
-        
         turn.orientation.x = q[0]
         turn.orientation.y = q[1]
         turn.orientation.z = q[2]
@@ -436,19 +429,19 @@ class Comp5(object):
             self.say("here we go!")
             rospy.sleep(1)
             self.time_out = time.time() + 60 * 5 # five minutes
-            self.time_loc = time.time() + 20
+            self.time_loc = time.time() + 40
             self.state = "localizing"
 
 
     def localizing(self):
         if time.time() < self.time_loc:
             if self.range_ahead > 2.0:
-                self.twist.angular.z = (self.twist.angular.z + math.sin(time.time()/2.0) / 2.0) / 2.0
-                self.twist.linear.x = (4.0 * self.twist.linear.x + 0.5) / 5.0
+                self.twist.angular.z = 0.1
+                self.twist.linear.x = 0.2
                 self.cmd_vel_pub.publish(self.twist)
             else:
-                self.twist.angular.z = (self.twist.angular.z + 0.5) / 2.0
-                self.twist.linear.x = (self.twist.linear.x + 0.0) / 2.0
+                self.twist.angular.z = 0.3
+                self.twist.linear.x = 0
                 self.cmd_vel_pub.publish(self.twist)
         else:
             print "Finish localization"
@@ -466,45 +459,93 @@ class Comp5(object):
             goal = self.turn_goal()
             self.say("Found One!")
             self.move.send_goal(goal)
-            self.move.wait_for_result(rospy.Duration.from_sec(15))
-            if self.goal_is_active():
-                self.move.cancel_goal()
-                self.state = "returning"
-            else:
-                self.state = "docking"
-                self.time_lock = time.time() + 10
-                self.say("Docking with target!")
+            self.move.wait_for_result()
+            self.state = "locking"
+            self.time_lock = time.time() + 7
+            self.say("Locking on to target!")
+
+
+    def locking(self):
+        if time.time() < self.time_lock:
+            self.twist.angular.z = 0
+            self.twist.linear.x = 0.05
+            self.cmd_vel_pub.publish(self.twist)
+        else:
+            self.say("Giving Up!")
+            self.state = "returning"
 
 
     def docking(self):
-        if time.time() < self.time_lock and self.range_ahead > 0.3:
-            self.twist.angular.z = 0
-            self.twist.linear.x = 0.4
-            self.cmd_vel_pub.publish(self.twist)
-        else:
+        if not self.goal_is_active():
+            pose = copy.deepcopy(self.pose)
+            q = np.array([pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w])
+            euler = tf.transformations.euler_from_quaternion(q)
+            #roll = euler[0]
+            #pitch = euler[1]
+            yaw = euler[2]
+            xdist = self.tvecs[0] + 0.1
+            zdist = self.tvecs[2] - 0.3
+
+            # I think this is correct / not tested...
+            x_offset = zdist * math.cos(yaw)
+            y_offset = zdist * math.sin(yaw)
+
+            # sin/cos may be reversed here / not tested...
+            x_offset += xdist * math.cos(yaw)
+            y_offset += xdist * math.sin(yaw)
+
+            print x_offset, y_offset
+
+            pose.position.x += x_offset
+            pose.position.y += y_offset
+            goal = goal_pose(pose)
+            self.move.send_goal(goal)
+            self.move.wait_for_result()
 
             self.say("Target Reached! beep boop beep boop.")
 
-            self.pause_until = time.time() + 6.0
+            self.pause_until = time.time() + 4
             self.state = "pausing"
+
+        print self.tvecs
+        """
+        #self.twist.angular.z = - theta[0]  * 180 / 3.1415 / 10
+        #self.twist.linear.x = (dist[-1]- 15) / 100
+        z = 0
+        if rvec[0] > 0.2:
+            tvec[0] -= 6
+        elif rvec[0] < -0.2:
+            tvec[0] += 6
+
+        if 0 > tvec[0]:
+            z = 0.2
+        elif 0 < tvec[0]:
+            z = -0.2
+        else:
+            z = 0
+
+
+        if tvec[-1] > 10:
+            x = 0.2
+        else:
+            x = 0
+
+        self.twist.angular.z = (3*self.twist.angular.z + z) / 4
+        self.twist.linear.x = (3*self.twist.linear.x + x) / 4
+
+        self.cmd_vel_pub.publish(self.twist)
+        """
 
     def pausing(self):
         if time.time() > self.pause_until:
             self.say("Returning to search!")
             self.state = "returning"
-        else:
-            if time.time() > self.pause_until - 2.0:
-                self.twist.angular.z = 0.3
-                self.twist.linear.x = -0.3
-                self.cmd_vel_pub.publish(self.twist)
-            else:
-                pass
 
     def returning(self):
         try:
             self.goals.reset_goal()
             self.say("Resuming Search!")
-            self.time_wait_search = time.time() + 7.0
+            self.time_wait_search = time.time() + 15
             self.state = "searching"
         except rospy.ROSInterruptException:
             pass
@@ -532,18 +573,6 @@ def goal_pose(pose):
 
 if __name__ == "__main__":
     rospy.init_node('Comp5')
-    
-    if True:
-        Comp5 = Comp5()
-    else:
-        def match(x1, y1, x2, y2, name, val):
-            print name, (x1 + x2) / 2.0, val
-        def cam_cb(msg):
-            global UA
-            global AR
-            UA.process(msg, match)
-            AR.process(msg, match)
-        UA = TemplateMatcher("ua_small.png", 0.4)
-        AR = TemplateMatcher("ar_small.png", 0.4)
-        rospy.Subscriber('/cv_camera/image_rect_color', Image, cam_cb)
+    Comp5 = Comp5()
+    #set_interval(Comp5.tick, 0.1)
     rospy.spin()
