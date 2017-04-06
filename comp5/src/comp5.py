@@ -252,6 +252,7 @@ class Comp5(object):
         self.time_lock = time.time() + 3600
         self.time_loc = time.time() + 3600
         self.time_wait_search = time.time()
+        self.t = 0
         
         self.UA_Template_Tracker = TemplateMatcher("ua_small.png", 0.4)
         self.AR_Template_Tracker = TemplateMatcher("ar_small.png", 0.4)
@@ -295,7 +296,7 @@ class Comp5(object):
 
         self.goals = SearchGoals()
         self.sound = SoundClient()  # blocking = False by default
-
+        
         rospy.sleep(1)
 
         self.move = actionlib.SimpleActionClient('move_base', MoveBaseAction)
@@ -318,8 +319,11 @@ class Comp5(object):
     def webcam_cb(self, msg):
         if self.state == "searching":
             if time.time() > self.time_wait_search:
-                self.UA_Template_Tracker.process(msg, self.found_webcam_match)
-                self.AR_Template_Tracker.process(msg, self.found_webcam_match)
+                self.t += 1
+                if self.t % 2:
+                    self.UA_Template_Tracker.process(msg, self.found_webcam_match)
+                else:
+                    self.AR_Template_Tracker.process(msg, self.found_webcam_match)
 
     def found_webcam_match(self, x1, y1, x2, y2, name, val):
         print "FOUND A TARGET:", x1, y1, x2, y2, name, val
